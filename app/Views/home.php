@@ -587,7 +587,7 @@ opacity:1;
     </section>
     <!-- /Hero Section -->
    <!-- Home About Section -->
-   <section id="home-about" class="home-about section">
+  <?php /* <section id="home-about" class="home-about section">
     <div class="container" data-aos="fade-up">
         <div class="row align-items-center">
             <!-- Left Content -->
@@ -662,6 +662,8 @@ opacity:1;
         </div>
     </div>
 </section>
+
+*/ ?>
 <!-- /Home About Section -->
 <!-- Featured Departments Section -->
 <section id="featured-departments" class="featured-departments section">
