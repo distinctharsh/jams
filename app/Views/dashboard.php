@@ -1201,10 +1201,6 @@
   }
   
   document.addEventListener('DOMContentLoaded', function() {
-    <?php if (session()->getFlashdata('show_view_request')): ?>
-      showPage('view-request');
-    <?php endif; ?>
-    
     // Update request count in sidebar
     setTimeout(function() {
       const requestCount = document.querySelectorAll('#requests table tbody tr').length;

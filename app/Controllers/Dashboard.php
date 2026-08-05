@@ -103,18 +103,7 @@ class Dashboard extends BaseController
             return redirect()->to(base_url('dashboard'));
         }
         
-        session()->set('current_request', $request);
         return redirect()->to(base_url('dashboard'));
-    }
-    
-    public function viewRequests()
-    {
-        if (!session()->get('isLoggedIn')) {
-            return redirect()->to(base_url('/'));
-        }
-        
-        $data['requests'] = $this->requestModel->getAllRequests();
-        return view('pages/requests-content', $data);
     }
     
     public function getRequest($id)
