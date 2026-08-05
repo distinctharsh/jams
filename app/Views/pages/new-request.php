@@ -194,15 +194,15 @@
                     </h3>
                     <div class="space-y-2 bg-slate-50 p-4 rounded-lg border border-slate-200">
                         <label class="flex items-start gap-2 cursor-pointer">
-                            <input type="checkbox" checked class="mt-1 w-4 h-4 text-[#1e4d7b] rounded border-slate-300 focus:ring-[#1e4d7b]">
+                            <input type="checkbox" name="declarations[]" value="security" class="mt-1 w-4 h-4 text-[#1e4d7b] rounded border-slate-300 focus:ring-[#1e4d7b]">
                             <span class="text-xs text-slate-700 font-medium">Adequate security arrangements are available at the site.</span>
                         </label>
                         <label class="flex items-start gap-2 cursor-pointer">
-                            <input type="checkbox" checked class="mt-1 w-4 h-4 text-[#1e4d7b] rounded border-slate-300 focus:ring-[#1e4d7b]">
+                            <input type="checkbox" name="declarations[]" value="deployment" class="mt-1 w-4 h-4 text-[#1e4d7b] rounded border-slate-300 focus:ring-[#1e4d7b]">
                             <span class="text-xs text-slate-700 font-medium">Each and every jammer will be deployed and accounted for.</span>
                         </label>
                         <label class="flex items-start gap-2 cursor-pointer">
-                            <input type="checkbox" checked class="mt-1 w-4 h-4 text-[#1e4d7b] rounded border-slate-300 focus:ring-[#1e4d7b]">
+                            <input type="checkbox" name="declarations[]" value="non_interference" class="mt-1 w-4 h-4 text-[#1e4d7b] rounded border-slate-300 focus:ring-[#1e4d7b]">
                             <span class="text-xs text-slate-700 font-medium">Deployment will not interfere with public mobile communications outside venue premises.</span>
                         </label>
                     </div>
