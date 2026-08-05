@@ -15,3 +15,5 @@ $routes->get('logout', 'Auth::logout');
 $routes->get('dashboard', 'Dashboard::index');
 $routes->get('new-request', 'Dashboard::newRequest');
 $routes->post('dashboard/submit-request', 'Dashboard::submitRequest');
+$routes->get('dashboard/view-request/(:num)', 'Dashboard::viewRequest/$1');
+$routes->get('dashboard/get-request/(:num)', 'Dashboard::getRequest/$1');

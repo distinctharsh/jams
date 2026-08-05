@@ -24,7 +24,7 @@
                     </h5>
                     <small class="text-white-50 text-center">
                         Register yourself to access the<br>
-                        JAMAR Allocation Management System
+                        JAMAR Approval Management System
                     </small>
                 </div>
                 <!-- Right Panel -->

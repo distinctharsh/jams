@@ -219,12 +219,9 @@
             </div>
 
         </form>
-            </div>
-
-        </form>
     </div>
 
-    <div class="space-y-6">
+    <div class="space-y-6 py-6">
         <div class="gov-card p-6">
             <h3 class="text-base font-bold text-[#1e4d7b] mb-4 flex items-center justify-between">
                 <span>Submission progress</span>

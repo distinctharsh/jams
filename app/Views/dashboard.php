@@ -1145,6 +1145,11 @@
 .page-content.active {
     display: block;
 }
+
+
+.timeline-comment{
+    font-size:12px;
+}
   </style>
 </head>
 <body>
@@ -1170,23 +1175,19 @@
   
   // SPA Navigation - Show pages without refresh
   function showPage(pageId) {
-    // Hide all pages
     document.querySelectorAll('.page-content').forEach(page => {
       page.classList.remove('active');
     });
     
-    // Show selected page
     const selectedPage = document.getElementById(pageId);
     if (selectedPage) {
       selectedPage.classList.add('active');
     }
     
-    // Update sidebar active state
     document.querySelectorAll('.gov-sidebar .nav-item').forEach(item => {
       item.classList.remove('active');
     });
     
-    // Find and activate the corresponding nav item based on pageId
     const navItems = document.querySelectorAll('.gov-sidebar .nav-item');
     navItems.forEach(item => {
       if (item.getAttribute('onclick') && item.getAttribute('onclick').includes(pageId)) {
@@ -1194,11 +1195,25 @@
       }
     });
     
-    // Prevent default link behavior
     if (event) {
       event.preventDefault();
     }
   }
+  
+  document.addEventListener('DOMContentLoaded', function() {
+    <?php if (session()->getFlashdata('show_view_request')): ?>
+      showPage('view-request');
+    <?php endif; ?>
+    
+    // Update request count in sidebar
+    setTimeout(function() {
+      const requestCount = document.querySelectorAll('#requests table tbody tr').length;
+      const requestBadge = document.getElementById('request-count');
+      if (requestBadge) {
+        requestBadge.textContent = requestCount;
+      }
+    }, 100);
+  });
   
   // filter chips (toggle active)
   document.querySelectorAll('.filter-chip').forEach(chip => {

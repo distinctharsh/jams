@@ -62,8 +62,8 @@ class CreateRequestsTable extends Migration
                 'null' => true,
             ],
             'status' => [
-                'type' => 'ENUM',
-                'constraint' => ['pending', 'approved', 'rejected', 'completed'],
+                'type' => 'VARCHAR',
+                'constraint' => 20,
                 'default' => 'pending',
             ],
             'created_by' => [

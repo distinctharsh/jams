@@ -10,7 +10,7 @@
             <i class="fas fa-calendar-check"></i>
             <span>New Request</span>
         </a>
-        <a href="#" class="nav-item" onclick="showPage('requests')"><i class="fas fa-clipboard-list"></i> Requests <span class="badge">42</span></a>
+        <a href="#" class="nav-item" onclick="showPage('requests')"><i class="fas fa-clipboard-list"></i> Requests <span class="badge" id="request-count">0</span></a>
         <a href="#" class="nav-item" onclick="showPage('users')"><i class="fas fa-users"></i> Users</a>
         <a href="#" class="nav-item" onclick="showPage('analytics')"><i class="fas fa-chart-simple"></i> Analytics</a>
         <div class="text-[9px] font-bold text-slate-400 uppercase tracking-wider px-3 mt-6 mb-2">System</div>
@@ -34,7 +34,12 @@
     
     <!-- Requests Content -->
     <div id="requests" class="page-content">
-        <?php include APPPATH.'Views/pages/requests-content.php'; ?>
+        <?php 
+        $requestModel = new \App\Models\RequestModel();
+        $requestData['requests'] = $requestModel->getAllRequests();
+        $requestCount = count($requestData['requests']);
+        echo view('pages/requests-content', $requestData);
+        ?>
     </div>
     
     <!-- Users Content -->
@@ -55,6 +60,18 @@
     <!-- Audit Log Content -->
     <div id="audit-log" class="page-content">
         <?php include APPPATH.'Views/pages/audit-log.php'; ?>
+    </div>
+    
+    <!-- View Request Content -->
+    <div id="view-request" class="page-content">
+        <div id="view-request-content">
+            <?php 
+            if (session()->getFlashdata('show_view_request') && session()->getFlashdata('current_request')) {
+                $requestData['request'] = session()->getFlashdata('current_request');
+                echo view('pages/view-request', $requestData);
+            }
+            ?>
+        </div>
     </div>
   </div>
 </div>

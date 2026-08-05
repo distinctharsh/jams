@@ -25,7 +25,7 @@
                         <hr class="my-4 border-light opacity-50 w-75">
                         <p class="text-white mb-0">
                             <strong>JAMS</strong><br>
-                            JAMAR Allocation Management System
+                            JAMAR Approval Management System
                         </p>
                         <small class="mt-3 d-block text-white">
                             Secure • Transparent • Digital Governance

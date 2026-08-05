@@ -76,6 +76,11 @@ class Dashboard extends BaseController
             try {
                 $requestId = $this->requestModel->createRequest($data);
                 session()->setFlashdata('success', 'Request submitted successfully! Request ID: #' . str_pad($requestId, 4, '0', STR_PAD_LEFT));
+
+                $request = $this->requestModel->getRequestById($requestId);
+                session()->setFlashdata('current_request', $request);
+                session()->setFlashdata('show_view_request', true);
+                
                 return redirect()->to(base_url('dashboard'));
             } catch (\Exception $e) {
                 session()->setFlashdata('error', 'Error submitting request: ' . $e->getMessage());
@@ -86,14 +91,43 @@ class Dashboard extends BaseController
         return redirect()->to(base_url('dashboard'));
     }
     
+    public function viewRequest($id)
+    {
+        if (!session()->get('isLoggedIn')) {
+            return redirect()->to(base_url('/'));
+        }
+        
+        $request = $this->requestModel->getRequestById($id);
+        if (!$request) {
+            session()->setFlashdata('error', 'Request not found');
+            return redirect()->to(base_url('dashboard'));
+        }
+        
+        session()->set('current_request', $request);
+        return redirect()->to(base_url('dashboard'));
+    }
+    
     public function viewRequests()
     {
-        // Check login
         if (!session()->get('isLoggedIn')) {
             return redirect()->to(base_url('/'));
         }
         
         $data['requests'] = $this->requestModel->getAllRequests();
         return view('pages/requests-content', $data);
+    }
+    
+    public function getRequest($id)
+    {
+        if (!session()->get('isLoggedIn')) {
+            return $this->response->setJSON(['success' => false, 'message' => 'Unauthorized']);
+        }
+        
+        $request = $this->requestModel->getRequestById($id);
+        if (!$request) {
+            return $this->response->setJSON(['success' => false, 'message' => 'Request not found']);
+        }
+        
+        return $this->response->setJSON(['success' => true, 'request' => $request]);
     }
 }
