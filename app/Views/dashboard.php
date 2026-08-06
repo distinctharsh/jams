@@ -789,7 +789,7 @@
 }
 
 .gov-card:hover{
-    transform:translateY(-4px);
+    /* transform:translateY(-4px); */
     box-shadow:0 20px 40px rgba(30,77,123,.18);
 }
 
