@@ -2,23 +2,25 @@
 <div class="flex flex-1 overflow-hidden">
   <!-- SIDEBAR -->
   <aside class="gov-sidebar">
-    <div>
-      <nav>
-         <div class="icon-btn sidebar-toggle-btn" onclick="toggleSidebar()">
+    <div class="sidebar-toggle-header">
+        <div class="icon-btn sidebar-toggle-btn" onclick="toggleSidebar()">
             <i class="fas fa-bars"></i>
         </div>
-        <div class="text-[9px] font-bold text-slate-400 uppercase tracking-wider px-3 mb-2">Main</div>
-        <a href="#" class="nav-item active" onclick="showPage('dashboard')"><i class="fas fa-gauge-high"></i> Dashboard</a>
+    </div>
+    <div>
+      <nav>
+        <div class="text-[9px] font-bold text-slate-400 uppercase tracking-wider px-3 mb-2 nav-label">Main</div>
+        <a href="#" class="nav-item active" onclick="showPage('dashboard')"><i class="fas fa-gauge-high"></i> <span>Dashboard</span></a>
         <a href="#" class="nav-item booking-btn" onclick="showPage('new-request')">
             <i class="fas fa-calendar-check"></i>
             <span>New Request</span>
         </a>
-        <a href="#" class="nav-item" onclick="showPage('requests')"><i class="fas fa-clipboard-list"></i> Requests <span class="badge" id="request-count">0</span></a>
-        <a href="#" class="nav-item" onclick="showPage('users')"><i class="fas fa-users"></i> Users</a>
-        <a href="#" class="nav-item" onclick="showPage('analytics')"><i class="fas fa-chart-simple"></i> Analytics</a>
-        <div class="text-[9px] font-bold text-slate-400 uppercase tracking-wider px-3 mt-6 mb-2">System</div>
-        <a href="#" class="nav-item" onclick="showPage('settings')"><i class="fas fa-sliders"></i> Settings</a>
-        <a href="#" class="nav-item" onclick="showPage('audit-log')"><i class="fas fa-shield-halved"></i> Audit Log</a>
+        <a href="#" class="nav-item" onclick="showPage('requests')"><i class="fas fa-clipboard-list"></i> <span>Requests <span class="badge" id="request-count">0</span></span></a>
+        <a href="#" class="nav-item" onclick="showPage('users')"><i class="fas fa-users"></i> <span>Users</span></a>
+        <a href="#" class="nav-item" onclick="showPage('analytics')"><i class="fas fa-chart-simple"></i> <span>Analytics</span></a>
+        <div class="text-[9px] font-bold text-slate-400 uppercase tracking-wider px-3 mt-6 mb-2 nav-label">System</div>
+        <a href="#" class="nav-item" onclick="showPage('settings')"><i class="fas fa-sliders"></i> <span>Settings</span></a>
+        <a href="#" class="nav-item" onclick="showPage('audit-log')"><i class="fas fa-shield-halved"></i> <span>Audit Log</span></a>
       </nav>
     </div>
   </aside>
