@@ -15,6 +15,9 @@
         <div class="icon-btn back-btn" onclick="history.back()">
             <i class="fas fa-arrow-left"></i>
         </div>
+        <div class="icon-btn sidebar-toggle-btn" onclick="toggleSidebar()">
+            <i class="fas fa-bars"></i>
+        </div>
         <button class="btn-orange" onclick="showPage('new-request')">
             <i class="fas fa-plus"></i> New Request
         </button>

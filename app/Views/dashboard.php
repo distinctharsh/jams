@@ -209,6 +209,28 @@
       box-shadow: 2px 0 12px rgba(0,0,0,0.02);
       height: 100%;
       overflow-y: auto;
+      transition: width 0.3s ease;
+    }
+    .gov-sidebar.collapsed {
+      width: 0;
+      padding: 0;
+      overflow: hidden;
+    }
+    .sidebar-toggle-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 36px;
+      height: 36px;
+      border-radius: 8px;
+      background: #f1f5f9;
+      color: #334155;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+    .sidebar-toggle-btn:hover {
+      background: #e2e8f0;
+      color: #1e4d7b;
     }
     .gov-sidebar .nav-item {
       display: flex;
@@ -1172,6 +1194,12 @@
       document.getElementById('dropdownMenu')?.classList.remove('show');
     }
   });
+  
+  // Sidebar toggle
+  function toggleSidebar() {
+    const sidebar = document.querySelector('.gov-sidebar');
+    sidebar.classList.toggle('collapsed');
+  }
   
   // SPA Navigation - Show pages without refresh
   function showPage(pageId) {
