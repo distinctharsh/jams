@@ -219,4 +219,14 @@ class Auth extends BaseController
         return redirect()->to(base_url('/'))
                          ->with('success', 'Logged out successfully');
     }
+
+    public function signup()
+    {
+        if (session()->has('username')) {
+            return redirect()->to(base_url('dashboard'));
+        }
+
+        $data['title'] = 'Sign Up - JAMS';
+        return view('auth/signup_page', $data);
+    }
 }

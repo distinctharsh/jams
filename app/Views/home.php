@@ -563,9 +563,12 @@ opacity:1;
                     <button class="btn btn-login" data-bs-toggle="modal" data-bs-target="#loginModal">
                         <i class="bi bi-box-arrow-in-right me-2"></i>Login
                     </button>
-                    <button class="btn btn-signup" data-bs-toggle="modal" data-bs-target="#signupModal">
+                    <!-- <button class="btn btn-signup" data-bs-toggle="modal" data-bs-target="#signupModal">
                         <i class="bi bi-person-plus me-2"></i>Sign Up
-                    </button>
+                    </button> -->
+                    <a href="<?= base_url('signup') ?>" class="btn btn-signup">
+                        <i class="bi bi-person-plus me-2"></i>Sign Up
+                    </a>
                 <?php endif; ?>
                 </div>
             </div>

@@ -7,6 +7,7 @@ $routes->get('/', 'Home::index');
 $routes->get('test-db', 'Test::index');
 
 // Auth Routes
+$routes->get('signup', 'Auth::signup');
 $routes->post('auth/checkLogin', 'Auth::checkLogin');
 $routes->post('auth/register', 'Auth::register');
 $routes->post('refresh-captcha', 'Auth::refreshCaptcha');
