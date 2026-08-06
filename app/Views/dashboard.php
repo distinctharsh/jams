@@ -42,18 +42,21 @@
       background: #1e4d7b;
       color: white;
       border-bottom: 3px solid #e58500;
-      padding: 0 2rem;
+      padding: 0 1.5rem;
       height: 80px; /* increased height for bigger branding */
       display: flex;
       align-items: center;
       justify-content: space-between;
       flex-shrink: 0;
       box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+      gap: 1rem;
     }
     .gov-header .brand {
       display: flex;
       align-items: center;
       gap: 12px;
+      min-width: 0;
+      flex-shrink: 1;
     }
     .gov-header .brand i {
       color: #e58500;
@@ -80,17 +83,21 @@
       display: flex;
       align-items: center;
       gap: 14px;
+      min-width: 0;
     }
     .emblem-wrapper img {
       height: 56px;  /* increased from 44px */
       width: auto;
       filter: brightness(0) invert(1);
       opacity: 0.95;
+      flex-shrink: 0;
     }
     .cabinet-text {
       display: flex;
       flex-direction: column;
       line-height: 1.2;
+      white-space: nowrap;
+      min-width: 0;
     }
     .cabinet-text .hindi {
       font-size: 1.1rem;    /* bigger */
@@ -117,6 +124,7 @@
       display: flex;
       align-items: center;
       gap: 1.2rem;
+      flex-shrink: 0;
     }
     .gov-header .header-actions .search-wrap {
       background: rgba(255,255,255,0.10);
@@ -1011,13 +1019,15 @@
     display:flex;
     align-items:center;
     justify-content:space-between;
-    min-width:220px;
-    padding:10px 16px;
+    min-width:0;
+    max-width:220px;
+    padding:8px 12px;
     background:#fff;
     border:1px solid #d9e2ec;
     border-radius:8px;
     cursor:pointer;
     transition:.2s;
+    gap:8px;
 }
 
 .profile-trigger:hover{
@@ -1029,24 +1039,31 @@
     display:flex;
     flex-direction:column;
     text-align:left;
+    overflow:hidden;
+    min-width:0;
 }
 
 .profile-name{
-    font-size:15px;
+    font-size:14px;
     font-weight:600;
     color:#1f2937;
     line-height:1.2;
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
 }
 
 .profile-role{
-    font-size:12px;
+    font-size:11px;
     color:#6b7280;
-    margin-top:2px;
+    margin-top:1px;
+    white-space:nowrap;
 }
 
 .profile-trigger i{
     color:#6b7280;
     font-size:12px;
+    flex-shrink:0;
 }
 
 .dropdown-menu-gov{
@@ -1118,16 +1135,16 @@
 }
 
 .profile-avatar{
-    width:42px;
-    height:42px;
+    width:38px;
+    height:38px;
     border-radius:50%;
-    background:#f59e0b;;
+    background:#f59e0b;
     border:1px solid #d7dee7;
     display:flex;
     align-items:center;
     justify-content:center;
     color:#1e4d7b;
-    font-size:18px;
+    font-size:16px;
     flex-shrink:0;
 }
 
@@ -1146,7 +1163,7 @@
 }
 
 .dropdown-arrow{
-    margin-left:12px;
+    margin-left:4px;
     color:#6b7280;
     font-size:12px;
 }
@@ -1163,6 +1180,7 @@
     cursor: pointer;
     transition: all .3s ease;
     box-shadow: 0 6px 18px rgba(13,110,253,.25);
+    flex-shrink: 0;
 }
 
 .back-btn i {
@@ -1191,10 +1209,33 @@
     display: block;
 }
 
-
 .timeline-comment{
     font-size:12px;
 }
+
+  @media(max-width:1200px){
+      .gov-header { padding: 0 1rem; }
+      .cabinet-text .hindi { font-size: 0.95rem; }
+      .cabinet-text .english { font-size: 1.05rem; }
+      .cabinet-text .gov-india { font-size: 0.62rem; }
+      .emblem-wrapper img { height: 46px; }
+  }
+
+  @media(max-width:992px){
+      .gov-header .header-actions { gap: 0.6rem; }
+      .profile-details { display: none; }
+      .dropdown-arrow { display: none; }
+      .profile-trigger { padding: 3px; border-radius: 50%; border: 2px solid #e58500; }
+  }
+
+  @media(max-width:768px){
+      .cabinet-text .gov-india { display: none; }
+      .cabinet-text .hindi { font-size: 0.85rem; }
+      .cabinet-text .english { font-size: 0.95rem; }
+      .emblem-wrapper img { height: 38px; }
+      .gov-table th, .gov-table td{ padding:12px; font-size:13px; }
+      .calendar-cell{ height:34px; font-size:11px; }
+  }
   </style>
 </head>
 <body>
@@ -1223,13 +1264,17 @@
     const sidebar = document.querySelector('.gov-sidebar');
     const toggleIcon = document.getElementById('toggleIcon');
     
-    sidebar.classList.toggle('collapsed');
-    if (sidebar.classList.contains('collapsed')) {
-      toggleIcon.classList.remove('fa-xmark');
-      toggleIcon.classList.add('fa-bars');
-    } else {
-      toggleIcon.classList.remove('fa-bars');
-      toggleIcon.classList.add('fa-xmark');
+    if (sidebar) {
+      sidebar.classList.toggle('collapsed');
+      if (toggleIcon) {
+        if (sidebar.classList.contains('collapsed')) {
+          toggleIcon.classList.remove('fa-xmark');
+          toggleIcon.classList.add('fa-bars');
+        } else {
+          toggleIcon.classList.remove('fa-bars');
+          toggleIcon.classList.add('fa-xmark');
+        }
+      }
     }
   }
   
@@ -1255,8 +1300,8 @@
       }
     });
     
-    if (event) {
-      event.preventDefault();
+    if (window.event) {
+      window.event.preventDefault();
     }
   }
   
