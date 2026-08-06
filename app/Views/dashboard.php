@@ -1221,7 +1221,16 @@
   // Sidebar toggle
   function toggleSidebar() {
     const sidebar = document.querySelector('.gov-sidebar');
+    const toggleIcon = document.getElementById('toggleIcon');
+    
     sidebar.classList.toggle('collapsed');
+    if (sidebar.classList.contains('collapsed')) {
+      toggleIcon.classList.remove('fa-xmark');
+      toggleIcon.classList.add('fa-bars');
+    } else {
+      toggleIcon.classList.remove('fa-bars');
+      toggleIcon.classList.add('fa-xmark');
+    }
   }
   
   // SPA Navigation - Show pages without refresh

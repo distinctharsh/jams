@@ -1,15 +1,16 @@
 <!-- MAIN LAYOUT: sidebar + content -->
 <div class="flex flex-1 overflow-hidden">
   <!-- SIDEBAR -->
-  <aside class="gov-sidebar">
-    <div class="sidebar-toggle-header">
-        <div class="icon-btn sidebar-toggle-btn" onclick="toggleSidebar()">
-            <i class="fas fa-bars"></i>
-        </div>
-    </div>
+    <aside class="gov-sidebar">
     <div>
-      <nav>
-        <div class="text-[9px] font-bold text-slate-400 uppercase tracking-wider px-3 mb-2 nav-label">Main</div>
+        <div class="flex items-center justify-between px-3 mb-3 pt-1">
+        <span class="text-[9px] font-bold text-slate-400 uppercase tracking-wider nav-label">Main</span>
+        <div class="icon-btn sidebar-toggle-btn" id="sidebarToggleBtn" onclick="toggleSidebar()" title="Toggle Sidebar">
+            <i class="fas fa-xmark" id="toggleIcon"></i>
+        </div>
+        </div>
+
+        <nav>
         <a href="#" class="nav-item active" onclick="showPage('dashboard')"><i class="fas fa-gauge-high"></i> <span>Dashboard</span></a>
         <a href="#" class="nav-item booking-btn" onclick="showPage('new-request')">
             <i class="fas fa-calendar-check"></i>
@@ -21,9 +22,9 @@
         <div class="text-[9px] font-bold text-slate-400 uppercase tracking-wider px-3 mt-6 mb-2 nav-label">System</div>
         <a href="#" class="nav-item" onclick="showPage('settings')"><i class="fas fa-sliders"></i> <span>Settings</span></a>
         <a href="#" class="nav-item" onclick="showPage('audit-log')"><i class="fas fa-shield-halved"></i> <span>Audit Log</span></a>
-      </nav>
+        </nav>
     </div>
-  </aside>
+    </aside>
 
   <!-- MAIN CONTENT -->
   <div class="main-content" id="mainContent">
