@@ -51,7 +51,8 @@
 .gov-topbar{
     background: #1e4d7b !important;
     color: #fff;
-    height: 42px;
+    min-height: 42px;
+    height: auto;
 }
 
 /*.gov-topbar span,
@@ -198,6 +199,31 @@
 .gov-link:hover {
     color: #ffd54f;
 }
+
+@media (min-width: 992px) {
+    .gov-topbar-left {
+        padding-left: 150px;
+    }
+}
+
+@media (max-width: 991px) {
+
+    .gov-topbar {
+        height: auto !important;
+        min-height: 42px;
+    }
+
+    .gov-topbar-left {
+        padding-left: 12px;
+        justify-content: center;
+        text-align: center;
+        margin-bottom: 8px;
+    }
+
+    .gov-topbar .col-12 > .d-flex {
+        justify-content: center !important;
+    }
+}
 </style>
 <!DOCTYPE html>
 <html lang="en">
@@ -232,14 +258,14 @@
         <div class="container-fluid px-4">
                 <div class="row align-items-center">
                     <!-- Left -->
-                    <div class="col-lg-5 d-flex align-items-center" style="margin-left:150px;">
+                    <div class="col-12 col-lg-6 d-flex align-items-center gov-topbar-left">
             <i class="bi bi-globe2 text-white me-2"></i>
             <span class="text-white fw-semibold">
                 Cabinet Secretariat (मंत्रिमंडल सचिवालय)
             </span>
         </div>
             <!-- Right -->
-            <div class="col-lg-5">
+            <div class="col-12 col-lg-6">
                 <div class="d-flex justify-content-end align-items-center flex-wrap gap-3">
                     <!-- Skip -->
                     <?php if (session()->has('username')) : ?>

@@ -224,7 +224,7 @@ h6 {
 
 .scrolled .header .topbar {
   height: 0;
-  visibility: hidden;
+  display: none;
   overflow: hidden;
 }
 
