@@ -216,9 +216,9 @@
     color: #174a78;
     user-select: none;
     font-family: "Courier New", monospace;
-    text-shadow:
+    /* text-shadow:
         1px 1px 0 #ffffff,
-        2px 2px 0 rgba(23, 74, 120, 0.08);
+        2px 2px 0 rgba(23, 74, 120, 0.08); */
     transform: skew(-4deg);
 }
 

@@ -1790,19 +1790,6 @@ if ($authorizationStatus === 1) {
 
                             </div>
 
-
-                            <!-- SECURITY NOTICE -->
-                            <div class="security-notice">
-                                <i class="fas fa-lock"></i>
-
-                                <span>
-                                    Your uploaded document will be securely
-                                    processed for official verification.
-                                    Please ensure that the document is clear,
-                                    valid and duly authorized.
-                                </span>
-                            </div>
-
                             <!-- SUBMIT -->
                             <button
                                 type="submit"
@@ -2118,7 +2105,7 @@ if ($authorizationStatus === 1) {
                         <?php endif; ?>
                     </div>
                 </div>
-            <?php endif; ?>
+            <?php endif; ?>    
             <!-- AJAX MESSAGE -->
             <div id="message" class="mt-3"></div>
         </div>
@@ -2209,34 +2196,25 @@ $(document).ready(function(){
         const fileInput=$('#authorization_letter')[0];
         const file=fileInput&&fileInput.files?fileInput.files[0]:null;
         if(!file){
-            $('#message').html(
-                '<div class="alert alert-warning">Please select Authorization Letter.</div>'
-            );
+            showToast('warning', 'Please select Authorization Letter.');
             return;
         }
         /* FILE SIZE */
         if(file.size>5*1024*1024){
-            $('#message').html(
-                '<div class="alert alert-danger">Maximum file size is 5 MB.</div>'
-            );
+            showToast('danger', 'Maximum file size is 5 MB.');
             return;
         }
         /* CAPTCHA */
         const captcha=$.trim($('#captcha').val());
         if(!captcha){
-            $('#message').html(
-                '<div class="alert alert-warning">Please enter CAPTCHA code.</div>'
-            );
+            showToast('warning', 'Please enter CAPTCHA code.');
             $('#captcha').focus();
             return;
         }
         /* AUTHORIZATION TOKEN */
         const authorizationToken=$.trim($('#authorization_token').val());
-        console.log('Authorization Token:',authorizationToken);
         if(!authorizationToken){
-            $('#message').html(
-                '<div class="alert alert-danger">Authorization token is missing. Please reload the page.</div>'
-            );
+            showToast('danger', 'Authorization token is missing. Please reload the page.');
             return;
         }
         /* FORM DATA */
@@ -2279,26 +2257,18 @@ $(document).ready(function(){
                 }
                 /* SUCCESS */
                 if(response.success){
-                    $('#message').html(
-                        '<div class="alert alert-success">'+
-                        (response.message||'Authorization Letter submitted successfully.')+
-                        '</div>'
-                    );
+                    showToast('success', response.message || 'Authorization Letter submitted successfully.');
+                    showToast('success', 'The Registration will be approved in 05 working days.');
                     setTimeout(function(){
                         if(response.redirect){
                             window.location.href=response.redirect;
                         }else{
                             window.location.reload();
                         }
-                    },1000);
+                    }, 1500);
                     return;
                 }
-                /* FAILURE */
-                $('#message').html(
-                    '<div class="alert alert-danger">'+
-                    (response.message||'Something went wrong.')+
-                    '</div>'
-                );
+                showToast('error', response.message || 'Something went wrong.');
                 /* ALWAYS GENERATE NEW CAPTCHA AFTER FAILED SUBMISSION */
                 $('#captcha').val('');
                 refreshAuthorizationCaptcha(true);
@@ -2327,10 +2297,7 @@ $(document).ready(function(){
                 }catch(error){
                     console.log('Invalid JSON response');
                 }
-                $('#message').html(
-                    '<div class="alert alert-danger">'+message+'</div>'
-                );
-                /* ALWAYS REFRESH CAPTCHA AFTER AJAX ERROR */
+                showToast('error', message);
                 $('#captcha').val('');
                 refreshAuthorizationCaptcha(false);
                 /* ENABLE BUTTON */

@@ -103,7 +103,7 @@ main.signup-page-main {
 }
 
 .captcha-text {
-    font-size: 17px !important;
+    /* font-size: 17px !important; */
     font-weight: 700;
     letter-spacing: 3px;
     color: #0d6efd;
@@ -316,7 +316,7 @@ main.signup-page-main {
 }
 
 /* Terms */
-.signup-terms {
+/* .signup-terms {
     color: #596675;
     font-size: 12px;
 }
@@ -333,7 +333,7 @@ main.signup-page-main {
 
 .signup-terms i {
     color: #1e4d7b;
-}
+} */
 
 /* Login Link */
 .signup-login-link {
@@ -507,18 +507,13 @@ main.signup-page-main {
                                         <option value="" selected disabled>
                                             Select Body Name
                                         </option>
-                                        <option value="Cabinet Secretariat">
-                                            Cabinet Secretariat
-                                        </option>
-                                        <option value="Ministry/Department">
-                                            Ministry / Department
-                                        </option>
-                                        <option value="Attached Office">
-                                            Attached Office
-                                        </option>
-                                        <option value="Subordinate Office">
-                                            Subordinate Office
-                                        </option>
+                                        <?php if (!empty($organizations)): ?>
+                                            <?php foreach ($organizations as $org): ?>
+                                                <option value="<?= esc($org['org_name']) ?>" data-org-type="<?= esc($org['org_type']) ?>">
+                                                    <?= esc($org['org_name']) ?>
+                                                </option>
+                                            <?php endforeach; ?>
+                                        <?php endif; ?>
                                     </select>
                                 </div>
                             </div>
@@ -540,18 +535,15 @@ main.signup-page-main {
                                         <option value="" selected disabled>
                                             Select Body Type
                                         </option>
-                                        <option value="Statutory Body">
-                                            Statutory Body
-                                        </option>
-                                        <option value="Autonomous Body">
-                                            Autonomous Body
-                                        </option>
-                                        <option value="UGC">
-                                            UGC
-                                        </option>
-                                        <option value="Other">
-                                            Other
-                                        </option>
+                                        <?php if (!empty($organization_types)): ?>
+                                            <?php foreach ($organization_types as $type): ?>
+                                                <option value="<?= esc($type['name']) ?>" 
+                                                        data-type-id="<?= esc($type['id']) ?>" 
+                                                        data-ugc-required="<?= esc($type['is_ugc_id_required']) ?>">
+                                                    <?= esc($type['name']) ?>
+                                                </option>
+                                            <?php endforeach; ?>
+                                        <?php endif; ?>
                                     </select>
                                 </div>
                             </div>
@@ -622,7 +614,7 @@ main.signup-page-main {
                         </div>
 
                         <!-- Terms -->
-                        <div class="form-check mt-2 signup-terms">
+                        <!-- <div class="form-check mt-2 signup-terms">
                             <input class="form-check-input"
                                    type="checkbox"
                                    id="terms"
@@ -634,7 +626,7 @@ main.signup-page-main {
                                     Terms & Conditions
                                 </a>.
                             </label>
-                        </div>
+                        </div> -->
 
                         <!-- Submit -->
                         <div class="d-grid mt-3">
@@ -666,6 +658,53 @@ main.signup-page-main {
         </div>
     </div>
 </main>
+
+<!-- Email Popup Modal -->
+<div class="modal fade" id="emailPopup" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Email Verification</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="text-center">
+                    <i class="fas fa-envelope-circle-check text-success" style="font-size: 48px;"></i>
+                    <p class="mt-3 mb-0">Link has been sent to email to upload competent authority signed letter for verification.</p>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Authorization Link Popup Modal -->
+<div class="modal fade" id="authLinkPopup" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Authorization Link</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="text-center">
+                    <i class="fas fa-link text-primary" style="font-size: 48px;"></i>
+                    <p class="mt-3 mb-3">Click the link below to proceed to authorization page:</p>
+                    <div class="card p-3 bg-light">
+                        <a href="#" id="authLinkUrl" class="text-decoration-none text-primary fw-bold" target="_blank">
+                            /auth/authorization?token=...
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
 
 <?php echo view('footer/footer'); ?>
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
@@ -717,8 +756,8 @@ $(document).ready(function() {
 
     // UGC / Body Type Selection Toggle Event
     $('#signup_body_type').change(function() {
-        let selectedValue = $(this).val();
-        if (selectedValue === 'UGC') {
+        let isUgcRequired = $(this).find(':selected').data('ugc-required');
+        if (parseInt(isUgcRequired) === 1) {
             $('#ugc_input_container').slideDown(200);
             $('#signup_ugc_details').prop('required', true);
         } else {
@@ -727,16 +766,29 @@ $(document).ready(function() {
         }
     });
 
+    $('#signup_body_name').change(function() {
+        let selectedOrgType = $(this).find(':selected').data('org-type');
+        if (selectedOrgType) {
+            $('#signup_body_type option').each(function() {
+                if ($(this).data('type-id') == selectedOrgType) {
+                    $(this).prop('selected', true);
+                    return false;
+                }
+            });
+            $('#signup_body_type').trigger('change');
+        }
+    });
+
     // Form Submit Event
     $('#signupForm').on('submit', function(e) {
         e.preventDefault();
-        if (!$('#terms').is(':checked')) {
-            showToast(
-                'warning',
-                'Please accept the Terms & Conditions'
-            );
-            return;
-        }
+        // if (!$('#terms').is(':checked')) {
+        //     showToast(
+        //         'warning',
+        //         'Please accept the Terms & Conditions'
+        //     );
+        //     return;
+        // }
 
         let formData = {
             full_name: ($('#signup_full_name').val() || '').trim(),
@@ -771,18 +823,8 @@ $(document).ready(function() {
                 }
                 // Registration Successful
                 if (response.success) {
-
-                    showToast(
-                        'success',
-                        response.message
-                    );
-                    setTimeout(function() {
-                        if (response.redirect) {
-
-                            window.location.href =
-                                response.redirect;
-                        }
-                    }, 1000);
+                    const userId = response.user_id;
+                    showEmailPopup(userId);
                     return;
                 }
                 // Validation Errors
@@ -857,6 +899,37 @@ $(document).ready(function() {
             }
         });
     });
+    
+    function showEmailPopup(userId) {
+        const emailPopup = new bootstrap.Modal(document.getElementById('emailPopup'));
+        emailPopup.show();
+        
+        document.getElementById('emailPopup').addEventListener('hidden.bs.modal', function() {
+            showAuthLinkPopup(userId);
+        }, { once: true });
+    }
+    
+    function showAuthLinkPopup(userId) {
+        const token = generateToken(userId);
+        const authUrl = '<?= base_url('auth/authorization?token=') ?>' + token;
+        document.getElementById('authLinkUrl').href = authUrl;
+        document.getElementById('authLinkUrl').textContent = authUrl;
+        const authLinkPopup = new bootstrap.Modal(document.getElementById('authLinkPopup'));
+        authLinkPopup.show();
+    }
+    
+    function generateToken(userId) {
+        const expiry = Math.floor(Date.now() / 1000) + 15768000;
+        const payload = {
+            user_id: userId,
+            expires: expiry
+        };
+        
+        const payloadString = JSON.stringify(payload);
+        const base64Payload = btoa(payloadString);
+        const urlEncodedToken = encodeURIComponent(base64Payload);
+        return urlEncodedToken;
+    }
     
 });
 </script>
