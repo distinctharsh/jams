@@ -1,0 +1,398 @@
+<style>
+.branding{
+    background:#fff;
+    border-bottom:3px solid #FF9933;
+}
+
+.logo img{
+    height:75px;
+}
+
+.logo h5{
+    font-size:20px;
+    color:#222;
+    margin-bottom:2px;
+}
+
+.logo h4{
+    font-size:26px;
+    color:#0d6efd;
+    margin-bottom:2px;
+}
+
+.logo small{
+    font-size:14px;
+}
+
+.navmenu ul li a{
+    font-weight:600;
+}
+
+@media(max-width:991px){
+
+    .logo img{
+        height:55px;
+    }
+
+    .logo h5{
+        font-size:15px;
+    }
+
+    .logo h4{
+        font-size:18px;
+    }
+
+    .logo small{
+        font-size:12px;
+    }
+}
+
+/* Government Topbar */
+.gov-topbar{
+    background: #1e4d7b !important;
+    color: #fff;
+    min-height: 42px;
+    height: auto;
+}
+
+/*.gov-topbar span,
+.gov-topbar a,
+.gov-topbar i{
+    color: #fff !important;
+}*/
+/*.text-dark {
+    --bs-text-opacity: 1;
+    color: #fff !important;
+}*/
+.gov-topbar a{
+    text-decoration: none;
+}
+
+.gov-topbar a:hover{
+    color: #f8f9fa !important;
+}
+.cabinet-title{
+    color: #1e4d7b !important;
+    font-size: 26px;
+    font-weight: 700;
+}
+
+.gov-title{
+    color: #1e4d7b !important;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.digital-india-logo{
+    height: 70px;
+    width: auto;
+    transition: all .3s ease;
+}
+
+.digital-india-logo:hover{
+    transform: scale(1.08);
+}
+
+@media (max-width: 991px){
+    .digital-india-logo{
+        display: none;
+    }
+}
+
+.english-name {
+    font-family: 'EB Garamond', serif;
+    font-weight: 600;
+    font-size: 1.38rem;
+    color: var(--white);
+    letter-spacing: .04em;
+    line-height: 1.15;
+    display: block;
+}
+
+.hindi-title{
+    color: #FF9933 !important;
+    font-size: 22px;
+    font-weight: 700;
+}
+
+.cabinet-title{
+    color: #1e4d7b !important;
+    font-size: 26px;
+    font-weight: 700;
+}
+
+.gov-title{
+    color: #1e4d7b !important;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.gov-logo{
+    height:60px;
+    width:auto;
+    object-fit:contain;
+    transition:all .3s ease;
+}
+
+.gov-logo:hover{
+    transform:scale(1.05);
+}
+</style>
+<style>.gov-topbar{
+    background:#003366;
+    font-size:14px;
+}
+
+.gov-link{
+    color:#fff;
+    text-decoration:none;
+    font-weight:500;
+}
+
+.gov-link:hover{
+    color:#FFD54F;
+}
+
+.high-contrast{
+    background:#000 !important;
+    color:#fff !important;
+}
+
+.high-contrast *{
+    background:#000 !important;
+    color:#fff !important;
+    border-color:#fff !important;
+}
+
+.dropdown-menu{
+    border-radius:10px;
+}
+
+.skip-link{
+    position:absolute;
+    left:-999px;
+}
+
+.skip-link:focus{
+    left:10px;
+    top:10px;
+    z-index:9999;
+    background:#fff;
+    color:#000;
+    padding:10px 15px;
+}
+.gov-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    color: #fff;
+    text-decoration: none;
+    font-weight: 600;
+    transition: .3s;
+}
+
+.gov-link i {
+    font-size: 16px;
+    color: #ffc107;
+}
+
+.gov-link:hover {
+    color: #ffd54f;
+}
+
+@media (min-width: 992px) {
+    .gov-topbar-left {
+        padding-left: 150px;
+    }
+}
+
+@media (max-width: 991px) {
+
+    .gov-topbar {
+        height: auto !important;
+        min-height: 42px;
+    }
+
+    .gov-topbar-left {
+        padding-left: 12px;
+        justify-content: center;
+        text-align: center;
+        margin-bottom: 8px;
+    }
+
+    .gov-topbar .col-12 > .d-flex {
+        justify-content: center !important;
+    }
+}
+</style>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="csrf-token" content="<?= csrf_hash() ?>">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  <title>Cabinet Secretariat</title>
+  <!-- Favicons -->
+  <link href="<?= base_url('assets/image/Emblem_of_India.svg.webp') ?>" rel="icon">
+  <link href="<?= base_url('assets/image/apple-touch-icon.png') ?>" rel="apple-touch-icon">
+  <!-- Fonts -->
+  <link href="https://fonts.googleapis.com" rel="preconnect">
+  <link href="https://fonts.gstatic.com" rel="preconnect" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900&family=Montserrat:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900&family=Lato:ital,wght@0,100;0,300;0,400;0,700;0,900&display=swap" rel="stylesheet">
+  <!-- Vendor CSS -->
+  <link href="<?= base_url('assets/vendor/bootstrap/css/bootstrap.min.css') ?>" rel="stylesheet">
+  <link href="<?= base_url('assets/vendor/bootstrap-icons/bootstrap-icons.css') ?>" rel="stylesheet">
+  <link href="<?= base_url('assets/vendor/aos/aos.css') ?>" rel="stylesheet">
+  <link href="<?= base_url('assets/vendor/glightbox/css/glightbox.min.css') ?>" rel="stylesheet">
+  <link href="<?= base_url('assets/vendor/fontawesome-free/css/all.min.css') ?>" rel="stylesheet">
+  <link href="<?= base_url('assets/vendor/swiper/swiper-bundle.min.css') ?>" rel="stylesheet">
+
+  <!-- Main CSS -->
+  <link href="<?= base_url('assets/css/main.css') ?>" rel="stylesheet">
+</head>
+<body class="index-page">
+<header id="header" class="header fixed-top">
+  <!-- Top Bar -->
+<!-- ================= Top Government Bar ================= -->
+<div class="topbar gov-topbar py-2">
+        <div class="container-fluid px-4">
+                <div class="row align-items-center">
+                    <!-- Left -->
+                    <div class="col-12 col-lg-6 d-flex align-items-center gov-topbar-left">
+            <i class="bi bi-globe2 text-white me-2"></i>
+            <span class="text-white fw-semibold">
+                Cabinet Secretariat (मंत्रिमंडल सचिवालय)
+            </span>
+        </div>
+            <!-- Right -->
+            <div class="col-12 col-lg-6">
+                <div class="d-flex justify-content-end align-items-center flex-wrap gap-3">
+                    <!-- Skip -->
+                    <?php if (session()->has('username')) : ?>
+                        <!-- Dashboard -->
+                        <a href="<?= base_url('dashboard') ?>" class="gov-link me-2">
+                            <i class="fas fa-gauge-high me-1"></i>
+                            <?= esc(session()->get('full_name')) ?>
+                        </a>
+
+                        <!-- Logout -->
+                        <a href="<?= base_url('logout') ?>" class="gov-link logout-link">
+                            <i class="fas fa-right-from-bracket me-1"></i>
+                            Logout
+                        </a>
+
+                    <?php else : ?>
+
+                        <!-- Login -->
+                        <a href="#" class="gov-link" data-bs-toggle="modal" data-bs-target="#loginModal">
+                            <i class="fas fa-user-circle me-1"></i>
+                            Login
+                        </a>
+
+                    <?php endif; ?>
+                    <!-- Language -->
+                    <div class="dropdown d-inline-block">
+                        <a href="#"
+                           class="text-white text-decoration-none dropdown-toggle"
+                           data-bs-toggle="dropdown"
+                           aria-expanded="false">
+                            🌐 English
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            <li><a class="dropdown-item" href="#">English</a></li>
+                            <li><a class="dropdown-item" href="#">हिन्दी</a></li>
+                        </ul>
+                    </div>
+                    <!-- Accessibility -->
+                    <div class="dropdown">
+                        <button class="btn btn-sm btn-warning dropdown-toggle"
+                            data-bs-toggle="dropdown">
+
+                            <i class="bi bi-universal-access"></i>
+                            Accessibility
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-end shadow">
+                            <li>
+                                <button class="dropdown-item" onclick="changeFont(1)">
+                                    A+
+                                </button>
+                            </li>
+                            <li>
+                                <button class="dropdown-item" onclick="changeFont(0)">
+                                    A
+                                </button>
+                            </li>
+                            <li>
+                                <button class="dropdown-item" onclick="changeFont(-1)">
+                                    A-
+                                </button>
+                            </li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li>
+                                <button class="dropdown-item" onclick="toggleContrast()">
+                                    High Contrast
+                                </button>
+                            </li>
+                            <li>
+                                <button class="dropdown-item" onclick="resetAccessibility()">
+                                    Reset
+                                </button>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+  <!-- Branding -->
+  <div class="branding d-flex align-items-center">
+    <div class="container position-relative d-flex align-items-center justify-content-between">
+      <!-- Logo -->
+      <a href="<?= base_url() ?>" class="logo d-flex align-items-center text-decoration-none">
+        <img src="<?= base_url('assets/image/Emblem_of_India.svg.webp') ?>"
+             alt="Government of India"
+             style="height:100px; width:auto;">
+        <div class="ms-3">
+        <h5 class="mb-0 fw-bold hindi-title">
+            मंत्रिमंडल सचिवालय
+        </h5>
+        <h4 class="mb-0 fw-bold cabinet-title">
+            Cabinet Secretariat
+        </h4>
+        <small class="gov-title">
+            Government of India
+        </small>
+        </div>
+      </a>
+      <!-- Navigation -->
+      <nav id="navmenu" class="navmenu">
+        <ul>
+          <li><a href="<?= base_url() ?>" class="active">Home</a></li>
+          <li><a href="#">About Us</a></li>
+          <li><a href="#">Services</a></li>
+          <li><a href="#">Contact</a></li>
+        </ul>
+        <i class="mobile-nav-toggle d-xl-none bi bi-list"></i>
+      </nav>
+    <div class="d-none d-lg-flex align-items-center ms-4 gap-3">
+    <!-- Digital India -->
+    <a href="https://www.digitalindia.gov.in/"
+       target="_blank"
+       title="Digital India">
+        <img src="https://master-cabsec.digifootprint.gov.in/static/uploads/2025/06/89b0a44d4c258057766cac713a24c09f.png"
+             alt="Digital India"
+             class="gov-logo">
+    </a>
+    <!-- Swachh Bharat -->
+    <a href="https://swachhbharat.mygov.in/"
+    target="_blank"
+    title="Swachh Bharat Mission">
+    <img src="<?= base_url('assets/image/swach-bharat.png') ?>"
+    alt="Swachh Bharat"
+    class="gov-logo">
+    </a>
+   </div>
+    </div>
+  </div>
+</header>
