@@ -6,40 +6,36 @@ use CodeIgniter\Model;
 
 class UserModel extends Model
 {
-    protected $table = 'users';
+    protected $table      = 'users';
     protected $primaryKey = 'id';
+    protected $useAutoIncrement = true;
+
+    protected $returnType       = 'array';
+
     protected $allowedFields = [
-        'full_name', 
-        'employee_id', 
-        'email', 
-        'mobile', 
-        'username', 
+        'full_name',
+        'employee_id',
+        'email',
+        'mobile',
         'password',
-        'is_active'
+        'is_active',
+        'created_at',
+        'updated_at'
     ];
-    protected $useTimestamps = true;
+
+    protected $useTimestamps = false;
     protected $createdField = 'created_at';
     protected $updatedField = 'updated_at';
-    
     protected $validationRules = [
         'full_name' => 'required|min_length[3]|max_length[100]',
-        'employee_id' => 'required|min_length[3]|max_length[50]|is_unique[users.employee_id]',
-        'email' => 'required|valid_email|is_unique[users.email]|max_length[100]',
-        'mobile' => 'required|numeric|min_length[10]|max_length[15]',
-        'username' => 'required|min_length[4]|max_length[50]|is_unique[users.username]',
-        'password' => 'required|min_length[6]',
+        'email'     => 'required|valid_email|max_length[100]|is_unique[users.email]',
+        'mobile'    => 'required|numeric|min_length[10]|max_length[15]',
     ];
-    
+
     protected $validationMessages = [
-        'employee_id' => [
-            'is_unique' => 'This Employee ID is already registered.',
-        ],
         'email' => [
-            'is_unique' => 'This Email is already registered.',
-        ],
-        'username' => [
-            'is_unique' => 'This Username is already taken.',
-        ],
+            'is_unique' => 'This Email is already registered.'
+        ]
     ];
 
     // Using password_verify for secure password checking

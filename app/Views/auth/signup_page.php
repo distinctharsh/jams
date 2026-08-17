@@ -5,7 +5,7 @@
    1. FIXED HEADER OVERLAP & MARGIN CORRECTION
    ========================================================= */
 main.signup-page-main {
-    padding-top: 170px !important; /* Header ke niche gap */
+    padding-top: 200px !important; /* Header ke niche gap */
     padding-bottom: 60px !important;
     background: #f8fafc;
     min-height: 85vh;
@@ -38,7 +38,7 @@ main.signup-page-main {
 
 .header-divider {
     height: 3px;
-    width: 55px;
+    width: 365px;
     background: linear-gradient(90deg, #0d6efd, #ff9933);
     border-radius: 2px;
     margin-top: 6px;
@@ -126,136 +126,467 @@ main.signup-page-main {
     border-radius: 8px;
     font-size: 14px;
 }
+
+/* ==========================================
+   CAPTCHA
+========================================== */
+
+.captcha-box {
+    height: 44px;
+    border: 1px dashed #9fb3c8;
+    border-radius: 9px;
+    background:
+        linear-gradient(
+            135deg,
+            #f8fafc,
+            #eef4f8
+        );
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 12px 0 15px;
+    overflow: hidden;
+}
+
+.captcha-text {
+    font-family: "Courier New", monospace;
+    font-size: 18px;
+    font-weight: 800;
+    letter-spacing: 4px;
+    color: #1e3a5f;
+    user-select: none;
+    text-decoration: line-through;
+    text-decoration-thickness: 1px;
+}
+
+.captcha-refresh {
+    width: 32px;
+    height: 32px;
+    border: 0;
+    border-radius: 7px;
+    background: #e3edf6;
+    color: #1e4d7b;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all .2s ease;
+}
+
+.captcha-refresh:hover {
+    background: #1e4d7b;
+    color: #fff;
+    transform: rotate(20deg);
+}
+
+.captcha-refresh i {
+    font-size: 17px;
+}
+/* ==========================================
+   CREATE ACCOUNT BUTTON
+========================================== */
+
+.signup-submit {
+    height: 46px;
+    border: none;
+    border-radius: 9px;
+    background: linear-gradient(
+        135deg,
+        #1e4d7b,
+        #28618f
+    );
+    color: #fff;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: .2px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 15px;
+    box-shadow: 0 5px 14px rgba(30, 77, 123, .18);
+    transition: all .25s ease;
+}
+
+.signup-submit:hover {
+    background: linear-gradient(
+        135deg,
+        #173d63,
+        #1e4d7b
+    );
+    color: #fff;
+    transform: translateY(-1px);
+    box-shadow: 0 7px 18px rgba(30, 77, 123, .25);
+}
+
+.signup-submit:active {
+    transform: translateY(0);
+}
+/* ================================
+   SIGNUP FORM PROFESSIONAL STYLE
+================================ */
+
+.signup-label {
+    color: #26374a;
+    font-size: 12.5px;
+    font-weight: 600;
+    margin-bottom: 5px;
+    letter-spacing: 0.1px;
+}
+
+.signup-label i {
+    color: #1e4d7b;
+    font-size: 12px;
+}
+
+/* Input Group */
+.signup-input-group {
+    border-radius: 6px;
+    overflow: hidden;
+}
+
+/* Left Icon */
+.signup-input-group .input-group-text {
+    min-width: 42px;
+    justify-content: center;
+    background: #f4f7fa;
+    border: 1px solid #ced6df;
+    border-right: 0;
+    color: #1e4d7b;
+    font-size: 15px;
+}
+
+/* Input / Select */
+.signup-input-group .form-control,
+.signup-input-group .form-select {
+    border: 1px solid #ced6df;
+    border-left: 0;
+    color: #26374a;
+    font-size: 13px;
+    min-height: 38px;
+}
+
+/* Placeholder */
+.signup-input-group .form-control::placeholder {
+    color: #8a96a3;
+    font-size: 12.5px;
+}
+
+/* Focus */
+.signup-input-group:focus-within .input-group-text {
+    background: #eef5fb;
+    border-color: #1e4d7b;
+    color: #1e4d7b;
+}
+
+.signup-input-group:focus-within .form-control,
+.signup-input-group:focus-within .form-select {
+    border-color: #1e4d7b;
+    box-shadow: none;
+}
+
+/* Select Arrow / Text */
+.signup-input-group .form-select {
+    cursor: pointer;
+    padding-top: 7px;
+    padding-bottom: 7px;
+}
+
+/* CAPTCHA */
+.captcha-box {
+    min-height: 38px;
+    border: 1px solid #ced6df;
+    border-radius: 6px;
+    background: #f7f9fb;
+}
+
+.captcha-text {
+    color: #26374a;
+    font-size: 15px;
+    letter-spacing: 3px;
+}
+
+.captcha-box button {
+    color: #1e4d7b !important;
+}
+
+.captcha-box button:hover {
+    color: #163b60 !important;
+    transform: rotate(20deg);
+    transition: 0.2s ease;
+}
+
+/* Terms */
+.signup-terms {
+    color: #596675;
+    font-size: 12px;
+}
+
+.signup-terms .form-check-input {
+    border-color: #9da9b5;
+    cursor: pointer;
+}
+
+.signup-terms .form-check-input:checked {
+    background-color: #1e4d7b;
+    border-color: #1e4d7b;
+}
+
+.signup-terms i {
+    color: #1e4d7b;
+}
+
+/* Login Link */
+.signup-login-link {
+    color: #657180;
+    font-size: 12.5px;
+}
+
+.signup-login-link > span i {
+    color: #1e4d7b;
+}
+
+.signup-login-link a {
+    color: #1e4d7b;
+}
+
+.signup-login-link a:hover {
+    color: #163b60;
+}
+
+/* Submit Button */
+.signup-submit {
+    min-height: 40px;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.2px;
+}
+
+.signup-submit i {
+    font-size: 14px;
+}
+
+.registration-header {
+    background: #1e4d7b;
+    padding: 15px 18px;
+    border-radius: 6px;
+}
+
+.registration-header-content {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.title-logo {
+    width: 55px;
+    height: 55px;
+    object-fit: contain;
+    background: #fff;
+    padding: 5px;
+    border-radius: 6px;
+}
+
+.form-header-title {
+    color: #fff !important;
+    font-weight: 700;
+}
+
+.form-header-subtitle {
+    color: #fff !important;
+    opacity: 0.9;
+    font-size: 14px;
+}
+
+.header-divider {
+    height: 2px;
+    background: rgba(255,255,255,0.7);
+    margin-top: 12px;
+}
 </style>
 
 <!-- Main Wrapper -->
 <main class="main signup-page-main">
     <div id="toastContainer" class="position-fixed"></div>
-    
     <div class="container mt-2">
         <div class="row justify-content-center">
             <div class="col-lg-7 col-md-9">
                 <div class="signup-card">
-                    
                     <!-- Form Title & Subtitle -->
-                    <div class="mb-3">
-                        <h3 class="form-header-title mb-1">
-                            User Registration
-                        </h3>
-                        <p class="form-header-subtitle mb-0">
-                            Cabinet Secretariat — JAMAR Approval Management System
-                        </p>
-                        <div class="header-divider"></div>
-                    </div>
+                    <div class="mb-3 registration-header">
+                        <div class="registration-header-content">
+                            <img src="<?= base_url('assets/image/Emblem_of_India.svg.webp') ?>"
+                                 alt="Jammers Approval Management System"
+                                 class="title-logo">
 
+                            <div>
+                                <h3 class="form-header-title mb-1">
+                                    JAMS - User Registration
+                                </h3>
+
+                                <p class="form-header-subtitle mb-0">
+                                    Cabinet Secretariat — JAMMERS Approval Management System
+                                </p>
+                            </div>
+                        </div>
+                        <!-- <div class="header-divider"></div> -->
+                    </div>
                     <form id="signupForm">
                         <input type="hidden" name="csrf_token" value="<?= csrf_hash() ?>">
-
                         <div class="row g-2 text-start">
                             <!-- Full Name -->
                             <div class="col-md-6 mb-2">
-                                <label class="form-label">Full Name</label>
-                                <input class="form-control login-input" 
-                                       type="text" 
-                                       id="signup_full_name" 
-                                       name="full_name"
-                                       placeholder="Enter full name"
-                                       required>
+                                <label class="form-label signup-label">
+                                    <i class="bi bi-person-fill me-1"></i>
+                                    Full Name
+                                </label>
+                                <div class="input-group signup-input-group">
+                                    <span class="input-group-text">
+                                        <i class="bi bi-person"></i>
+                                    </span>
+                                    <input class="form-control login-input"
+                                           type="text"
+                                           id="signup_full_name"
+                                           name="full_name"
+                                           placeholder="Enter full name"
+                                           required>
+                                </div>
                             </div>
-
                             <!-- Official Email -->
                             <div class="col-md-6 mb-2">
-                                <label class="form-label">Official Email</label>
-                                <input class="form-control login-input" 
-                                       type="email" 
-                                       id="signup_email" 
-                                       name="email"
-                                       placeholder="Enter official email"
-                                       required>
-                            </div>
-
-                            <!-- Body Name Dropdown -->
-                            <div class="col-md-6 mb-2">
-                                <label class="form-label">Body Name</label>
-                                <select class="form-select login-input" id="signup_body_name" name="body_name" required>
-                                    <option value="" selected disabled>Select Body Name</option>
-                                    <option value="Cabinet Secretariat">Cabinet Secretariat</option>
-                                    <option value="Ministry/Department">Ministry / Department</option>
-                                    <option value="Attached Office">Attached Office</option>
-                                    <option value="Subordinate Office">Subordinate Office</option>
-                                </select>
-                            </div>
-                            <!-- Body Type Dropdown -->
-                            <div class="col-md-6 mb-2">
-                                <label class="form-label">Body Type</label>
-                                <select class="form-select login-input" id="signup_body_type" name="body_type" required>
-                                    <option value="" selected disabled>Select Body Type</option>
-                                    <option value="Statutory Body">Statutory Body</option>
-                                    <option value="Autonomous Body">Autonomous Body</option>
-                                    <option value="UGC">UGC</option>
-                                    <option value="Other">Other</option>
-                                </select>
-                            </div>
-
-
-                            <!-- Dynamic UGC / Other Details Input (Hidden by Default) -->
-                            <div class="col-12 mb-2" id="ugc_input_container" style="display: none;">
-                                <label class="form-label">Specify UGC / Body Details</label>
-                                <input class="form-control login-input" 
-                                       type="text" 
-                                       id="signup_ugc_details" 
-                                       name="ugc_details"
-                                       placeholder="Enter details for selected body type">
+                                <label class="form-label signup-label">
+                                    <i class="bi bi-envelope-fill me-1"></i>
+                                    Official Email
+                                </label>
+                                <div class="input-group signup-input-group">
+                                    <span class="input-group-text">
+                                        <i class="bi bi-envelope"></i>
+                                    </span>
+                                    <input class="form-control login-input"
+                                           type="email"
+                                           id="signup_email"
+                                           name="email"
+                                           placeholder="Enter official email"
+                                           required>
+                                </div>
                             </div>
 
                             <!-- Mobile Number -->
                             <div class="col-md-6 mb-2">
-                                <label class="form-label">Mobile Number</label>
-                                <input class="form-control login-input" 
-                                       type="text" 
-                                       id="signup_mobile" 
-                                       name="mobile"
-                                       placeholder="Enter mobile number"
-                                       required>
-                            </div>
-
-                            <!-- Username -->
-                            <div class="col-md-6 mb-2">
-                                <label class="form-label">Username</label>
-                                <input class="form-control login-input" 
-                                       type="text" 
-                                       id="signup_username" 
-                                       name="username"
-                                       placeholder="Choose a username"
-                                       required>
-                            </div>
-
-                            <!-- Password -->
-                            <div class="col-12 mb-2">
-                                <label class="form-label">Password</label>
-                                <div class="input-group">
-                                    <input class="form-control login-input" 
-                                           type="password" 
-                                           id="signup_password" 
-                                           name="password"
-                                           placeholder="Create a password"
+                                <label class="form-label signup-label">
+                                    <i class="bi bi-phone-fill me-1"></i>
+                                    Mobile Number
+                                </label>
+                                <div class="input-group signup-input-group">
+                                    <span class="input-group-text">
+                                        <i class="bi bi-phone"></i>
+                                    </span>
+                                    <input class="form-control login-input"
+                                           type="text"
+                                           id="signup_mobile"
+                                           name="mobile"
+                                           placeholder="Enter mobile number"
                                            required>
-                                    <button type="button"
-                                            class="btn btn-outline-secondary"
-                                            onclick="toggleSignupPassword()">
-                                        <i id="signupEyeIcon" class="bi bi-eye-fill"></i>
-                                    </button>
                                 </div>
                             </div>
 
-                            <!-- CAPTCHA Section -->
-                            <div class="col-12 mb-1">
-                                <label class="form-label">
-                                    <i class="bi bi-shield-lock me-1"></i> Security Verification
+                            <!-- Body Name -->
+                            <div class="col-md-6 mb-2">
+                                <label class="form-label signup-label">
+                                    <i class="bi bi-building-fill me-1"></i>
+                                    Examination Body Name
                                 </label>
+                                <div class="input-group signup-input-group">
+                                    <span class="input-group-text">
+                                        <i class="bi bi-building"></i>
+                                    </span>
+                                    <select class="form-select login-input"
+                                            id="signup_body_name"
+                                            name="body_name"
+                                            required>
+                                        <option value="" selected disabled>
+                                            Select Body Name
+                                        </option>
+                                        <option value="Cabinet Secretariat">
+                                            Cabinet Secretariat
+                                        </option>
+                                        <option value="Ministry/Department">
+                                            Ministry / Department
+                                        </option>
+                                        <option value="Attached Office">
+                                            Attached Office
+                                        </option>
+                                        <option value="Subordinate Office">
+                                            Subordinate Office
+                                        </option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <!-- Body Type -->
+                            <div class="col-md-12 mb-2">
+                                <label class="form-label signup-label">
+                                    <i class="bi bi-diagram-3-fill me-1"></i>
+                                    Examination Body Type
+                                </label>
+                                <div class="input-group signup-input-group">
+                                    <span class="input-group-text">
+                                        <i class="bi bi-diagram-3"></i>
+                                    </span>
+                                    <select class="form-select login-input"
+                                            id="signup_body_type"
+                                            name="body_type"
+                                            required>
+                                        <option value="" selected disabled>
+                                            Select Body Type
+                                        </option>
+                                        <option value="Statutory Body">
+                                            Statutory Body
+                                        </option>
+                                        <option value="Autonomous Body">
+                                            Autonomous Body
+                                        </option>
+                                        <option value="UGC">
+                                            UGC
+                                        </option>
+                                        <option value="Other">
+                                            Other
+                                        </option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <!-- Dynamic UGC / Other Details -->
+                            <div class="col-12 mb-2"
+                                 id="ugc_input_container"
+                                 style="display:none;">
+                                <label class="form-label signup-label">
+                                    <i class="bi bi-info-circle-fill me-1"></i>
+                                    Specify UGC / Examination Body Details
+                                </label>
+                                <div class="input-group signup-input-group">
+                                    <span class="input-group-text">
+                                        <i class="bi bi-pencil-square"></i>
+                                    </span>
+                                    <input class="form-control login-input"
+                                           type="text"
+                                           id="signup_ugc_details"
+                                           name="ugc_details"
+                                           placeholder="Enter details for selected body type">
+                                </div>
+                            </div>
+
+                            <!-- CAPTCHA -->
+                            <div class="col-12 mb-1">
+                                <label class="form-label signup-label">
+                                    <i class="bi bi-shield-lock-fill me-1"></i>
+                                    Security Verification
+                                </label>
+
                                 <div class="row g-2">
+                                    <!-- CAPTCHA Input -->
                                     <div class="col-md-7">
-                                        <div class="input-group">
+                                        <div class="input-group signup-input-group">
                                             <span class="input-group-text">
                                                 <i class="bi bi-shield-check"></i>
                                             </span>
@@ -267,15 +598,21 @@ main.signup-page-main {
                                                    required>
                                         </div>
                                     </div>
+
+                                    <!-- CAPTCHA -->
                                     <div class="col-md-5">
                                         <div class="captcha-box d-flex align-items-center justify-content-between px-3">
-                                            <span class="captcha-text fw-bold" id="signupCaptchaText">
-                                                <?= isset($captcha_text) ? esc($captcha_text) : 'ABCDEF' ?>
+                                            <span class="captcha-text fw-bold"
+                                                  id="signupCaptchaText">
+                                                <?= isset($captcha_text)
+                                                    ? esc($captcha_text)
+                                                    : 'ABCDEF' ?>
                                             </span>
                                             <button type="button"
                                                     class="btn btn-sm btn-link text-primary p-0"
                                                     id="signupRefreshCaptcha"
-                                                    title="Refresh CAPTCHA">
+                                                    title="Refresh CAPTCHA"
+                                                    aria-label="Refresh CAPTCHA">
                                                 <i class="bi bi-arrow-clockwise fs-5"></i>
                                             </button>
                                         </div>
@@ -284,32 +621,42 @@ main.signup-page-main {
                             </div>
                         </div>
 
-                        <!-- Terms & Conditions -->
-                        <div class="form-check mt-2">
-                            <input class="form-check-input" 
-                                   type="checkbox" 
-                                   id="terms" 
+                        <!-- Terms -->
+                        <div class="form-check mt-2 signup-terms">
+                            <input class="form-check-input"
+                                   type="checkbox"
+                                   id="terms"
                                    required>
-                            <label class="form-check-label text-muted fs-6" for="terms" style="font-size:13px;">
-                                I agree to the <a href="#" class="text-decoration-none">Terms & Conditions</a>.
+                            <label class="form-check-label"
+                                   for="terms">
+                                I agree to the
+                                <a href="#" class="text-decoration-none">
+                                    Terms & Conditions
+                                </a>.
                             </label>
                         </div>
 
-                        <!-- Submit Button -->
+                        <!-- Submit -->
                         <div class="d-grid mt-3">
-                            <button type="submit" class="btn login-submit" id="signupBtn">
-                                <i class="bi bi-person-plus me-2"></i>
+                            <button type="submit"
+                                    class="btn login-submit signup-submit"
+                                    id="signupBtn">
+
+                                <i class="bi bi-person-plus-fill me-2"></i>
                                 Create Account
                             </button>
                         </div>
 
                         <!-- Login Redirect -->
-                        <div class="text-center mt-3 pt-2 border-top">
-                            <span class="text-muted fs-6" style="font-size:13px;">
+                        <div class="text-center mt-3 pt-2 border-top signup-login-link">
+                            <span>
+                                <i class="bi bi-person-check-fill me-1"></i>
                                 Already have an account?
                             </span>
-                            <a href="<?= base_url('/') ?>" class="fw-semibold text-decoration-none ms-1" style="font-size:13px;">
+                            <a href="#"
+                               class="fw-semibold text-decoration-none ms-1" data-bs-toggle="modal" data-bs-target="#loginModal">
                                 Login In
+                                <i class="bi bi-arrow-right-short"></i>
                             </a>
                         </div>
                     </form>
@@ -321,7 +668,6 @@ main.signup-page-main {
 </main>
 
 <?php echo view('footer/footer'); ?>
-
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="<?= base_url('assets/js/tost.js') ?>"></script>
 <script>
@@ -382,57 +728,135 @@ $(document).ready(function() {
     });
 
     // Form Submit Event
-    $('#signupForm').submit(function(e) {
+    $('#signupForm').on('submit', function(e) {
         e.preventDefault();
-
         if (!$('#terms').is(':checked')) {
-            showToast('warning', 'Please accept the Terms & Conditions');
+            showToast(
+                'warning',
+                'Please accept the Terms & Conditions'
+            );
             return;
         }
 
         let formData = {
-            full_name: $('#signup_full_name').val().trim(),
-            email: $('#signup_email').val().trim(),
-            body_type: $('#signup_body_type').val(),
-            body_name: $('#signup_body_name').val(),
-            ugc_details: $('#signup_ugc_details').val() ? $('#signup_ugc_details').val().trim() : '',
-            mobile: $('#signup_mobile').val().trim(),
-            username: $('#signup_username').val().trim(),
-            password: $('#signup_password').val().trim(),
-            captcha: $('#signup_captcha').val().trim(),
-            csrf_token: getCSRFHash()
+            full_name: ($('#signup_full_name').val() || '').trim(),
+            email: ($('#signup_email').val() || '').trim(),
+            mobile: ($('#signup_mobile').val() || '').trim(),
+            body_name: $('#signup_body_name').val() || '',
+            body_type: $('#signup_body_type').val() || '',
+            ugc_details: ($('#signup_ugc_details').val() || '').trim(),
+            captcha: ($('#signup_captcha').val() || '').trim(),
+            csrf_token: $('input[name="csrf_token"]').val() || ''
         };
-
-        $('#signupBtn').prop('disabled', true).html('<span class="spinner-border spinner-border-sm me-2"></span>Creating Account...');
-
+        console.log('Signup Form Data:', formData);
         $.ajax({
             url: "<?= base_url('auth/register') ?>",
             type: "POST",
             data: formData,
             dataType: "json",
-            headers: { "X-Requested-With": "XMLHttpRequest" },
+            beforeSend: function() {
+                $('#signupBtn')
+                    .prop('disabled', true)
+                    .html(
+                        '<i class="bi bi-hourglass-split me-2"></i>Registering...'
+                    );
+            },
             success: function(response) {
-                if (response.csrfHash) updateCSRF(response.csrfHash);
-                if (response.success) {
-                    showToast('success', response.message);
-                    setTimeout(function() {
-                        window.location.href = response.redirect;
-                    }, 1500);
-                } else {
-                    let error = response.message || 'Registration failed.';
-                    if (response.errors) error = Object.values(response.errors).join('<br>');
-                    showToast('error', error);
-                    refreshSignupCaptcha();
+                console.log('Register Response:', response);
+                // Update CSRF Token
+                if (response.csrfHash) {
+
+                    $('input[name="csrf_token"]')
+                        .val(response.csrfHash);
                 }
+                // Registration Successful
+                if (response.success) {
+
+                    showToast(
+                        'success',
+                        response.message
+                    );
+                    setTimeout(function() {
+                        if (response.redirect) {
+
+                            window.location.href =
+                                response.redirect;
+                        }
+                    }, 1000);
+                    return;
+                }
+                // Validation Errors
+                if (response.errors) {
+                    let errors = '';
+                    $.each(
+                        response.errors,
+                        function(field, message) {
+
+                            errors += message + '<br>';
+
+                        }
+                    );
+                    showToast(
+                        'error',
+                        errors
+                    );
+                } else {
+                    showToast(
+                        'error',
+                        response.message ||
+                        'Registration failed.'
+                    );
+                }
+                // Enable button
+                $('#signupBtn')
+                    .prop('disabled', false)
+                    .html(
+                        '<i class="bi bi-person-plus-fill me-2"></i>Create Account'
+                    );
             },
-            error: function() {
-                showToast('error', 'Server Error. Please try again.');
-                refreshSignupCaptcha();
+            error: function(xhr) {
+                console.error(
+                    'Registration Error:',
+                    xhr.responseText
+                );
+                let message =
+                    'Server error. Please try again.';
+                if (xhr.responseJSON) {
+                    if (xhr.responseJSON.message) {
+                        message =
+                            xhr.responseJSON.message;
+                    }
+                    if (xhr.responseJSON.errors) {
+                        let errors = '';
+                        $.each(
+                            xhr.responseJSON.errors,
+                            function(field, errorMessage) {
+                                errors +=
+                                    errorMessage + '<br>';
+                            }
+                        );
+                        if (errors) {
+                            message = errors;
+                        }
+                    }
+                }
+                showToast(
+                    'error',
+                    message
+                );
+                // Enable button
+                $('#signupBtn')
+                    .prop('disabled', false)
+                    .html(
+                        '<i class="bi bi-person-plus-fill me-2"></i>Create Account'
+                    );
             },
+            // Success ya Error dono ke baad CAPTCHA refresh hoga
             complete: function() {
-                $('#signupBtn').prop('disabled', false).html('<i class="bi bi-person-plus me-2"></i>Create Account');
+                refreshSignupCaptcha();
             }
         });
     });
+    
 });
 </script>

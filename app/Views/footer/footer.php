@@ -144,6 +144,13 @@
         </div>
     </div>
 </footer>
+<?php 
+$loginModal = APPPATH . 'Views/modals/login_modal.php';
+
+if (file_exists($loginModal)) {
+    include_once($loginModal);
+}
+?> 
 <!-- Scroll Top -->
 <a href="#" id="scroll-top" class="scroll-top d-flex align-items-center justify-content-center">
     <i class="bi bi-arrow-up-short"></i>
@@ -160,5 +167,246 @@
 
 <!-- Main JS -->
 <script src="<?= base_url('assets/js/main.js') ?>"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="<?= base_url('assets/js/tost.js') ?>"></script>
+<script>
+    AOS.init();
+
+    // ================================
+    // CSRF Helper Functions
+    // ================================
+    function getCSRFName() {
+        const csrfInput = document.querySelector('input[name="csrf_token"]');
+        return csrfInput ? csrfInput.name : 'csrf_token';
+    }
+
+    function getCSRFHash() {
+        const csrfInput = document.querySelector('input[name="csrf_token"]');
+        return csrfInput ? csrfInput.value : '';
+    }
+
+    function updateCSRF(hash) {
+        const csrfInputs = document.querySelectorAll('input[name="csrf_token"]');
+        csrfInputs.forEach(input => input.value = hash);
+    }
+
+    // ================================
+    // Toggle Password Functions
+    // ================================
+    window.toggleLoginPassword = function() {
+        const passwordInput = document.getElementById('login_password');
+        const eyeIcon = document.getElementById('loginEyeIcon');
+        if (passwordInput.type === 'password') {
+            passwordInput.type = 'text';
+            eyeIcon.className = 'bi bi-eye-slash-fill';
+        } else {
+            passwordInput.type = 'password';
+            eyeIcon.className = 'bi bi-eye-fill';
+        }
+    }
+
+    window.toggleSignupPassword = function() {
+        const passwordInput = document.getElementById('signup_password');
+        const eyeIcon = document.getElementById('signupEyeIcon');
+        if (passwordInput.type === 'password') {
+            passwordInput.type = 'text';
+            eyeIcon.className = 'bi bi-eye-slash-fill';
+        } else {
+            passwordInput.type = 'password';
+            eyeIcon.className = 'bi bi-eye-fill';
+        }
+    }
+
+    // ================================
+    // Refresh CAPTCHA - Login
+    // ================================
+    window.refreshLoginCaptcha = function() {
+        const csrfHash = getCSRFHash();
+        
+        $.ajax({
+            url: "<?= base_url('refresh-captcha') ?>",
+            type: "POST",
+            data: {
+                csrf_token: csrfHash
+            },
+            dataType: "json",
+            headers: {
+                "X-Requested-With": "XMLHttpRequest"
+            },
+            success: function(response) {
+                if (response.csrfHash) {
+                    updateCSRF(response.csrfHash);
+                }
+                if (response.success) {
+                    $('#loginCaptchaText').text(response.captcha);
+                    $('#login_captcha').val('');
+                }
+            },
+            error: function(xhr) {
+                console.error('CAPTCHA refresh error:', xhr);
+            }
+        });
+    }
+
+    // ================================
+    // Refresh CAPTCHA - Signup
+    // ================================
+    window.refreshSignupCaptcha = function() {
+        const csrfHash = getCSRFHash();
+        
+        $.ajax({
+            url: "<?= base_url('refresh-captcha') ?>",
+            type: "POST",
+            data: {
+                csrf_token: csrfHash
+            },
+            dataType: "json",
+            headers: {
+                "X-Requested-With": "XMLHttpRequest"
+            },
+            success: function(response) {
+                if (response.csrfHash) {
+                    updateCSRF(response.csrfHash);
+                }
+                if (response.success) {
+                    $('#signupCaptchaText').text(response.captcha);
+                    $('#signup_captcha').val('');
+                }
+            },
+            error: function(xhr) {
+                console.error('CAPTCHA refresh error:', xhr);
+            }
+        });
+    }
+
+    // ================================
+    // Document Ready
+    // ================================
+    $(document).ready(function() {
+        // =====================================
+        // Open Login Modal from Signup
+        // =====================================
+        $(document).on('click', '#openLogin', function(e) {
+            e.preventDefault();
+            const signupModal = bootstrap.Modal.getInstance(
+                document.getElementById('signupModal')
+            );
+            if (signupModal) {
+                signupModal.hide();
+            }
+            $('#signupModal').one('hidden.bs.modal', function() {
+                $('.modal-backdrop').remove();
+                $('body').removeClass('modal-open').css({
+                    overflow: '',
+                    paddingRight: ''
+                });
+                const loginModal = new bootstrap.Modal(
+                    document.getElementById('loginModal'),
+                    {
+                        backdrop: 'static',
+                        keyboard: false
+                    }
+                );
+                loginModal.show();
+            });
+        });
+
+        // =====================================
+        // Login Form Submit - Sending plain password
+        // =====================================
+        $('#loginForm').on('submit', function(e) {
+            e.preventDefault();
+            const username = $('#login_username').val().trim();
+            const password = $('#login_password').val().trim();
+            const captcha = $('#login_captcha').val().trim();
+            
+            if (!username || !password || !captcha) {
+                showToast('warning', 'All fields are required');
+                return;
+            }
+            
+            $('#loginBtn')
+                .prop('disabled', true)
+                .html('<span class="spinner-border spinner-border-sm me-2"></span>Logging in...');
+            
+            $.ajax({
+                url: '<?= base_url('auth/checkLogin') ?>',
+                type: 'POST',
+                dataType: 'json',
+                data: {
+                    username: username,
+                    password: password, // Sending plain password
+                    captcha: captcha,
+                    csrf_token: getCSRFHash()
+                },
+                success: function(response) {
+                    if (response.csrfHash) {
+                        updateCSRF(response.csrfHash);
+                    }
+                    if (response.success) {
+                        showToast('success', response.message);
+                        const loginModal = bootstrap.Modal.getInstance(
+                            document.getElementById('loginModal')
+                        );
+                        if (loginModal) {
+                            loginModal.hide();
+                        }
+                        setTimeout(function() {
+                            window.location.href = response.redirect;
+                        }, 1000);
+                    } else {
+                        let message = response.message || 'Login failed.';
+                        if (response.errors) {
+                            message = Object.values(response.errors).join('<br>');
+                        }
+                        showToast('error', message);
+                        refreshLoginCaptcha();
+                        $('#login_captcha').val('');
+                    }
+                },
+                error: function(xhr) {
+                    let message = 'An error occurred. Please try again.';
+                    if (xhr.responseJSON && xhr.responseJSON.message) {
+                        message = xhr.responseJSON.message;
+                    }
+                    showToast('error', message);
+                    refreshLoginCaptcha();
+                    $('#login_captcha').val('');
+                },
+                complete: function() {
+                    $('#loginBtn')
+                        .prop('disabled', false)
+                        .html('<i class="bi bi-box-arrow-in-right me-2"></i>Login');
+                }
+            });
+        });
+
+        // =====================================
+        // Refresh CAPTCHA Events
+        // =====================================
+        $('#loginRefreshCaptcha').click(function() {
+            refreshLoginCaptcha();
+        });
+        
+        // Refresh CAPTCHA when modals open
+        $('#loginModal').on('shown.bs.modal', function() {
+            refreshLoginCaptcha();
+        });
+
+        // =====================================
+        // Cleanup Modals
+        // =====================================
+        $('#loginModal').on('hidden.bs.modal', function() {
+            $('.modal-backdrop').remove();
+            $('body').removeClass('modal-open').css({
+                overflow: '',
+                paddingRight: ''
+            });
+            $('#loginForm')[0].reset();
+            $('#login_captcha').val('');
+        });
+
+    });
+</script>
 </body>
 </html>

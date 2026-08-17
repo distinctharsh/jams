@@ -10,6 +10,18 @@ $routes->get('test-db', 'Test::index');
 $routes->get('signup', 'Auth::signup');
 $routes->post('auth/checkLogin', 'Auth::checkLogin');
 $routes->post('auth/register', 'Auth::register');
+$routes->get(
+    'auth/authorization',
+    'Auth::authorization'
+);
+$routes->post(
+    'auth/upload-authorization',
+    'Auth::uploadAuthorization'
+);
+$routes->get(
+    'auth/application-submitted',
+    'Auth::applicationSubmitted'
+);
 $routes->post('refresh-captcha', 'Auth::refreshCaptcha');
 $routes->get('logout', 'Auth::logout');
 

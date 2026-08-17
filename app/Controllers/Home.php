@@ -25,11 +25,18 @@ class Home extends BaseController
 
     private function generateCaptcha()
     {
-        $characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+        $characters = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+
         $captcha = '';
-        for ($i = 0; $i < 6; $i++) {
-            $captcha .= $characters[rand(0, strlen($characters) - 1)];
+
+        for ($i = 0; $i < 5; $i++) {
+            $captcha .= $characters[random_int(0, strlen($characters) - 1)];
         }
+
+        $session = \Config\Services::session();
+
+        $session->set('captcha_text', $captcha);
+
         return $captcha;
     }
 }

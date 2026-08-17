@@ -1,17 +1,141 @@
 <!-- MAIN LAYOUT: sidebar + content -->
+<style>
+/* Sidebar Section Header */
+.sidebar-section-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 5px 10px 8px;
+    margin-bottom: 8px;
+}
+
+/* Main Label */
+.sidebar-section-title {
+    display: flex;
+    align-items: center;
+    gap: 3px;
+    font-size: 14px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: #1e4d7b;
+    white-space: nowrap;
+}
+
+.sidebar-section-title i {
+    font-size: 8px;
+    opacity: 0.75;
+}
+
+/* Toggle Button */
+.sidebar-toggle-btn {
+    width: 27px;
+    height: 27px;
+    min-width: 27px;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    background: #cc7700;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    box-shadow: 0 1px 2px rgba(15, 23, 42, 0.05);
+}
+
+.sidebar-toggle-btn i {
+    font-size: 10px;
+    transition: transform 0.25s ease;
+}
+
+.sidebar-toggle-btn:hover {
+    background: #f1f5f9;
+    border-color: #cbd5e1;
+    color: #1e4d7b;
+    transform: translateY(-1px);
+}
+
+.sidebar-toggle-btn:active {
+    transform: scale(0.94);
+}
+
+/* Collapsed Sidebar */
+.gov-sidebar.collapsed .sidebar-section-header {
+    justify-content: center;
+    padding-left: 0;
+    padding-right: 0;
+}
+
+.gov-sidebar.collapsed .sidebar-section-title {
+    display: none;
+}
+
+.gov-sidebar.collapsed .sidebar-toggle-btn i {
+    transform: rotate(180deg);
+}
+.sidebar-section-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 12px;
+}
+
+.sidebar-section-title {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 11px;
+    font-weight: 700;
+}
+
+.sidebar-section-title i {
+    font-size: 15px;   /* Dashboard icon bigger */
+}
+
+.sidebar-toggle-btn {
+    width: 32px;
+    height: 32px;
+    min-width: 32px;
+    border: none;
+    border-radius: 7px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 17px;   /* Toggle icon bigger */
+    transition: all 0.2s ease;
+}
+
+.sidebar-toggle-btn i {
+    font-size: 17px;
+}
+
+.sidebar-toggle-btn:hover {
+    transform: scale(1.05);
+}
+</style>
 <div class="flex flex-1 overflow-hidden">
   <!-- SIDEBAR -->
     <aside class="gov-sidebar">
     <div>
-        <div class="flex items-center justify-between px-3 mb-3 pt-1">
-        <span class="text-[9px] font-bold text-slate-400 uppercase tracking-wider nav-label">Main</span>
-        <div class="icon-btn sidebar-toggle-btn" id="sidebarToggleBtn" onclick="toggleSidebar()" title="Toggle Sidebar">
-            <i class="fas fa-xmark" id="toggleIcon"></i>
+        <div class="sidebar-section-header">
+            <a href="#" onclick="showPage('dashboard')" class="sidebar-section-title nav-label">
+                <i class="fas fa-layer-group me-1"></i>
+               Dashboard
+            </a>
+            <button
+                type="button"
+                class="sidebar-toggle-btn"
+                id="sidebarToggleBtn"
+                onclick="toggleSidebar()"
+                title="Toggle Sidebar"
+                aria-label="Toggle Sidebar">
+                <i class="fas fa-chevron-left" id="toggleIcon"></i>
+            </button>
         </div>
-        </div>
-
         <nav>
-        <a href="#" class="nav-item active" onclick="showPage('dashboard')"><i class="fas fa-gauge-high"></i> <span>Dashboard</span></a>
+        <!-- <a href="#" class="nav-item active" onclick="showPage('dashboard')"><i class="fas fa-gauge-high"></i> <span>Dashboard</span></a> -->
         <a href="#" class="nav-item booking-btn" onclick="showPage('new-request')">
             <i class="fas fa-calendar-check"></i>
             <span>New Request</span>

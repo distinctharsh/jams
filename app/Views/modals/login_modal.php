@@ -1,4 +1,277 @@
 <!-- Login Modal -->
+<style>
+/* =========================================================
+   LOGIN MODAL
+   ========================================================= */
+/* Login Modal Container */
+.jams-modal {
+    border: none;
+    border-radius: 20px;
+    overflow: hidden;
+    animation: zoomIn .4s;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, .35);
+}
+
+/* Modal Backdrop */
+.modal-backdrop.show {
+    backdrop-filter: blur(7px);
+    background: rgba(0, 0, 0, .4);
+}
+
+
+/* =========================================================
+   LOGIN LEFT PANEL
+   ========================================================= */
+
+.login-left {
+    background: linear-gradient(160deg, #1e4d7b, #2f6ea8);
+    color: #fff;
+    text-align: center;
+    padding: 35px 20px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+/* Login Logo */
+.login-logo {
+    width: 150px;
+    margin: auto;
+    margin-bottom: -30px;
+}
+
+/* Left Panel Headings */
+.login-left h5 {
+    color: #FF9933;
+    font-weight: 700;
+}
+
+.login-left h6 {
+    font-weight: 700;
+}
+
+/* Force White Text */
+.login-left,
+.login-left h3,
+.login-left h4,
+.login-left h6,
+.login-left p,
+.login-left small {
+    color: #fff !important;
+}
+
+/* Left Panel Divider */
+.login-left hr {
+    border-color: rgba(255, 255, 255, .5) !important;
+}
+
+
+/* =========================================================
+   LOGIN FORM INPUTS
+   ========================================================= */
+
+.form-control {
+    height: 48px;
+    border-radius: 10px;
+}
+
+.login-input {
+    height: 45px;
+}
+
+.input-group-text {
+    background: #1e4d7b;
+    color: #fff;
+    border-color: #1e4d7b;
+    border-radius: 10px 0 0 10px;
+}
+
+
+/* =========================================================
+   LOGIN SUBMIT BUTTON
+   ========================================================= */
+
+.login-submit {
+    background: linear-gradient(135deg, #0d6efd, #084298);
+    color: #fff;
+    border: none;
+    border-radius: 12px;
+    padding: 14px 20px;
+    font-size: 16px;
+    font-weight: 600;
+    letter-spacing: .5px;
+    transition: all .3s ease;
+    box-shadow: 0 8px 20px rgba(13, 110, 253, .25);
+}
+
+.login-submit:hover {
+    background: linear-gradient(135deg, #084298, #052c65);
+    color: #fff;
+    transform: translateY(-2px);
+    box-shadow: 0 12px 25px rgba(13, 110, 253, .35);
+}
+
+.login-submit:focus {
+    color: #fff;
+    box-shadow: 0 0 0 .25rem rgba(13, 110, 253, .25);
+}
+
+.login-submit:active {
+    transform: scale(.98);
+}
+
+
+/* =========================================================
+   FORGOT PASSWORD
+   ========================================================= */
+
+.forgot-link {
+    color: #0d6efd;
+    font-size: 14px;
+    font-weight: 600;
+    transition: .3s;
+    position: relative;
+}
+
+.forgot-link:hover {
+    color: #084298;
+}
+
+.forgot-link::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    bottom: -3px;
+    width: 0;
+    height: 2px;
+    background: #0d6efd;
+    transition: .3s;
+}
+
+.forgot-link:hover::after {
+    width: 100%;
+}
+
+
+/* =========================================================
+   LOGIN CAPTCHA
+   ========================================================= */
+
+/* =========================================================
+   ATTRACTIVE CAPTCHA
+   ========================================================= */
+
+.captcha-box {
+    height: 52px;
+    min-width: 170px;
+    padding: 0 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    position: relative;
+    overflow: hidden;
+
+    border: 1px solid #c8d6e5;
+    border-radius: 10px;
+
+    background:
+        linear-gradient(135deg, #f8fbff 0%, #eef5fb 100%);
+
+    box-shadow:
+        0 3px 10px rgba(23, 74, 120, 0.08),
+        inset 0 1px 0 rgba(255, 255, 255, 0.9);
+
+    transition: all .25s ease;
+}
+
+/* Decorative Lines */
+.captcha-box::before,
+.captcha-box::after {
+    content: "";
+    position: absolute;
+    width: 140%;
+    height: 1px;
+    background: rgba(23, 74, 120, 0.12);
+    transform: rotate(-12deg);
+    pointer-events: none;
+}
+
+.captcha-box::before {
+    top: 15px;
+}
+
+.captcha-box::after {
+    bottom: 14px;
+    transform: rotate(10deg);
+}
+
+/* CAPTCHA Text */
+.captcha-text {
+    position: relative;
+    z-index: 2;
+    font-size: 23px;
+    font-weight: 800;
+    letter-spacing: 5px;
+    color: #174a78;
+    user-select: none;
+    font-family: "Courier New", monospace;
+    text-shadow:
+        1px 1px 0 #ffffff,
+        2px 2px 0 rgba(23, 74, 120, 0.08);
+    transform: skew(-4deg);
+}
+
+/* Hover */
+.captcha-box:hover {
+    border-color: #174a78;
+    box-shadow:
+        0 5px 16px rgba(23, 74, 120, 0.14),
+        inset 0 1px 0 rgba(255, 255, 255, 0.9);
+    transform: translateY(-1px);
+}
+
+#refreshCaptcha {
+    border-radius: 6px;
+}
+
+/* =========================================================
+   LOGIN MODAL BODY
+   ========================================================= */
+.modal-body {
+    background: #fbfcff;
+}
+
+/* =========================================================
+   LOGIN MODAL ANIMATION
+   ========================================================= */
+@keyframes zoomIn {
+    from {
+        transform: scale(.6);
+        opacity: 0;
+    }
+    to {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+.header-divider {
+    width: 100%;
+    max-width: 1031px;
+    height: 3px;
+    margin-top: 8px;
+    margin-bottom: 22px;
+    background: linear-gradient(
+        90deg,
+        #174a78 0%,
+        #ff9933 50%,
+        #138808 100%
+    );
+    border-radius: 5px;
+    opacity: 0.9;
+}
+</style>
 <div class="modal fade" id="loginModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-lg">
         <div class="modal-content jams-modal">
@@ -22,10 +295,10 @@
                         <h6 class="login-goi text-white">
                             Government of India
                         </h6>
-                        <hr class="my-4 border-light opacity-50 w-75">
+                        <div class="header-divider"></div>
                         <p class="text-white mb-0">
                             <strong>JAMS</strong><br>
-                            JAMAR Approval Management System
+                            JAMMER Approval Management System
                         </p>
                         <small class="mt-3 d-block text-white">
                             Secure • Transparent • Digital Governance
@@ -129,7 +402,7 @@
                                     <span class="text-muted">
                                         Don't have an account?
                                     </span>
-                                    <a href="#" id="openSignup" class="fw-semibold text-decoration-none">
+                                    <a href="<?= base_url('signup') ?>"  class="fw-semibold text-decoration-none">
                                         Sign Up Here
                                     </a>
                                 </div>

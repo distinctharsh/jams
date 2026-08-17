@@ -1,419 +1,130 @@
 <?php echo view('header/header'); ?>
 <style>
-/* Login Button */
-.btn-login{
-    background:#FF9933;
-    color:#fff;
-    border:2px solid #FF9933;
-    font-weight:600;
-    padding:12px 28px;
-    border-radius:8px;
-    transition:.3s;
+/* =========================================================
+   LOGIN / SIGN UP BUTTON
+   ========================================================= */
+
+.btn-login {
+    background: #FF9933;
+    color: #fff;
+    border: 2px solid #FF9933;
+    font-weight: 600;
+    padding: 12px 28px;
+    border-radius: 8px;
+    transition: .3s;
 }
 
-.btn-login:hover{
-    background:#e68600;
-    border-color:#e68600;
-    color:#fff;
+.btn-login:hover {
+    background: #e68600;
+    border-color: #e68600;
+    color: #fff;
 }
+
 
 /* Sign Up Button */
-.btn-signup{
-    background:#1e4d7b;
-    color:#fff;
-    border:2px solid #1e4d7b;
-    font-weight:600;
-    padding:12px 28px;
-    border-radius:8px;
-    transition:.3s;
+
+.btn-signup {
+    background: #1e4d7b;
+    color: #fff;
+    border: 2px solid #1e4d7b;
+    font-weight: 600;
+    padding: 12px 28px;
+    border-radius: 8px;
+    transition: .3s;
 }
 
-.btn-signup:hover{
-    background:#163a5b;
-    border-color:#163a5b;
-    color:#fff;
+.btn-signup:hover {
+    background: #163a5b;
+    border-color: #163a5b;
+    color: #fff;
 }
 
-.hero-description{
+
+/* =========================================================
+   HERO SECTION
+   ========================================================= */
+
+.hero-description {
     text-align: justify;
     line-height: 1.8;
     color: #555;
 }
 
-.hero-content h1{
+.hero-content h1 {
     line-height: 1.2;
 }
 
-.hero-content h5{
+.hero-content h5 {
     font-size: 24px;
     letter-spacing: .5px;
 }
 
-.section-heading{
-    font-size:42px;
-    font-weight:700;
-    color:#222;
+
+/* =========================================================
+   SECTION HEADING
+   ========================================================= */
+
+.section-heading {
+    font-size: 42px;
+    font-weight: 700;
+    color: #222;
 }
 
-.lead-text{
-    color:#1e4d7b;
-    font-size:18px;
-    font-weight:500;
+.lead-text {
+    color: #1e4d7b;
+    font-size: 18px;
+    font-weight: 500;
 }
 
-.stats-grid{
-    display:flex;
-    gap:20px;
-    margin-top:30px;
+
+/* =========================================================
+   STATS
+   ========================================================= */
+
+.stats-grid {
+    display: flex;
+    gap: 15px;
+    margin-top: 20px;
 }
 
-.stat-item{
-    flex:1;
-    background:#fff;
-    border-radius:12px;
-    padding:20px;
-    text-align:center;
-    box-shadow:0 5px 20px rgba(0,0,0,.08);
+.stats-grid .stat-item {
+    flex: 1;
+    padding: 15px 12px;
+    border-radius: 10px;
+    text-align: center;
+    background: #fff;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, .08);
 }
 
-.stat-number{
-    font-size:34px;
-    font-weight:700;
-    color:#FF9933;
+.stats-grid .stat-number {
+    font-size: 28px;
+    font-weight: 700;
+    color: #1e4d7b;
+    line-height: 1;
 }
 
-.stat-label{
-    color:#555;
-    font-weight:600;
-    margin-top:8px;
+.stats-grid .stat-label {
+    font-size: 13px;
+    margin-top: 6px;
+    color: #666;
+    font-weight: 600;
 }
 
-.about-visual img{
-    border-radius:18px;
-    border:8px solid #fff;
+
+/* =========================================================
+   ABOUT VISUAL
+   ========================================================= */
+
+.about-visual img {
+    border-radius: 18px;
+    border: 8px solid #fff;
 }
 
-.stats-grid{
-    display:flex;
-    gap:15px;
-    margin-top:20px;
-}
 
-.stats-grid .stat-item{
-    flex:1;
-    padding:15px 12px;
-    border-radius:10px;
-    text-align:center;
-    background:#fff;
-    box-shadow:0 3px 10px rgba(0,0,0,.08);
-}
+/* =========================================================
+   TOAST CONTAINER
+   ========================================================= */
 
-.stats-grid .stat-number{
-    font-size:28px;   /* पहले 34-40px था */
-    font-weight:700;
-    color:#1e4d7b;
-    line-height:1;
-}
-
-.stats-grid .stat-label{
-    font-size:13px;   /* पहले 16px था */
-    margin-top:6px;
-    color:#666;
-    font-weight:600;
-}
-</style>
-<style>
-    .jams-modal{
-    border:none;
-    border-radius:20px;
-    overflow:hidden;
-    animation:zoomIn .4s;
-    box-shadow:0 20px 60px rgba(0,0,0,.35);
-}
-
-.modal-backdrop.show{
-    backdrop-filter:blur(7px);
-    background:rgba(0,0,0,.4);
-}
-
-.login-left{
-
-    background:linear-gradient(160deg,#1e4d7b,#2f6ea8);
-
-    color:#fff;
-
-    text-align:center;
-
-    padding:35px 20px;
-
-    display:flex;
-
-    flex-direction:column;
-
-    justify-content:center;
-
-}
-
-.login-logo{
-
-    width:150px;
-
-    margin:auto;
-
-    margin-bottom:-30px;
-
-}
-
-.login-left h5{
-
-    color:#FF9933;
-
-    font-weight:700;
-
-}
-
-.login-left h6{
-
-    font-weight:700;
-
-}
-
-.form-control{
-
-    height:48px;
-
-    border-radius:10px;
-
-}
-
-.input-group-text{
-
-    background:#f6f6f6;
-
-    border-radius:10px 0 0 10px;
-
-}
-
-.btn-login{
-
-    background:#FF9933;
-
-    color:#fff;
-
-    height:50px;
-
-    border:none;
-
-    border-radius:10px;
-
-    font-weight:600;
-
-}
-
-.btn-login:hover{
-
-    background:#e58500;
-
-    color:#fff;
-
-}
-
-@keyframes zoomIn{
-
-from{
-
-transform:scale(.6);
-
-opacity:0;
-
-}
-
-to{
-
-transform:scale(1);
-
-opacity:1;
-
-}
-
-}
-
-.login-left,
-.login-left h3,
-.login-left h4,
-.login-left h6,
-.login-left p,
-.login-left small {
-    color: #fff !important;
-}
-
-.login-left hr {
-    border-color: rgba(255,255,255,.5) !important;
-}
-
-/* Login Button */
-.login-submit{
-    background: linear-gradient(135deg,#0d6efd,#084298);
-    color:#fff;
-    border:none;
-    border-radius:12px;
-    padding:14px 20px;
-    font-size:16px;
-    font-weight:600;
-    letter-spacing:.5px;
-    transition:all .3s ease;
-    box-shadow:0 8px 20px rgba(13,110,253,.25);
-}
-
-.login-submit:hover{
-    background:linear-gradient(135deg,#084298,#052c65);
-    color:#fff;
-    transform:translateY(-2px);
-    box-shadow:0 12px 25px rgba(13,110,253,.35);
-}
-
-.login-submit:focus{
-    color:#fff;
-    box-shadow:0 0 0 .25rem rgba(13,110,253,.25);
-}
-
-.login-submit:active{
-    transform:scale(.98);
-}
-
-/* Forgot Password */
-.forgot-link{
-    color:#0d6efd;
-    font-size:14px;
-    font-weight:600;
-    transition:.3s;
-    position:relative;
-}
-
-.forgot-link:hover{
-    color:#084298;
-}
-
-.forgot-link::after{
-    content:"";
-    position:absolute;
-    left:0;
-    bottom:-3px;
-    width:0;
-    height:2px;
-    background:#0d6efd;
-    transition:.3s;
-}
-
-.forgot-link:hover::after{
-    width:100%;
-}
-
-.signup-modal{
-    border:none;
-    border-radius:22px;
-    overflow:hidden;
-    box-shadow:0 25px 60px rgba(0,0,0,.20);
-}
-
-.signup-header{
-    background:linear-gradient(135deg,#0B3D91,#1565C0);
-    padding:22px 30px;
-    border:none;
-}
-
-.signup-icon{
-    width:80px;
-    height:80px;
-    margin:auto;
-    border-radius:50%;
-    background:linear-gradient(135deg,#0B3D91,#1976D2);
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    color:#fff;
-    font-size:34px;
-    box-shadow:0 10px 25px rgba(13,110,253,.25);
-}
-
-.signup-input{
-    height:50px;
-    border-left:none;
-    border-radius:0 12px 12px 0;
-    box-shadow:none;
-}
-
-.signup-input:focus{
-    border-color:#0d6efd;
-    box-shadow:0 0 0 .15rem rgba(13,110,253,.15);
-}
-
-.input-group-text{
-    background:#f8f9fa;
-    border-radius:12px 0 0 12px;
-    color:#0B3D91;
-    font-size:18px;
-}
-
-.signup-btn{
-    height:52px;
-    border:none;
-    border-radius:14px;
-    color:#fff;
-    font-size:16px;
-    font-weight:600;
-    background:linear-gradient(135deg,#0B3D91,#1976D2);
-    transition:.35s;
-}
-
-.signup-btn:hover{
-    color:#fff;
-    transform:translateY(-2px);
-    box-shadow:0 12px 25px rgba(13,110,253,.30);
-}
-
-.form-label{
-    color:#1f2937;
-    margin-bottom:8px;
-}
-
-.form-check-label{
-    color:#495057;
-}
-
-.modal-body{
-    background:#fbfcff;
-}
-.captcha-box{
-    height: 45px;
-    border:1px solid #ced4da;
-    border-radius:8px;
-    background:#f8f9fa;
-}
-
-.captcha-text{
-    font-size:20px;
-    font-weight:700;
-    letter-spacing:3px;
-    color:#0d6efd;
-    user-select:none;
-    font-family:'Courier New', monospace;
-}
-
-.input-group-text{
-    background:#0d6efd;
-    color:#fff;
-    border-color:#0d6efd;
-}
-
-.login-input{
-    height:45px;
-}
-
-#refreshCaptcha{
-    border-radius:6px;
-}
-/* Toast Container */
 #toastContainer {
     width: 350px;
     max-width: 95%;
@@ -424,6 +135,7 @@ opacity:1;
 
 
 /* Toast Box */
+
 .toast {
     width: 100%;
     min-height: 55px;
@@ -433,6 +145,7 @@ opacity:1;
 
 
 /* Toast Body */
+
 .toast-body {
     padding: 12px 15px;
     font-size: 15px;
@@ -440,66 +153,83 @@ opacity:1;
 
 
 /* Close Button */
+
 .toast .btn-close {
     margin-right: 8px;
 }
 
-.dashboard-card-btn{
-    display:inline-flex;
-    align-items:center;
-    gap:12px;
-    padding:10px 18px;
-    border-radius:12px;
-    text-decoration:none;
-    background:linear-gradient(135deg,#0b3d91,#1565c0);
-    color:#fff !important;
-    box-shadow:0 8px 20px rgba(0,0,0,.18);
-    transition:.3s ease;
-    min-width:260px;
+
+/* =========================================================
+   DASHBOARD CARD BUTTON
+   ========================================================= */
+
+.dashboard-card-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 18px;
+    border-radius: 12px;
+    text-decoration: none;
+    background: linear-gradient(135deg, #0b3d91, #1565c0);
+    color: #fff !important;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, .18);
+    transition: .3s ease;
+    min-width: 260px;
 }
 
-.dashboard-card-btn:hover{
-    color:#fff !important;
-    transform:translateY(-2px);
-    box-shadow:0 12px 28px rgba(0,0,0,.25);
+.dashboard-card-btn:hover {
+    color: #fff !important;
+    transform: translateY(-2px);
+    box-shadow: 0 12px 28px rgba(0, 0, 0, .25);
 }
 
-.dashboard-icon{
-    width:42px;
-    height:42px;
-    border-radius:50%;
-    background:rgba(255,255,255,.15);
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    font-size:18px;
-    color:#fff;
+
+/* Dashboard Icon */
+
+.dashboard-icon {
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, .15);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    color: #fff;
 }
 
-.dashboard-info{
-    flex:1;
-    line-height:1.2;
+
+/* Dashboard Info */
+
+.dashboard-info {
+    flex: 1;
+    line-height: 1.2;
 }
 
-.dashboard-info small{
-    display:block;
-    font-size:11px;
-    color:rgba(255,255,255,.85);
-    text-transform:uppercase;
-    letter-spacing:.5px;
+.dashboard-info small {
+    display: block;
+    font-size: 11px;
+    color: rgba(255, 255, 255, .85);
+    text-transform: uppercase;
+    letter-spacing: .5px;
 }
 
-.dashboard-info h6{
-    margin:2px 0 0;
-    font-size:15px;
-    font-weight:600;
-    color:#fff;
+.dashboard-info h6 {
+    margin: 2px 0 0;
+    font-size: 15px;
+    font-weight: 600;
+    color: #fff;
 }
 
-.dashboard-arrow{
-    font-size:18px;
-    color:#fff;
+
+/* Dashboard Arrow */
+
+.dashboard-arrow {
+    font-size: 18px;
+    color: #fff;
 }
+
+
 </style>
  <main class="main" id="mainContent">
     <div id="toast-container"
@@ -563,7 +293,7 @@ opacity:1;
                     <button class="btn btn-login" data-bs-toggle="modal" data-bs-target="#loginModal">
                         <i class="bi bi-box-arrow-in-right me-2"></i>Login
                     </button>
-                    <!-- <button class="btn btn-signup" data-bs-toggle="modal" data-bs-target="#signupModal">
+                   <!--  <button class="btn btn-signup" data-bs-toggle="modal" data-bs-target="#signupModal">
                         <i class="bi bi-person-plus me-2"></i>Sign Up
                     </button> -->
                     <a href="<?= base_url('signup') ?>" class="btn btn-signup">
@@ -589,85 +319,6 @@ opacity:1;
       </div>
     </section>
     <!-- /Hero Section -->
-   <!-- Home About Section -->
-  <?php /* <section id="home-about" class="home-about section">
-    <div class="container" data-aos="fade-up">
-        <div class="row align-items-center">
-            <!-- Left Content -->
-            <div class="col-lg-6 mb-5 mb-lg-0" data-aos="fade-right">
-                <div class="about-content">
-                    <span class="badge px-3 py-2 mb-3"
-                          style="background:#FF9933;color:#fff;font-size:15px;">
-                        Cabinet Secretariat • Government of India
-                    </span>
-                    <h2 class="section-heading fw-bold">
-                        JAMS
-                        <span style="color:#1e4d7b;">
-                            (Jammers Approval Management System)
-                        </span>
-                    </h2>
-                    <p class="lead-text mt-3">
-                        JAMS is a centralized digital platform developed to simplify,
-                        monitor and manage the Approval of files, departments and
-                        official work within the Cabinet Secretariat.
-                    </p>
-                    <p>
-                        The system provides secure file Approval, real-time monitoring,
-                        workflow transparency and departmental coordination.
-                        It improves operational efficiency, minimizes manual intervention
-                        and enables faster decision-making through a modern digital platform.
-                    </p>
-                    <!-- Stats -->
-                    <div class="stats-grid mt-4">
-                        <div class="stat-item">
-                            <div class="stat-number purecounter"
-                                 data-purecounter-start="0"
-                                 data-purecounter-end="5000"
-                                 data-purecounter-duration="2">
-                            </div>
-                            <div class="stat-label">
-                                Files Managed
-                            </div>
-                        </div>
-                        <div class="stat-item">
-                            <div class="stat-number purecounter"
-                                 data-purecounter-start="0"
-                                 data-purecounter-end="120"
-                                 data-purecounter-duration="2">
-                            </div>
-                            <div class="stat-label">
-                                Departments
-                            </div>
-                        </div>
-                        <div class="stat-item">
-                            <div class="stat-number purecounter"
-                                 data-purecounter-start="0"
-                                 data-purecounter-end="1000"
-                                 data-purecounter-duration="2">
-                            </div>
-                            <div class="stat-label">
-                                Active Users
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <!-- Right Image -->
-            <div class="col-lg-6" data-aos="fade-left">
-                <div class="about-visual">
-                    <div class="main-image">
-                        <img src="<?= base_url('assets/image/jams-banner.png') ?>"
-                             class="img-fluid rounded-4 shadow"
-                             alt="JAMS Dashboard">
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</section>
-
-*/ ?>
-<!-- /Home About Section -->
 <!-- Featured Departments Section -->
 <section id="featured-departments" class="featured-departments section">
     <!-- Section Title -->
@@ -798,443 +449,6 @@ opacity:1;
 <!-- /Featured Departments Section -->
 </main>
 <!-- Include Modals -->
-<?php include_once __DIR__ . '/modals/login_modal.php'; ?>
-<?php include_once __DIR__ . '/modals/signup_modal.php'; ?>
 <?php echo view('footer/footer'); ?>
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script src="<?= base_url('assets/js/tost.js') ?>"></script>
-<script>
-    AOS.init();
 
-    // ================================
-    // CSRF Helper Functions
-    // ================================
-    function getCSRFName() {
-        const csrfInput = document.querySelector('input[name="csrf_token"]');
-        return csrfInput ? csrfInput.name : 'csrf_token';
-    }
-
-    function getCSRFHash() {
-        const csrfInput = document.querySelector('input[name="csrf_token"]');
-        return csrfInput ? csrfInput.value : '';
-    }
-
-    function updateCSRF(hash) {
-        const csrfInputs = document.querySelectorAll('input[name="csrf_token"]');
-        csrfInputs.forEach(input => input.value = hash);
-    }
-
-    // ================================
-    // Toggle Password Functions
-    // ================================
-    window.toggleLoginPassword = function() {
-        const passwordInput = document.getElementById('login_password');
-        const eyeIcon = document.getElementById('loginEyeIcon');
-        if (passwordInput.type === 'password') {
-            passwordInput.type = 'text';
-            eyeIcon.className = 'bi bi-eye-slash-fill';
-        } else {
-            passwordInput.type = 'password';
-            eyeIcon.className = 'bi bi-eye-fill';
-        }
-    }
-
-    window.toggleSignupPassword = function() {
-        const passwordInput = document.getElementById('signup_password');
-        const eyeIcon = document.getElementById('signupEyeIcon');
-        if (passwordInput.type === 'password') {
-            passwordInput.type = 'text';
-            eyeIcon.className = 'bi bi-eye-slash-fill';
-        } else {
-            passwordInput.type = 'password';
-            eyeIcon.className = 'bi bi-eye-fill';
-        }
-    }
-
-    // ================================
-    // Refresh CAPTCHA - Login
-    // ================================
-    window.refreshLoginCaptcha = function() {
-        const csrfHash = getCSRFHash();
-        
-        $.ajax({
-            url: "<?= base_url('refresh-captcha') ?>",
-            type: "POST",
-            data: {
-                csrf_token: csrfHash
-            },
-            dataType: "json",
-            headers: {
-                "X-Requested-With": "XMLHttpRequest"
-            },
-            success: function(response) {
-                if (response.csrfHash) {
-                    updateCSRF(response.csrfHash);
-                }
-                if (response.success) {
-                    $('#loginCaptchaText').text(response.captcha);
-                    $('#login_captcha').val('');
-                }
-            },
-            error: function(xhr) {
-                console.error('CAPTCHA refresh error:', xhr);
-            }
-        });
-    }
-
-    // ================================
-    // Refresh CAPTCHA - Signup
-    // ================================
-    window.refreshSignupCaptcha = function() {
-        const csrfHash = getCSRFHash();
-        
-        $.ajax({
-            url: "<?= base_url('refresh-captcha') ?>",
-            type: "POST",
-            data: {
-                csrf_token: csrfHash
-            },
-            dataType: "json",
-            headers: {
-                "X-Requested-With": "XMLHttpRequest"
-            },
-            success: function(response) {
-                if (response.csrfHash) {
-                    updateCSRF(response.csrfHash);
-                }
-                if (response.success) {
-                    $('#signupCaptchaText').text(response.captcha);
-                    $('#signup_captcha').val('');
-                }
-            },
-            error: function(xhr) {
-                console.error('CAPTCHA refresh error:', xhr);
-            }
-        });
-    }
-
-    // ================================
-    // Document Ready
-    // ================================
-    $(document).ready(function() {
-        // =====================================
-        // Open Login Modal from Signup
-        // =====================================
-        $(document).on('click', '#openLogin', function(e) {
-            e.preventDefault();
-            const signupModal = bootstrap.Modal.getInstance(
-                document.getElementById('signupModal')
-            );
-            if (signupModal) {
-                signupModal.hide();
-            }
-            $('#signupModal').one('hidden.bs.modal', function() {
-                $('.modal-backdrop').remove();
-                $('body').removeClass('modal-open').css({
-                    overflow: '',
-                    paddingRight: ''
-                });
-                const loginModal = new bootstrap.Modal(
-                    document.getElementById('loginModal'),
-                    {
-                        backdrop: 'static',
-                        keyboard: false
-                    }
-                );
-                loginModal.show();
-            });
-        });
-
-        // =====================================
-        // Open Signup Modal
-        // =====================================
-        $(document).on('click', '#openSignup', function(e) {
-            e.preventDefault();
-            const login = bootstrap.Modal.getInstance(
-                document.getElementById('loginModal')
-            );
-            if (login) {
-                login.hide();
-            }
-            $('#loginModal').one('hidden.bs.modal', function() {
-                $('.modal-backdrop').remove();
-                $('body')
-                    .removeClass('modal-open')
-                    .css({
-                        overflow: '',
-                        paddingRight: ''
-                    });
-                new bootstrap.Modal(
-                    document.getElementById('signupModal'),
-                    {
-                        backdrop: 'static',
-                        keyboard: false
-                    }
-                ).show();
-            });
-        });
-
-        // =====================================
-        // Login Form Submit - Sending plain password
-        // =====================================
-        $('#loginForm').on('submit', function(e) {
-            e.preventDefault();
-            const username = $('#login_username').val().trim();
-            const password = $('#login_password').val().trim();
-            const captcha = $('#login_captcha').val().trim();
-            
-            if (!username || !password || !captcha) {
-                showToast('warning', 'All fields are required');
-                return;
-            }
-            
-            $('#loginBtn')
-                .prop('disabled', true)
-                .html('<span class="spinner-border spinner-border-sm me-2"></span>Logging in...');
-            
-            $.ajax({
-                url: '<?= base_url('auth/checkLogin') ?>',
-                type: 'POST',
-                dataType: 'json',
-                data: {
-                    username: username,
-                    password: password, // Sending plain password
-                    captcha: captcha,
-                    csrf_token: getCSRFHash()
-                },
-                success: function(response) {
-                    if (response.csrfHash) {
-                        updateCSRF(response.csrfHash);
-                    }
-                    if (response.success) {
-                        showToast('success', response.message);
-                        const loginModal = bootstrap.Modal.getInstance(
-                            document.getElementById('loginModal')
-                        );
-                        if (loginModal) {
-                            loginModal.hide();
-                        }
-                        setTimeout(function() {
-                            window.location.href = response.redirect;
-                        }, 1000);
-                    } else {
-                        let message = response.message || 'Login failed.';
-                        if (response.errors) {
-                            message = Object.values(response.errors).join('<br>');
-                        }
-                        showToast('error', message);
-                        refreshLoginCaptcha();
-                        $('#login_captcha').val('');
-                    }
-                },
-                error: function(xhr) {
-                    let message = 'An error occurred. Please try again.';
-                    if (xhr.responseJSON && xhr.responseJSON.message) {
-                        message = xhr.responseJSON.message;
-                    }
-                    showToast('error', message);
-                    refreshLoginCaptcha();
-                    $('#login_captcha').val('');
-                },
-                complete: function() {
-                    $('#loginBtn')
-                        .prop('disabled', false)
-                        .html('<i class="bi bi-box-arrow-in-right me-2"></i>Login');
-                }
-            });
-        });
-
-        // =====================================
-        // Signup Form Submit
-        // =====================================
-        $('#signupForm').submit(function(e) {
-            e.preventDefault();
-            
-            // Check terms
-            if (!$('#terms').is(':checked')) {
-                showToast('warning', 'Please accept the Terms & Conditions');
-                return;
-            }
-            
-            // Get form values
-            let full_name = $('#signup_full_name').val().trim();
-            let employee_id = $('#signup_employee_id').val().trim();
-            let email = $('#signup_email').val().trim();
-            let mobile = $('#signup_mobile').val().trim();
-            let username = $('#signup_username').val().trim();
-            let password = $('#signup_password').val().trim();
-            let captcha = $('#signup_captcha').val().trim();
-            
-            // Validate all fields
-            if (!full_name) {
-                showToast('warning', 'Please enter your full name');
-                $('#signup_full_name').focus();
-                return;
-            }
-            if (!employee_id) {
-                showToast('warning', 'Please enter your employee ID');
-                $('#signup_employee_id').focus();
-                return;
-            }
-            if (!email) {
-                showToast('warning', 'Please enter your email');
-                $('#signup_email').focus();
-                return;
-            }
-            if (!mobile) {
-                showToast('warning', 'Please enter your mobile number');
-                $('#signup_mobile').focus();
-                return;
-            }
-            if (!username) {
-                showToast('warning', 'Please choose a username');
-                $('#signup_username').focus();
-                return;
-            }
-            if (!password) {
-                showToast('warning', 'Please create a password');
-                $('#signup_password').focus();
-                return;
-            }
-            if (password.length < 6) {
-                showToast('warning', 'Password must be at least 6 characters');
-                $('#signup_password').focus();
-                return;
-            }
-            if (!captcha) {
-                showToast('warning', 'Please enter the CAPTCHA code');
-                $('#signup_captcha').focus();
-                return;
-            }
-            
-            // Prepare form data
-            let formData = {
-                full_name: full_name,
-                employee_id: employee_id,
-                email: email,
-                mobile: mobile,
-                username: username,
-                password: password, // Sending plain password
-                captcha: captcha
-            };
-
-            // Add CSRF token
-            formData[getCSRFName()] = getCSRFHash();
-            
-            // Disable submit button
-            $('#signupBtn')
-                .prop('disabled', true)
-                .html('<span class="spinner-border spinner-border-sm me-2"></span>Creating Account...');
-            
-            // Send AJAX request
-            $.ajax({
-                url: "<?= base_url('auth/register') ?>",
-                type: "POST",
-                data: formData,
-                dataType: "json",
-                headers: {
-                    "X-Requested-With": "XMLHttpRequest"
-                },
-                success: function(response) {
-                    // Update CSRF token
-                    if (response.csrfHash) {
-                        updateCSRF(response.csrfHash);
-                    }
-                    
-                    if (response.success) {
-                        showToast('success', response.message);
-                        const modal = bootstrap.Modal.getInstance(
-                            document.getElementById('signupModal')
-                        );
-                        if (modal) {
-                            modal.hide();
-                        }
-                        setTimeout(function() {
-                            window.location.href = response.redirect;
-                        }, 1500);
-                    } else {
-                        let error = response.message || 'Registration failed.';
-                        if (response.errors) {
-                            let errorMessages = Object.values(response.errors).join('<br>');
-                            showToast('error', errorMessages);
-                        } else {
-                            showToast('error', error);
-                        }
-                        refreshSignupCaptcha();
-                        $('#signup_captcha').val('');
-                    }
-                },
-                error: function(xhr) {
-                    let errorMessage = 'Server Error. Please try again.';
-                    try {
-                        let response = JSON.parse(xhr.responseText);
-                        if (response.message) {
-                            errorMessage = response.message;
-                        }
-                        if (response.errors) {
-                            errorMessage = Object.values(response.errors).join('<br>');
-                        }
-                    } catch(e) {
-                        console.log('Error parsing response:', e);
-                    }
-                    
-                    showToast('error', errorMessage);
-                    refreshSignupCaptcha();
-                    $('#signup_captcha').val('');
-                },
-                complete: function() {
-                    $('#signupBtn')
-                        .prop('disabled', false)
-                        .html('<i class="bi bi-person-plus me-2"></i>Create Account');
-                }
-            });
-        });
-
-        // =====================================
-        // Refresh CAPTCHA Events
-        // =====================================
-        $('#loginRefreshCaptcha').click(function() {
-            refreshLoginCaptcha();
-        });
-        
-        $('#signupRefreshCaptcha').click(function() {
-            refreshSignupCaptcha();
-        });
-
-        // Refresh CAPTCHA when modals open
-        $('#loginModal').on('shown.bs.modal', function() {
-            refreshLoginCaptcha();
-        });
-
-        $('#signupModal').on('shown.bs.modal', function() {
-            refreshSignupCaptcha();
-        });
-
-        // =====================================
-        // Cleanup Modals
-        // =====================================
-        $('#loginModal').on('hidden.bs.modal', function() {
-            $('.modal-backdrop').remove();
-            $('body').removeClass('modal-open').css({
-                overflow: '',
-                paddingRight: ''
-            });
-            $('#loginForm')[0].reset();
-            $('#login_captcha').val('');
-        });
-
-        $('#signupModal').on('hidden.bs.modal', function() {
-            $('.modal-backdrop').remove();
-            $('body')
-                .removeClass('modal-open')
-                .css({
-                    overflow: '',
-                    paddingRight: ''
-                });
-            $('#signupForm')[0].reset();
-            $('#signup_captcha').val('');
-            $('#terms').prop('checked', false);
-        });
-    });
-</script>
 
