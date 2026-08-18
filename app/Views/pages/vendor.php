@@ -20,21 +20,21 @@
     </div>
 
     <!-- Data Table Card -->
-    <div class="gov-card overflow-hidden">
+    <div class="gov-card p-5 overflow-hidden shadow-sm border border-slate-200 rounded-xl bg-white">
         <div class="overflow-x-auto">
-            <table class="w-full text-sm gov-table" id="vendorTable">
+            <table class="w-full text-sm gov-table rounded-lg overflow-hidden" id="vendorTable">
                 <thead class="bg-[#1e4d7b] text-white">
                     <tr>
-                        <th class="px-5 py-4 text-center w-16">#</th>
-                        <th class="px-5 py-4 text-left">Vendor Name</th>
-                        <th class="px-5 py-4 text-center">Status</th>
-                        <th class="px-5 py-4 text-right pr-6">Actions</th>
+                        <th class="px-5 py-3.5 text-center w-16 font-semibold uppercase tracking-wider text-xs">#</th>
+                        <th class="px-5 py-3.5 text-left font-semibold uppercase tracking-wider text-xs">Vendor Name</th>
+                        <th class="px-5 py-3.5 text-center font-semibold uppercase tracking-wider text-xs">Status</th>
+                        <th class="px-5 py-3.5 text-right pr-6 font-semibold uppercase tracking-wider text-xs">Actions</th>
                     </tr>
                 </thead>
-                <tbody class="divide-y divide-slate-100 bg-white">
+                <tbody class="divide-y divide-slate-100 bg-white text-slate-700">
                     <?php if(!empty($vendors)): ?>
                         <?php foreach($vendors as $index => $vendor): ?>
-                            <tr class="hover:bg-slate-50 transition">
+                            <tr class="hover:bg-slate-50/80 transition-colors duration-150">
                                 <td class="px-5 py-4 text-center font-bold text-[#1e4d7b]">
                                     #<?= str_pad($index + 1, 3, '0', STR_PAD_LEFT) ?>
                                 </td>
@@ -54,23 +54,16 @@
                                 </td>
                                 <td class="px-5 py-4 text-right pr-6">
                                     <div class="flex justify-end gap-2">
-                                        <button class="w-9 h-9 rounded-lg bg-blue-50 text-[#1e4d7b] hover:bg-blue-100 transition edit-vendor-btn" data-id="<?= $vendor['id'] ?>" title="Edit">
-                                            <i class="fas fa-pen-to-square"></i>
+                                        <button class="w-8 h-8 rounded-lg bg-blue-50 text-[#1e4d7b] hover:bg-blue-100 border border-blue-100 transition edit-vendor-btn flex items-center justify-center" data-id="<?= $vendor['id'] ?>" title="Edit">
+                                            <i class="fas fa-pen-to-square text-xs"></i>
                                         </button>
-                                        <button class="w-9 h-9 rounded-lg bg-red-50 text-red-600 hover:bg-red-100 transition delete-vendor-btn" data-id="<?= $vendor['id'] ?>" title="Delete">
-                                            <i class="fas fa-trash-can"></i>
+                                        <button class="w-8 h-8 rounded-lg bg-red-50 text-red-600 hover:bg-red-100 border border-red-100 transition delete-vendor-btn flex items-center justify-center" data-id="<?= $vendor['id'] ?>" title="Delete">
+                                            <i class="fas fa-trash-can text-xs"></i>
                                         </button>
                                     </div>
                                 </td>
                             </tr>
                         <?php endforeach; ?>
-                    <?php else: ?>
-                        <tr>
-                            <td colspan="4" class="text-center py-12">
-                                <i class="fa-solid fa-truck-field text-slate-300 text-5xl mb-3 block"></i>
-                                <p class="text-slate-500 font-medium">No vendor records found.</p>
-                            </td>
-                        </tr>
                     <?php endif; ?>
                 </tbody>
             </table>
@@ -129,8 +122,47 @@
 <!-- Scripts -->
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="<?= base_url('assets/js/tost.js') ?>"></script>
+
 <script>
 $(document).ready(function() {
+    let vendorDataTable = null;
+
+    function initDataTable() {
+        if ($.fn && $.fn.DataTable) {
+            if ($.fn.DataTable.isDataTable('#vendorTable')) {
+                $('#vendorTable').DataTable().destroy();
+            }
+
+            vendorDataTable = $('#vendorTable').DataTable({
+                "pageLength": 10,
+                "lengthMenu": [ [10, 15, 25, 50, 100, -1], [10, 15, 25, 50, 100, "All"] ],
+                "responsive": true,
+                "autoWidth": false,
+                "dom": '<"flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-4"lf>rt<"flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mt-4"ip>',
+                "columnDefs": [
+                    { "orderable": false, "targets": [3] }
+                ],
+                "language": {
+                    "search": "_INPUT_",
+                    "searchPlaceholder": "Search vendor...",
+                    "lengthMenu": "Show _MENU_ entries",
+                    "info": "Showing _START_ to _END_ of _TOTAL_ entries",
+                    "infoEmpty": "Showing 0 to 0 of 0 entries",
+                    "infoFiltered": "(filtered from _MAX_ total entries)",
+                    "paginate": {
+                        "previous": "<i class='fas fa-chevron-left text-xs'></i>",
+                        "next": "<i class='fas fa-chevron-right text-xs'></i>"
+                    }
+                }
+            });
+        } else {
+            console.error("DataTables plugin is not loaded properly.");
+        }
+    }
+
+    // Initialize DataTable on page load
+    initDataTable();
+
     function openVendorModal() {
         $('#vendorModal').removeClass('hidden');
     }
@@ -223,34 +255,38 @@ $(document).ready(function() {
     }
 
     function renderVendorsTable(vendors) {
+        if ($.fn.DataTable.isDataTable('#vendorTable')) {
+            $('#vendorTable').DataTable().destroy();
+        }
+
         let tbody = $('#vendorTable tbody');
         tbody.empty();
 
         if(!vendors || vendors.length === 0) {
             tbody.html('<tr><td colspan="4" class="text-center py-12"><i class="fa-solid fa-truck-field text-slate-300 text-5xl mb-3 block"></i><p class="text-slate-500 font-medium">No vendor records found.</p></td></tr>');
-            return;
+        } else {
+            vendors.forEach(function(vendor, index) {
+                let isActive = (vendor.isactive == 1 || vendor.isactive == '1');
+                let row = '<tr class="hover:bg-slate-50/80 transition-colors duration-150">' +
+                    '<td class="px-5 py-4 text-center font-bold text-[#1e4d7b]">#' + String(index + 1).padStart(3, '0') + '</td>' +
+                    '<td class="px-5 py-4 font-bold text-slate-800">' + (vendor.vendor_name ? vendor.vendor_name : '') + '</td>' +
+                    '<td class="px-5 py-4 text-center">' +
+                        (isActive ? 
+                            '<span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg border-l-4 border-green-500 bg-green-50 text-green-700 font-semibold text-xs shadow-sm"><i class="fas fa-check-circle"></i> Active</span>' : 
+                            '<span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg border-l-4 border-red-500 bg-red-50 text-red-700 font-semibold text-xs shadow-sm"><i class="fas fa-times-circle"></i> Inactive</span>') +
+                    '</td>' +
+                    '<td class="px-5 py-4 text-right pr-6">' +
+                        '<div class="flex justify-end gap-2">' +
+                            '<button class="w-8 h-8 rounded-lg bg-blue-50 text-[#1e4d7b] hover:bg-blue-100 border border-blue-100 transition edit-vendor-btn flex items-center justify-center" data-id="' + vendor.id + '" title="Edit"><i class="fas fa-pen-to-square text-xs"></i></button>' +
+                            '<button class="w-8 h-8 rounded-lg bg-red-50 text-red-600 hover:bg-red-100 border border-red-100 transition delete-vendor-btn flex items-center justify-center" data-id="' + vendor.id + '" title="Delete"><i class="fas fa-trash-can text-xs"></i></button>' +
+                        '</div>' +
+                    '</td>' +
+                    '</tr>';
+                tbody.append(row);
+            });
         }
 
-        vendors.forEach(function(vendor, index) {
-            let isActive = (vendor.isactive == 1 || vendor.isactive == '1');
-            let row = '<tr class="hover:bg-slate-50 transition">' +
-                '<td class="px-5 py-4 text-center font-bold text-[#1e4d7b]">#' + String(index + 1).padStart(3, '0') + '</td>' +
-                '<td class="px-5 py-4 font-bold text-slate-800">' + (vendor.vendor_name ? vendor.vendor_name : '') + '</td>' +
-                '<td class="px-5 py-4 text-center">' +
-                    (isActive ? 
-                        '<span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg border-l-4 border-green-500 bg-green-50 text-green-700 font-semibold text-xs shadow-sm"><i class="fas fa-check-circle"></i> Active</span>' : 
-                        '<span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg border-l-4 border-red-500 bg-red-50 text-red-700 font-semibold text-xs shadow-sm"><i class="fas fa-times-circle"></i> Inactive</span>') +
-                '</td>' +
-                '<td class="px-5 py-4 text-right pr-6">' +
-                    '<div class="flex justify-end gap-2">' +
-                        '<button class="w-9 h-9 rounded-lg bg-blue-50 text-[#1e4d7b] hover:bg-blue-100 transition edit-vendor-btn" data-id="' + vendor.id + '" title="Edit"><i class="fas fa-pen-to-square"></i></button>' +
-                        '<button class="w-9 h-9 rounded-lg bg-red-50 text-red-600 hover:bg-red-100 transition delete-vendor-btn" data-id="' + vendor.id + '" title="Delete"><i class="fas fa-trash-can"></i></button>' +
-                    '</div>' +
-                '</td>' +
-                '</tr>';
-            tbody.append(row);
-        });
-
+        initDataTable();
         attachVendorEventListeners();
     }
 

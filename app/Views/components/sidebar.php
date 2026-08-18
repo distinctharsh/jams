@@ -241,3 +241,9 @@
 
   </div>
 </div>
+
+<head>
+    <script src="<?= base_url('assets/js/jquery-3.7.0.min.js') ?>"></script>
+    <link rel="stylesheet" href="<?= base_url('assets/css/jquery.dataTables.min.css') ?>">
+    <script src="<?= base_url('assets/js/jquery.dataTables.min.js') ?>"></script>
+</head>

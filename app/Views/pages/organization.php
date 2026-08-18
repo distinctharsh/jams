@@ -20,23 +20,23 @@
     </div>
 
     <!-- Data Table Card -->
-    <div class="gov-card p-4 overflow-hidden">
+    <div class="gov-card p-5 overflow-hidden shadow-sm border border-slate-200 rounded-xl bg-white">
         <div class="overflow-x-auto">
-            <table class="w-full text-sm gov-table" id="orgTable">
+            <table class="w-full text-sm gov-table rounded-lg overflow-hidden" id="orgTable">
                 <thead class="bg-[#1e4d7b] text-white">
                     <tr>
-                        <th class="px-5 py-4 text-center w-16">#</th>
-                        <th class="px-5 py-4 text-left">Organization Name</th>
-                        <th class="px-5 py-4 text-left">Type</th>
-                        <th class="px-5 py-4 text-center">Auth Letter Req.</th>
-                        <th class="px-5 py-4 text-center">Status</th>
-                        <th class="px-5 py-4 text-right pr-6">Actions</th>
+                        <th class="px-5 py-3.5 text-center w-16 font-semibold uppercase tracking-wider text-xs">#</th>
+                        <th class="px-5 py-3.5 text-left font-semibold uppercase tracking-wider text-xs">Organization Name</th>
+                        <th class="px-5 py-3.5 text-left font-semibold uppercase tracking-wider text-xs">Type</th>
+                        <th class="px-5 py-3.5 text-center font-semibold uppercase tracking-wider text-xs">Auth Letter Req.</th>
+                        <th class="px-5 py-3.5 text-center font-semibold uppercase tracking-wider text-xs">Status</th>
+                        <th class="px-5 py-3.5 text-right pr-6 font-semibold uppercase tracking-wider text-xs">Actions</th>
                     </tr>
                 </thead>
-                <tbody class="divide-y divide-slate-100 bg-white">
+                <tbody class="divide-y divide-slate-100 bg-white text-slate-700">
                     <?php if(!empty($organizations)): ?>
                         <?php foreach($organizations as $index => $org): ?>
-                            <tr class="hover:bg-slate-50 transition">
+                            <tr class="hover:bg-slate-50/80 transition-colors duration-150">
                                 <td class="px-5 py-4 text-center font-bold text-[#1e4d7b]">
                                     #<?= str_pad($index + 1, 3, '0', STR_PAD_LEFT) ?>
                                 </td>
@@ -49,7 +49,7 @@
                                     <?php endif; ?>
                                 </td>
                                 <td class="px-5 py-4">
-                                    <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-blue-50 text-[#1e4d7b] border border-blue-200">
+                                    <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-blue-50 text-[#1e4d7b] border border-blue-200/80">
                                         <?= esc($org['org_type_name'] ?? $org['type_name'] ?? $org['org_type']) ?>
                                     </span>
                                 </td>
@@ -77,11 +77,11 @@
                                 </td>
                                 <td class="px-5 py-4 text-right pr-6">
                                     <div class="flex justify-end gap-2">
-                                        <button class="w-9 h-9 rounded-lg bg-blue-50 text-[#1e4d7b] hover:bg-blue-100 transition edit-btn" data-id="<?= $org['id'] ?>" title="Edit">
-                                            <i class="fas fa-pen-to-square"></i>
+                                        <button class="w-8 h-8 rounded-lg bg-blue-50 text-[#1e4d7b] hover:bg-blue-100 border border-blue-100 transition edit-btn flex items-center justify-center" data-id="<?= $org['id'] ?>" title="Edit">
+                                            <i class="fas fa-pen-to-square text-xs"></i>
                                         </button>
-                                        <button class="w-9 h-9 rounded-lg bg-red-50 text-red-600 hover:bg-red-100 transition delete-btn" data-id="<?= $org['id'] ?>" title="Delete">
-                                            <i class="fas fa-trash-can"></i>
+                                        <button class="w-8 h-8 rounded-lg bg-red-50 text-red-600 hover:bg-red-100 border border-red-100 transition delete-btn flex items-center justify-center" data-id="<?= $org['id'] ?>" title="Delete">
+                                            <i class="fas fa-trash-can text-xs"></i>
                                         </button>
                                     </div>
                                 </td>
@@ -172,37 +172,9 @@
 
 <script src="<?= base_url('assets/js/tost.js') ?>"></script>
 
-<style>
-/* Datatables Custom Tailwind Styling */
-.dataTables_wrapper .dataTables_length select {
-    padding: 4px 28px 4px 10px !important;
-    border-radius: 6px;
-    border: 1px solid #cbd5e1;
-}
-.dataTables_wrapper .dataTables_filter input {
-    padding: 6px 12px !important;
-    border-radius: 6px;
-    border: 1px solid #cbd5e1;
-    margin-left: 8px;
-    outline: none;
-}
-.dataTables_wrapper .dataTables_filter input:focus {
-    border-color: #1e4d7b;
-}
-.dataTables_wrapper .dataTables_paginate .paginate_button.current {
-    background: #1e4d7b !important;
-    color: white !important;
-    border: 1px solid #1e4d7b !important;
-    border-radius: 6px;
-}
-.dataTables_wrapper .dataTables_paginate .paginate_button:hover {
-    background: #163a5d !important;
-    color: white !important;
-    border: 1px solid #163a5d !important;
-    border-radius: 6px;
-}
-</style>
-
+<head>
+    <script src="<?= base_url('assets/js/jquery-3.7.0.min.js') ?>"></script>
+</head>
 <script>
 $(document).ready(function() {
     let dataTableInstance = null;
@@ -215,17 +187,20 @@ $(document).ready(function() {
 
             dataTableInstance = $('#orgTable').DataTable({
                 "pageLength": 10,
-                "lengthMenu": [10, 25, 50, 100],
+                "lengthMenu": [ [10, 15, 25, 50, 100, -1], [10, 15, 25, 50, 100, "All"] ],
                 "responsive": true,
                 "autoWidth": false,
+                "dom": '<"flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-4"lf>rt<"flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mt-4"ip>',
                 "columnDefs": [
-                    { "orderable": false, "targets": [3, 4, 5] }
+                    { "orderable": false, "targets": [5] }
                 ],
                 "language": {
                     "search": "_INPUT_",
                     "searchPlaceholder": "Search organization...",
                     "lengthMenu": "Show _MENU_ entries",
                     "info": "Showing _START_ to _END_ of _TOTAL_ entries",
+                    "infoEmpty": "Showing 0 to 0 of 0 entries",
+                    "infoFiltered": "(filtered from _MAX_ total entries)",
                     "paginate": {
                         "previous": "<i class='fas fa-chevron-left text-xs'></i>",
                         "next": "<i class='fas fa-chevron-right text-xs'></i>"
