@@ -1293,10 +1293,12 @@
       item.classList.remove('active');
     });
     
-    const navItems = document.querySelectorAll('.gov-sidebar .nav-item');
-    navItems.forEach(item => {
-      if (item.getAttribute('onclick') && item.getAttribute('onclick').includes(pageId)) {
-        item.classList.add('active');
+    document.querySelectorAll('.gov-sidebar .nav-item').forEach(item => {
+      const onclickAttr = item.getAttribute('onclick');
+      if (onclickAttr) {
+        if (onclickAttr.includes(`'${pageId}'`) || onclickAttr.includes(`"${pageId}"`)) {
+          item.classList.add('active');
+        }
       }
     });
     

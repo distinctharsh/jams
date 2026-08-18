@@ -37,3 +37,10 @@ $routes->get('dashboard/get-organizations', 'Dashboard::getOrganizations');
 $routes->post('dashboard/save-organization', 'Dashboard::saveOrganization');
 $routes->get('dashboard/get-organization/(:num)', 'Dashboard::getOrganization/$1');
 $routes->post('dashboard/delete-organization/(:num)', 'Dashboard::deleteOrganization/$1');
+
+// Organization Types Routes
+$routes->get('dashboard/organization-types', 'Dashboard::orgTypes');
+$routes->get('dashboard/get-org-types', 'Dashboard::getOrgTypes');
+$routes->post('dashboard/save-org-type', 'Dashboard::saveOrgType');
+$routes->get('dashboard/get-org-type/(:num)', 'Dashboard::getOrgType/$1');
+$routes->post('dashboard/delete-org-type/(:num)', 'Dashboard::deleteOrgType/$1');

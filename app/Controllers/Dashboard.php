@@ -11,12 +11,14 @@ class Dashboard extends BaseController
     protected $userModel;
     protected $requestModel;
     protected $orgModel;
+    protected $orgTypeModel;
 
     public function __construct()
     {
         $this->userModel = new UserModel();
         $this->requestModel = new RequestModel();
         $this->orgModel = new OrganizationModel();
+        $this->orgTypeModel = new \App\Models\OrgTypeModel();
     }
 
     public function index()
@@ -225,6 +227,119 @@ class Dashboard extends BaseController
 
         try {
             $this->orgModel->deleteOrganization($id);
+            return $this->response->setJSON([
+                'success'  => true,
+                'message'  => 'Record deleted successfully.',
+                'csrfHash' => csrf_hash()
+            ]);
+        } catch (\Exception $e) {
+            return $this->response->setJSON([
+                'success'  => false,
+                'message'  => 'Error deleting record: ' . $e->getMessage(),
+                'csrfHash' => csrf_hash()
+            ]);
+        }
+    }
+
+
+    public function orgTypes()
+    {
+        if (!session()->get('isLoggedIn')) {
+            return redirect()->to(base_url('/'));
+        }
+
+        $data = [
+            'orgTypes' => $this->orgTypeModel->getAllOrgTypes()
+        ];
+
+        return view('pages/organization-type', $data);
+    }
+
+    public function getOrgTypes()
+    {
+        if (!session()->get('isLoggedIn')) {
+            return $this->response->setJSON(['success' => false, 'message' => 'Unauthorized']);
+        }
+
+        return $this->response->setJSON([
+            'success'  => true,
+            'orgTypes' => $this->orgTypeModel->getAllOrgTypes(),
+            'csrfHash' => csrf_hash()
+        ]);
+    }
+
+    public function saveOrgType()
+    {
+        if (!session()->get('isLoggedIn')) {
+            return $this->response->setJSON(['success' => false, 'message' => 'Unauthorized']);
+        }
+
+        $id = $this->request->getPost('id');
+        $saveData = [
+            'name'                => $this->request->getPost('name'),
+            'competent_authority' => $this->request->getPost('competent_authority'),
+            'is_ugc_id_required'  => $this->request->getPost('is_ugc_id_required') ? 1 : 0,
+            'isactive'            => $this->request->getPost('isactive') ? 1 : 0,
+        ];
+
+        try {
+            if (!empty($id)) {
+                $this->orgTypeModel->updateOrgType($id, $saveData);
+                $msg = 'Organization Type updated successfully.';
+            } else {
+                $this->orgTypeModel->createOrgType($saveData);
+                $msg = 'Organization Type created successfully.';
+            }
+
+            return $this->response->setJSON([
+                'success'  => true,
+                'message'  => $msg,
+                'csrfHash' => csrf_hash()
+            ]);
+        } catch (\Exception $e) {
+            return $this->response->setJSON([
+                'success'  => false,
+                'message'  => 'Error saving data: ' . $e->getMessage(),
+                'csrfHash' => csrf_hash()
+            ]);
+        }
+    }
+
+    public function getOrgType($id = null)
+    {
+        if (!session()->get('isLoggedIn')) {
+            return $this->response->setJSON(['success' => false, 'message' => 'Unauthorized']);
+        }
+
+        if (!$id) {
+            return $this->response->setJSON(['success' => false, 'message' => 'Invalid ID']);
+        }
+
+        $data = $this->orgTypeModel->getOrgTypeById($id);
+
+        if ($data) {
+            return $this->response->setJSON([
+                'success'  => true,
+                'data'     => $data,
+                'csrfHash' => csrf_hash()
+            ]);
+        }
+
+        return $this->response->setJSON([
+            'success'  => false,
+            'message'  => 'Record not found',
+            'csrfHash' => csrf_hash()
+        ]);
+    }
+
+    public function deleteOrgType($id)
+    {
+        if (!session()->get('isLoggedIn')) {
+            return $this->response->setJSON(['success' => false, 'message' => 'Unauthorized']);
+        }
+
+        try {
+            $this->orgTypeModel->deleteOrgType($id);
             return $this->response->setJSON([
                 'success'  => true,
                 'message'  => 'Record deleted successfully.',

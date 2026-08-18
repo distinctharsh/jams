@@ -148,6 +148,7 @@
         <a href="#" class="nav-item" onclick="showPage('audit-log')"><i class="fas fa-shield-halved"></i> <span>Audit Log</span></a>
         <div class="text-[9px] font-bold text-slate-400 uppercase tracking-wider px-3 mt-6 mb-2 nav-label">Admin</div>
         <a href="#" class="nav-item" onclick="showPage('organization')"><i class="fa-solid fa-sitemap"></i> <span>Manage Organization</span></a>
+        <a href="#" class="nav-item" onclick="showPage('organization-type')"><i class="fa-solid fa-layer-group"></i> <span>Organization Types</span></a>
         </nav>
     </div>
     </aside>
@@ -214,5 +215,15 @@
         echo view('pages/organization', $orgData);
         ?>
     </div>
+
+    <!-- Organization Type Content -->
+    <div id="organization-type" class="page-content">
+        <?php 
+        $orgTypeModel = new \App\Models\OrgTypeModel();
+        $orgTypeData['orgTypes'] = $orgTypeModel->getAllOrgTypes();
+        echo view('pages/organization-type', $orgTypeData);
+        ?>
+    </div>
+
   </div>
 </div>

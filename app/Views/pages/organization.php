@@ -117,7 +117,7 @@
 
         <!-- Form Body -->
         <form id="orgForm">
-            <input type="hidden" name="csrf_token" value="<?= csrf_hash() ?>">
+            <?= csrf_field() ?>
             <input type="hidden" name="id" id="org_id">
 
             <div class="p-6 space-y-4">
@@ -176,6 +176,7 @@
 
 <!-- Scripts -->
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="<?= base_url('assets/js/tost.js') ?>"></script>
 <script>
 $(document).ready(function() {
     function openModal() {
@@ -192,12 +193,17 @@ $(document).ready(function() {
 
     function updateCSRF(hash) {
         if(hash) {
-            $('input[name="csrf_token"]').val(hash);
+            $('#orgForm input[type="hidden"]').first().val(hash);
         }
     }
 
     $('#btnAddNew').click(function() {
+        let csrfInput = $('#orgForm input[type="hidden"]').first();
+        let csrfName = csrfInput.attr('name');
+        let csrfVal = csrfInput.val();
+
         $('#orgForm')[0].reset();
+        csrfInput.attr('name', csrfName).val(csrfVal);
         $('#org_id').val('');
         $('#auth_req').prop('checked', true);
         $('#isactive').prop('checked', true);
@@ -206,7 +212,6 @@ $(document).ready(function() {
         openModal();
     });
 
-    // Initial attachment of event listeners
     attachEventListeners();
 
     // Save/Update AJAX
@@ -228,15 +233,16 @@ $(document).ready(function() {
                 if(res.success) {
                     closeModal();
                     loadOrganizations();
-                    alert(res.message);
+                    showToast('success', res.message || 'Organization saved successfully!');
                 } else if(res.errors) {
-                    alert(Object.values(res.errors).join("\n"));
+                    let errorMsg = Object.values(res.errors).join("<br>");
+                    showToast('error', errorMsg);
                 } else {
-                    alert(res.message || 'Something went wrong.');
+                    showToast('error', res.message || 'Something went wrong.');
                 }
             },
             error: function() {
-                alert('An error occurred while saving.');
+                showToast('error', 'An error occurred while saving.');
             },
             complete: function() {
                 $('#saveBtn').prop('disabled', false).text('Save Changes');
@@ -255,12 +261,11 @@ $(document).ready(function() {
                 }
             },
             error: function() {
-                alert('Error loading organizations data');
+                showToast('error', 'Error loading organizations data.');
             }
         });
     }
     
-    // Function to render the table
     function renderOrganizationsTable(organizations) {
         let tbody = $('#orgTable tbody');
         tbody.empty();
@@ -303,7 +308,6 @@ $(document).ready(function() {
         attachEventListeners();
     }
     
-    // Function to attach event listeners to dynamically created buttons
     function attachEventListeners() {
         $('.edit-btn').off('click').on('click', function() {
             let id = $(this).data('id');
@@ -324,11 +328,11 @@ $(document).ready(function() {
                         $('#modalTitle').html('<i class="fa-solid fa-sitemap text-[#e58500]"></i> Edit Organization');
                         openModal();
                     } else {
-                        alert(res.message || 'Unable to fetch record.');
+                        showToast('error', res.message || 'Unable to fetch record.');
                     }
                 },
                 error: function() {
-                    alert('Error fetching organization data');
+                    showToast('error', 'Error fetching organization data.');
                 }
             });
         });
@@ -336,22 +340,27 @@ $(document).ready(function() {
         $('.delete-btn').off('click').on('click', function() {
             if(!confirm('Are you sure you want to delete this record?')) return;
             let id = $(this).data('id');
+            
+            let csrfInput = $('#orgForm input[type="hidden"]').first();
+            let dataParam = {};
+            dataParam[csrfInput.attr('name')] = csrfInput.val();
+
             $.ajax({
                 url: "<?= base_url('dashboard/delete-organization/') ?>" + id,
                 type: "POST",
-                data: { csrf_token: $('input[name="csrf_token"]').val() },
+                data: dataParam,
                 dataType: "json",
                 success: function(res) {
                     if(res.csrfHash) updateCSRF(res.csrfHash);
                     if(res.success) {
                         loadOrganizations();
-                        alert(res.message);
+                        showToast('success', res.message || 'Organization deleted successfully!');
                     } else {
-                        alert(res.message || 'Unable to delete record.');
+                        showToast('error', res.message || 'Unable to delete record.');
                     }
                 },
                 error: function() {
-                    alert('Error deleting organization');
+                    showToast('error', 'Error deleting organization.');
                 }
             });
         });
