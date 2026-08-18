@@ -44,3 +44,10 @@ $routes->get('dashboard/get-org-types', 'Dashboard::getOrgTypes');
 $routes->post('dashboard/save-org-type', 'Dashboard::saveOrgType');
 $routes->get('dashboard/get-org-type/(:num)', 'Dashboard::getOrgType/$1');
 $routes->post('dashboard/delete-org-type/(:num)', 'Dashboard::deleteOrgType/$1');
+
+// Vendor Routes
+$routes->get('dashboard/vendors', 'Dashboard::vendors');
+$routes->get('dashboard/get-vendors', 'Dashboard::getVendors');
+$routes->get('dashboard/get-vendor/(:num)', 'Dashboard::getVendor/$1');
+$routes->post('dashboard/save-vendor', 'Dashboard::saveVendor');
+$routes->post('dashboard/delete-vendor/(:num)', 'Dashboard::deleteVendor/$1');

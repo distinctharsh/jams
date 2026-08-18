@@ -149,6 +149,7 @@
         <div class="text-[9px] font-bold text-slate-400 uppercase tracking-wider px-3 mt-6 mb-2 nav-label">Admin</div>
         <a href="#" class="nav-item" onclick="showPage('organization')"><i class="fa-solid fa-sitemap"></i> <span>Manage Organization</span></a>
         <a href="#" class="nav-item" onclick="showPage('organization-type')"><i class="fa-solid fa-layer-group"></i> <span>Organization Types</span></a>
+        <a href="#" class="nav-item" onclick="showPage('vendor')"><i class="fa-solid fa-layer-group"></i> <span>Vendor</span></a>
         </nav>
     </div>
     </aside>
@@ -222,6 +223,15 @@
         $orgTypeModel = new \App\Models\OrgTypeModel();
         $orgTypeData['orgTypes'] = $orgTypeModel->getAllOrgTypes();
         echo view('pages/organization-type', $orgTypeData);
+        ?>
+    </div>
+
+    <!-- Vendor Content -->
+    <div id="vendor" class="page-content">
+        <?php 
+        $vendorModel = new \App\Models\VendorModel();
+        $vendorData['vendors'] = $vendorModel->getAllVendors();
+        echo view('pages/vendor', $vendorData);
         ?>
     </div>
 

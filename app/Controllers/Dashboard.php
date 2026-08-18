@@ -5,6 +5,7 @@ namespace App\Controllers;
 use App\Models\UserModel;
 use App\Models\RequestModel;
 use App\Models\OrganizationModel;
+use App\Models\VendorModel;
 
 class Dashboard extends BaseController
 {
@@ -12,6 +13,7 @@ class Dashboard extends BaseController
     protected $requestModel;
     protected $orgModel;
     protected $orgTypeModel;
+    protected $vendorModel;
 
     public function __construct()
     {
@@ -19,6 +21,7 @@ class Dashboard extends BaseController
         $this->requestModel = new RequestModel();
         $this->orgModel = new OrganizationModel();
         $this->orgTypeModel = new \App\Models\OrgTypeModel();
+        $this->vendorModel  = new VendorModel();
     }
 
     public function index()
@@ -340,6 +343,116 @@ class Dashboard extends BaseController
 
         try {
             $this->orgTypeModel->deleteOrgType($id);
+            return $this->response->setJSON([
+                'success'  => true,
+                'message'  => 'Record deleted successfully.',
+                'csrfHash' => csrf_hash()
+            ]);
+        } catch (\Exception $e) {
+            return $this->response->setJSON([
+                'success'  => false,
+                'message'  => 'Error deleting record: ' . $e->getMessage(),
+                'csrfHash' => csrf_hash()
+            ]);
+        }
+    }
+
+    public function vendors()
+    {
+        if (!session()->get('isLoggedIn')) {
+            return redirect()->to(base_url('/'));
+        }
+
+        $data = [
+            'vendors' => $this->vendorModel->getAllVendors()
+        ];
+
+        return view('pages/vendor', $data);
+    }
+
+    public function getVendors()
+    {
+        if (!session()->get('isLoggedIn')) {
+            return $this->response->setJSON(['success' => false, 'message' => 'Unauthorized']);
+        }
+
+        return $this->response->setJSON([
+            'success'  => true,
+            'vendors'  => $this->vendorModel->getAllVendors(),
+            'csrfHash' => csrf_hash()
+        ]);
+    }
+
+    public function saveVendor()
+    {
+        if (!session()->get('isLoggedIn')) {
+            return $this->response->setJSON(['success' => false, 'message' => 'Unauthorized']);
+        }
+
+        $id = $this->request->getPost('id');
+        $saveData = [
+            'vendor_name' => $this->request->getPost('vendor_name'),
+            'isactive'    => $this->request->getPost('isactive') ? '1' : '0',
+        ];
+
+        try {
+            if (!empty($id)) {
+                $this->vendorModel->updateVendor($id, $saveData);
+                $msg = 'Vendor updated successfully.';
+            } else {
+                $this->vendorModel->createVendor($saveData);
+                $msg = 'Vendor created successfully.';
+            }
+
+            return $this->response->setJSON([
+                'success'  => true,
+                'message'  => $msg,
+                'csrfHash' => csrf_hash()
+            ]);
+        } catch (\Exception $e) {
+            return $this->response->setJSON([
+                'success'  => false,
+                'message'  => 'Error saving data: ' . $e->getMessage(),
+                'csrfHash' => csrf_hash()
+            ]);
+        }
+    }
+
+    public function getVendor($id = null)
+    {
+        if (!session()->get('isLoggedIn')) {
+            return $this->response->setJSON(['success' => false, 'message' => 'Unauthorized']);
+        }
+
+        if (!$id) {
+            return $this->response->setJSON(['success' => false, 'message' => 'Invalid ID']);
+        }
+
+        $data = $this->vendorModel->getVendorById($id);
+
+        if ($data) {
+            return $this->response->setJSON([
+                'success'  => true,
+                'data'     => $data,
+                'csrfHash' => csrf_hash()
+            ]);
+        }
+
+        return $this->response->setJSON([
+            'success'  => false,
+            'message'  => 'Record not found',
+            'csrfHash' => csrf_hash()
+        ]);
+    }
+
+    public function deleteVendor($id)
+    {
+        if (!session()->get('isLoggedIn')) {
+            return $this->response->setJSON(['success' => false, 'message' => 'Unauthorized']);
+        }
+
+        try {
+            $this->vendorModel->deleteVendor($id);
             return $this->response->setJSON([
                 'success'  => true,
                 'message'  => 'Record deleted successfully.',
