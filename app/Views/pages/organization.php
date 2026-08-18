@@ -25,11 +25,11 @@
             <table class="w-full text-sm gov-table rounded-lg overflow-hidden" id="orgTable">
                 <thead class="bg-[#1e4d7b] text-white">
                     <tr>
-                        <th class="px-5 py-3.5 text-center w-16 font-semibold uppercase tracking-wider text-xs">#</th>
+                        <th class="px-5 py-3.5 text-left w-16 font-semibold uppercase tracking-wider text-xs">S.No.</th>
                         <th class="px-5 py-3.5 text-left font-semibold uppercase tracking-wider text-xs">Organization Name</th>
                         <th class="px-5 py-3.5 text-left font-semibold uppercase tracking-wider text-xs">Type</th>
-                        <th class="px-5 py-3.5 text-center font-semibold uppercase tracking-wider text-xs">Auth Letter Req.</th>
-                        <th class="px-5 py-3.5 text-center font-semibold uppercase tracking-wider text-xs">Status</th>
+                        <th class="px-5 py-3.5 text-left font-semibold uppercase tracking-wider text-xs">Auth Letter Req.</th>
+                        <th class="px-5 py-3.5 text-left font-semibold uppercase tracking-wider text-xs">Status</th>
                         <th class="px-5 py-3.5 text-right pr-6 font-semibold uppercase tracking-wider text-xs">Actions</th>
                     </tr>
                 </thead>
@@ -37,8 +37,8 @@
                     <?php if(!empty($organizations)): ?>
                         <?php foreach($organizations as $index => $org): ?>
                             <tr class="hover:bg-slate-50/80 transition-colors duration-150">
-                                <td class="px-5 py-4 text-center font-bold text-[#1e4d7b]">
-                                    #<?= str_pad($index + 1, 3, '0', STR_PAD_LEFT) ?>
+                                <td class="px-5 py-4 text-left font-bold text-[#1e4d7b]">
+                                    <?= $index + 1 ?>
                                 </td>
                                 <td class="px-5 py-4">
                                     <div class="font-bold text-slate-800"><?= esc($org['org_name']) ?></div>
@@ -49,11 +49,11 @@
                                     <?php endif; ?>
                                 </td>
                                 <td class="px-5 py-4">
-                                    <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-blue-50 text-[#1e4d7b] border border-blue-200/80">
+                                    <span class="inline-flex items-left px-3 py-1 rounded-full text-xs font-semibold bg-blue-50 text-[#1e4d7b] border border-blue-200/80">
                                         <?= esc($org['org_type_name'] ?? $org['type_name'] ?? $org['org_type']) ?>
                                     </span>
                                 </td>
-                                <td class="px-5 py-4 text-center">
+                                <td class="px-5 py-4 text-left">
                                     <?php if ($org['authorization_letter_required']): ?>
                                         <span class="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-semibold bg-amber-50 text-amber-700 border border-amber-200">
                                             <i class="fas fa-exclamation-circle text-[10px]"></i> Yes
@@ -64,7 +64,7 @@
                                         </span>
                                     <?php endif; ?>
                                 </td>
-                                <td class="px-5 py-4 text-center">
+                                <td class="px-5 py-4 text-left">
                                     <?php if ($org['isactive']): ?>
                                         <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg border-l-4 border-green-500 bg-green-50 text-green-700 font-semibold text-xs shadow-sm">
                                             <i class="fas fa-check-circle"></i> Active
@@ -75,8 +75,8 @@
                                         </span>
                                     <?php endif; ?>
                                 </td>
-                                <td class="px-5 py-4 text-right pr-6">
-                                    <div class="flex justify-end gap-2">
+                                <td class="px-5 py-4 text-left pr-6">
+                                    <div class="flex justify-left gap-2">
                                         <button class="w-8 h-8 rounded-lg bg-blue-50 text-[#1e4d7b] hover:bg-blue-100 border border-blue-100 transition edit-btn flex items-center justify-center" data-id="<?= $org['id'] ?>" title="Edit">
                                             <i class="fas fa-pen-to-square text-xs"></i>
                                         </button>
@@ -170,11 +170,43 @@
     </div>
 </div>
 
-<script src="<?= base_url('assets/js/tost.js') ?>"></script>
 
-<head>
-    <script src="<?= base_url('assets/js/jquery-3.7.0.min.js') ?>"></script>
-</head>
+<link rel="stylesheet" href="<?= base_url('assets/css/buttons.dataTables.min.css') ?>">
+<script src="<?= base_url('assets/js/jquery-3.7.0.min.js') ?>"></script>
+<script src="<?= base_url('assets/js/tost.js') ?>"></script>
+<script src="<?= base_url('assets/js/jquery.dataTables.min.js') ?>"></script>
+<script src="<?= base_url('assets/js/dataTables.buttons.min.js') ?>"></script>
+<script src="<?= base_url('assets/js/jszip.min.js') ?>"></script>
+<script src="<?= base_url('assets/js/pdfmake.min.js') ?>"></script>
+<script src="<?= base_url('assets/js/vfs_fonts.js') ?>"></script>
+<script src="<?= base_url('assets/js/buttons.html5.min.js') ?>"></script>
+<script src="<?= base_url('assets/js/buttons.print.min.js') ?>"></script>
+
+<style>
+/* Buttons Design Customization */
+.dt-buttons {
+    display: inline-flex !important;
+    gap: 0.5rem !important;
+    margin-bottom: 0.5rem !important;
+}
+.dt-button {
+    background-color: #f8fafc !important;
+    border: 1px solid #cbd5e1 !important;
+    color: #1e4d7b !important;
+    font-size: 0.8125rem !important;
+    font-weight: 600 !important;
+    padding: 0.4rem 0.85rem !important;
+    border-radius: 0.5rem !important;
+    transition: all 0.2s ease !important;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05) !important;
+}
+.dt-button:hover {
+    background-color: #1e4d7b !important;
+    color: #ffffff !important;
+    border-color: #1e4d7b !important;
+}
+</style>
+
 <script>
 $(document).ready(function() {
     let dataTableInstance = null;
@@ -190,9 +222,37 @@ $(document).ready(function() {
                 "lengthMenu": [ [10, 15, 25, 50, 100, -1], [10, 15, 25, 50, 100, "All"] ],
                 "responsive": true,
                 "autoWidth": false,
-                "dom": '<"flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-4"lf>rt<"flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mt-4"ip>',
+                "dom": '<"flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-3"<"flex items-center gap-4"Bl>f>rt<"flex flex-col sm:flex-row sm:items-center justify-between gap-4 mt-4"ip>',
+
                 "columnDefs": [
                     { "orderable": false, "targets": [5] }
+                ],
+                "buttons": [
+                    {
+                        extend: 'copy',
+                        text: '<i class="fas fa-copy me-1"></i> Copy',
+                        exportOptions: { columns: [0, 1, 2, 3, 4] }
+                    },
+                    {
+                        extend: 'csv',
+                        text: '<i class="fas fa-file-csv me-1"></i> CSV',
+                        exportOptions: { columns: [0, 1, 2, 3, 4] }
+                    },
+                    {
+                        extend: 'excel',
+                        text: '<i class="fas fa-file-excel me-1"></i> Excel',
+                        exportOptions: { columns: [0, 1, 2, 3, 4] }
+                    },
+                    {
+                        extend: 'pdf',
+                        text: '<i class="fas fa-file-pdf me-1"></i> PDF',
+                        exportOptions: { columns: [0, 1, 2, 3, 4] }
+                    },
+                    {
+                        extend: 'print',
+                        text: '<i class="fas fa-print me-1"></i> Print',
+                        exportOptions: { columns: [0, 1, 2, 3, 4] }
+                    }
                 ],
                 "language": {
                     "search": "_INPUT_",
@@ -309,14 +369,14 @@ $(document).ready(function() {
         let tbody = $('#orgTable tbody');
         tbody.empty();
         
-        if(organizations.length === 0) {
+        if(!organizations || organizations.length === 0) {
             tbody.html('<tr><td colspan="6" class="text-center py-12"><i class="fa-solid fa-sitemap text-slate-300 text-5xl mb-3 block"></i><p class="text-slate-500 font-medium">No organization records found.</p></td></tr>');
         } else {
             organizations.forEach(function(org, index) {
                 let typeDisplayName = org.org_type_name || org.type_name || org.org_type;
 
                 let row = '<tr class="hover:bg-slate-50 transition">' +
-                    '<td class="px-5 py-4 text-center font-bold text-[#1e4d7b]">#' + String(index + 1).padStart(3, '0') + '</td>' +
+                    '<td class="px-5 py-4 text-center font-bold text-[#1e4d7b]">' + (index + 1) + '</td>' +
                     '<td class="px-5 py-4">' +
                         '<div class="font-bold text-slate-800">' + org.org_name + '</div>' +
                         (org.org_description ? '<div class="text-xs text-slate-500 truncate max-w-xs mt-0.5" title="' + org.org_description + '">' + org.org_description + '</div>' : '') +
@@ -335,9 +395,9 @@ $(document).ready(function() {
                             '<span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg border-l-4 border-red-500 bg-red-50 text-red-700 font-semibold text-xs shadow-sm"><i class="fas fa-times-circle"></i> Inactive</span>') +
                     '</td>' +
                     '<td class="px-5 py-4 text-right pr-6">' +
-                        '<div class="flex justify-end gap-2">' +
-                            '<button class="w-9 h-9 rounded-lg bg-blue-50 text-[#1e4d7b] hover:bg-blue-100 transition edit-btn" data-id="' + org.id + '" title="Edit"><i class="fas fa-pen-to-square"></i></button>' +
-                            '<button class="w-9 h-9 rounded-lg bg-red-50 text-red-600 hover:bg-red-100 transition delete-btn" data-id="' + org.id + '" title="Delete"><i class="fas fa-trash-can"></i></button>' +
+                        '<div class="flex justify-left gap-2">' +
+                            '<button class="w-8 h-8 rounded-lg bg-blue-50 text-[#1e4d7b] hover:bg-blue-100 border border-blue-100 transition edit-btn flex items-center justify-center" data-id="' + org.id + '" title="Edit"><i class="fas fa-pen-to-square text-xs"></i></button>' +
+                            '<button class="w-8 h-8 rounded-lg bg-red-50 text-red-600 hover:bg-red-100 border border-red-100 transition delete-btn flex items-center justify-center" data-id="' + org.id + '" title="Delete"><i class="fas fa-trash-can text-xs"></i></button>' +
                         '</div>' +
                     '</td>' +
                     '</tr>';

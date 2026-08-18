@@ -25,23 +25,23 @@
             <table class="w-full text-sm gov-table rounded-lg overflow-hidden" id="vendorTable">
                 <thead class="bg-[#1e4d7b] text-white">
                     <tr>
-                        <th class="px-5 py-3.5 text-center w-16 font-semibold uppercase tracking-wider text-xs">#</th>
+                        <th class="px-5 py-3.5 text-left w-16 font-semibold uppercase tracking-wider text-xs">S.No.</th>
                         <th class="px-5 py-3.5 text-left font-semibold uppercase tracking-wider text-xs">Vendor Name</th>
-                        <th class="px-5 py-3.5 text-center font-semibold uppercase tracking-wider text-xs">Status</th>
-                        <th class="px-5 py-3.5 text-right pr-6 font-semibold uppercase tracking-wider text-xs">Actions</th>
+                        <th class="px-5 py-3.5 text-left font-semibold uppercase tracking-wider text-xs">Status</th>
+                        <th class="px-5 py-3.5 text-left pr-6 font-semibold uppercase tracking-wider text-xs">Actions</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-slate-100 bg-white text-slate-700">
                     <?php if(!empty($vendors)): ?>
                         <?php foreach($vendors as $index => $vendor): ?>
                             <tr class="hover:bg-slate-50/80 transition-colors duration-150">
-                                <td class="px-5 py-4 text-center font-bold text-[#1e4d7b]">
-                                    #<?= str_pad($index + 1, 3, '0', STR_PAD_LEFT) ?>
+                                <td class="px-5 py-4 text-left font-bold text-[#1e4d7b]">
+                                    <?= $index + 1 ?>
                                 </td>
                                 <td class="px-5 py-4 font-bold text-slate-800">
                                     <?= esc($vendor['vendor_name']) ?>
                                 </td>
-                                <td class="px-5 py-4 text-center">
+                                <td class="px-5 py-4 text-left">
                                     <?php if ($vendor['isactive'] == 1 || $vendor['isactive'] == '1'): ?>
                                         <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg border-l-4 border-green-500 bg-green-50 text-green-700 font-semibold text-xs shadow-sm">
                                             <i class="fas fa-check-circle"></i> Active
@@ -53,7 +53,7 @@
                                     <?php endif; ?>
                                 </td>
                                 <td class="px-5 py-4 text-right pr-6">
-                                    <div class="flex justify-end gap-2">
+                                    <div class="flex justify-left gap-2">
                                         <button class="w-8 h-8 rounded-lg bg-blue-50 text-[#1e4d7b] hover:bg-blue-100 border border-blue-100 transition edit-vendor-btn flex items-center justify-center" data-id="<?= $vendor['id'] ?>" title="Edit">
                                             <i class="fas fa-pen-to-square text-xs"></i>
                                         </button>
@@ -119,9 +119,16 @@
     </div>
 </div>
 
-<!-- Scripts -->
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<link rel="stylesheet" href="<?= base_url('assets/css/buttons.dataTables.min.css') ?>">
+<script src="<?= base_url('assets/js/jquery-3.7.0.min.js') ?>"></script>
 <script src="<?= base_url('assets/js/tost.js') ?>"></script>
+<script src="<?= base_url('assets/js/jquery.dataTables.min.js') ?>"></script>
+<script src="<?= base_url('assets/js/dataTables.buttons.min.js') ?>"></script>
+<script src="<?= base_url('assets/js/jszip.min.js') ?>"></script>
+<script src="<?= base_url('assets/js/pdfmake.min.js') ?>"></script>
+<script src="<?= base_url('assets/js/vfs_fonts.js') ?>"></script>
+<script src="<?= base_url('assets/js/buttons.html5.min.js') ?>"></script>
+<script src="<?= base_url('assets/js/buttons.print.min.js') ?>"></script>
 
 <script>
 $(document).ready(function() {
@@ -138,7 +145,35 @@ $(document).ready(function() {
                 "lengthMenu": [ [10, 15, 25, 50, 100, -1], [10, 15, 25, 50, 100, "All"] ],
                 "responsive": true,
                 "autoWidth": false,
-                "dom": '<"flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-4"lf>rt<"flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mt-4"ip>',
+                "dom": '<"flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-3"<"flex items-center gap-4"Bl>f>rt<"flex flex-col sm:flex-row sm:items-center justify-between gap-4 mt-4"ip>',
+                "buttons": [
+                    {
+                        extend: 'copy',
+                        text: '<i class="fas fa-copy me-1"></i> Copy',
+                        exportOptions: { columns: [0, 1, 2] }
+                    },
+                    {
+                        extend: 'csv',
+                        text: '<i class="fas fa-file-csv me-1"></i> CSV',
+                        exportOptions: { columns: [0, 1, 2] }
+                    },
+                    {
+                        extend: 'excel',
+                        text: '<i class="fas fa-file-excel me-1"></i> Excel',
+                        exportOptions: { columns: [0, 1, 2] }
+                    },
+                    {
+                        extend: 'pdf',
+                        text: '<i class="fas fa-file-pdf me-1"></i> PDF',
+                        exportOptions: { columns: [0, 1, 2] }
+                    },
+                    {
+                        extend: 'print',
+                        text: '<i class="fas fa-print me-1"></i> Print',
+                        exportOptions: { columns: [0, 1, 2] }
+                    }
+                ],
+
                 "columnDefs": [
                     { "orderable": false, "targets": [3] }
                 ],

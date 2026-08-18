@@ -150,6 +150,7 @@
         <a href="#" class="nav-item" onclick="showPage('organization')"><i class="fa-solid fa-sitemap"></i> <span>Manage Organization</span></a>
         <a href="#" class="nav-item" onclick="showPage('organization-type')"><i class="fa-solid fa-layer-group"></i> <span>Organization Types</span></a>
         <a href="#" class="nav-item" onclick="showPage('vendor')"><i class="fas fa-handshake"></i> <span>Vendor</span></a>
+        <a href="#" class="nav-item" onclick="showPage('model')"><i class="fas fa-microchip"></i> <span>Model</span></a>
         </nav>
     </div>
     </aside>
@@ -239,11 +240,28 @@
         ?>
     </div>
 
+    <!-- Model Content -->
+    <div id="model" class="page-content">
+        <?php 
+        $modelModel = new \App\Models\ModelModel();
+        $modelData['models'] = $modelModel->getAllModels();
+        echo view('pages/model', $modelData);
+        ?>
+    </div>
+
   </div>
 </div>
 
 <head>
     <script src="<?= base_url('assets/js/jquery-3.7.0.min.js') ?>"></script>
     <link rel="stylesheet" href="<?= base_url('assets/css/jquery.dataTables.min.css') ?>">
+
     <script src="<?= base_url('assets/js/jquery.dataTables.min.js') ?>"></script>
+    <script src="<?= base_url('assets/js/dataTables.buttons.min.js') ?>"></script>
+    <script src="<?= base_url('assets/js/jszip.min.js') ?>"></script>
+    <script src="<?= base_url('assets/js/pdfmake.min.js') ?>"></script>
+    <script src="<?= base_url('assets/js/vfs_fonts.js') ?>"></script>
+    <script src="<?= base_url('assets/js/buttons.html5.min.js') ?>"></script>
+    <script src="<?= base_url('assets/js/buttons.print.min.js') ?>"></script>
+    <link rel="stylesheet" href="<?= base_url('assets/css/buttons.dataTables.min.css') ?>">
 </head>

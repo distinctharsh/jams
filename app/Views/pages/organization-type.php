@@ -25,20 +25,20 @@
             <table class="w-full text-sm gov-table rounded-lg overflow-hidden" id="orgTypeTable">
                 <thead class="bg-[#1e4d7b] text-white">
                     <tr>
-                        <th class="px-5 py-3.5 text-center w-16 font-semibold uppercase tracking-wider text-xs">#</th>
+                        <th class="px-5 py-3.5 text-left w-16 font-semibold uppercase tracking-wider text-xs">S.No.</th>
                         <th class="px-5 py-3.5 text-left font-semibold uppercase tracking-wider text-xs">Type Name</th>
                         <th class="px-5 py-3.5 text-left font-semibold uppercase tracking-wider text-xs">Competent Authority</th>
-                        <th class="px-5 py-3.5 text-center font-semibold uppercase tracking-wider text-xs">UGC ID Req.</th>
-                        <th class="px-5 py-3.5 text-center font-semibold uppercase tracking-wider text-xs">Status</th>
-                        <th class="px-5 py-3.5 text-right pr-6 font-semibold uppercase tracking-wider text-xs">Actions</th>
+                        <th class="px-5 py-3.5 text-left font-semibold uppercase tracking-wider text-xs">UGC ID Req.</th>
+                        <th class="px-5 py-3.5 text-left font-semibold uppercase tracking-wider text-xs">Status</th>
+                        <th class="px-5 py-3.5 text-left pr-6 font-semibold uppercase tracking-wider text-xs">Actions</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-slate-100 bg-white text-slate-700">
                     <?php if(!empty($orgTypes)): ?>
                         <?php foreach($orgTypes as $index => $type): ?>
                             <tr class="hover:bg-slate-50/80 transition-colors duration-150">
-                                <td class="px-5 py-4 text-center font-bold text-[#1e4d7b]">
-                                    #<?= str_pad($index + 1, 3, '0', STR_PAD_LEFT) ?>
+                                <td class="px-5 py-4 text-left font-bold text-[#1e4d7b]">
+                                    <?= $index + 1 ?>
                                 </td>
                                 <td class="px-5 py-4 font-bold text-slate-800">
                                     <?= esc($type['name']) ?>
@@ -46,7 +46,7 @@
                                 <td class="px-5 py-4 text-slate-600">
                                     <?= !empty($type['competent_authority']) ? esc($type['competent_authority']) : '<span class="text-slate-400 italic">N/A</span>' ?>
                                 </td>
-                                <td class="px-5 py-4 text-center">
+                                <td class="px-5 py-4 text-left">
                                     <?php if ($type['is_ugc_id_required']): ?>
                                         <span class="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-semibold bg-amber-50 text-amber-700 border border-amber-200">
                                             <i class="fas fa-check text-[10px]"></i> Yes
@@ -57,7 +57,7 @@
                                         </span>
                                     <?php endif; ?>
                                 </td>
-                                <td class="px-5 py-4 text-center">
+                                <td class="px-5 py-4 text-left">
                                     <?php if ($type['isactive']): ?>
                                         <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg border-l-4 border-green-500 bg-green-50 text-green-700 font-semibold text-xs shadow-sm">
                                             <i class="fas fa-check-circle"></i> Active
@@ -68,8 +68,8 @@
                                         </span>
                                     <?php endif; ?>
                                 </td>
-                                <td class="px-5 py-4 text-right pr-6">
-                                    <div class="flex justify-end gap-2">
+                                <td class="px-5 py-4 text-left pr-6">
+                                    <div class="flex justify-left gap-2">
                                         <button class="w-8 h-8 rounded-lg bg-blue-50 text-[#1e4d7b] hover:bg-blue-100 border border-blue-100 transition edit-type-btn flex items-center justify-center" data-id="<?= $type['id'] ?>" title="Edit">
                                             <i class="fas fa-pen-to-square text-xs"></i>
                                         </button>
@@ -150,7 +150,16 @@
     </div>
 </div>
 
+<link rel="stylesheet" href="<?= base_url('assets/css/buttons.dataTables.min.css') ?>">
+<script src="<?= base_url('assets/js/jquery-3.7.0.min.js') ?>"></script>
 <script src="<?= base_url('assets/js/tost.js') ?>"></script>
+<script src="<?= base_url('assets/js/jquery.dataTables.min.js') ?>"></script>
+<script src="<?= base_url('assets/js/dataTables.buttons.min.js') ?>"></script>
+<script src="<?= base_url('assets/js/jszip.min.js') ?>"></script>
+<script src="<?= base_url('assets/js/pdfmake.min.js') ?>"></script>
+<script src="<?= base_url('assets/js/vfs_fonts.js') ?>"></script>
+<script src="<?= base_url('assets/js/buttons.html5.min.js') ?>"></script>
+<script src="<?= base_url('assets/js/buttons.print.min.js') ?>"></script>
 <script>
 $(document).ready(function() {
     let orgTypeDataTable = null;
@@ -166,7 +175,35 @@ $(document).ready(function() {
                 "lengthMenu": [ [10, 15, 25, 50, 100, -1], [10, 15, 25, 50, 100, "All"] ],
                 "responsive": true,
                 "autoWidth": false,
-                "dom": '<"flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-4"lf>rt<"flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mt-4"ip>',
+                "dom": '<"flex flex-col sm:flex-row sm:items-center justify-between gap-4"<"flex items-center gap-4"Bl>f>rt<"flex flex-col sm:flex-row sm:items-center justify-between gap-4 mt-4"ip>',
+                "buttons": [
+                    {
+                        extend: 'copy',
+                        text: '<i class="fas fa-copy me-1"></i> Copy',
+                        exportOptions: { columns: [0, 1, 2, 3, 4] }
+                    },
+                    {
+                        extend: 'csv',
+                        text: '<i class="fas fa-file-csv me-1"></i> CSV',
+                        exportOptions: { columns: [0, 1, 2, 3, 4] }
+                    },
+                    {
+                        extend: 'excel',
+                        text: '<i class="fas fa-file-excel me-1"></i> Excel',
+                        exportOptions: { columns: [0, 1, 2, 3, 4] }
+                    },
+                    {
+                        extend: 'pdf',
+                        text: '<i class="fas fa-file-pdf me-1"></i> PDF',
+                        exportOptions: { columns: [0, 1, 2, 3, 4] }
+                    },
+                    {
+                        extend: 'print',
+                        text: '<i class="fas fa-print me-1"></i> Print',
+                        exportOptions: { columns: [0, 1, 2, 3, 4] }
+                    }
+                ],
+
                 "columnDefs": [
                     { "orderable": false, "targets": [5] }
                 ],

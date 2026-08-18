@@ -6,6 +6,7 @@ use App\Models\UserModel;
 use App\Models\RequestModel;
 use App\Models\OrganizationModel;
 use App\Models\VendorModel;
+use App\Models\ModelModel;
 
 class Dashboard extends BaseController
 {
@@ -14,6 +15,7 @@ class Dashboard extends BaseController
     protected $orgModel;
     protected $orgTypeModel;
     protected $vendorModel;
+    protected $modelModel;
 
     public function __construct()
     {
@@ -22,6 +24,7 @@ class Dashboard extends BaseController
         $this->orgModel = new OrganizationModel();
         $this->orgTypeModel = new \App\Models\OrgTypeModel();
         $this->vendorModel  = new VendorModel();
+        $this->modelModel  = new ModelModel();
     }
 
     public function index()
@@ -225,16 +228,17 @@ class Dashboard extends BaseController
         }
 
         try {
-            $this->orgModel->deleteOrganization($id);
+            $this->orgModel->updateOrganization($id, ['isactive' => 0]);
+
             return $this->response->setJSON([
                 'success'  => true,
-                'message'  => 'Record deleted successfully.',
+                'message'  => 'Record deactivated successfully.',
                 'csrfHash' => csrf_hash()
             ]);
         } catch (\Exception $e) {
             return $this->response->setJSON([
                 'success'  => false,
-                'message'  => 'Error deleting record: ' . $e->getMessage(),
+                'message'  => 'Error deactivating record: ' . $e->getMessage(),
                 'csrfHash' => csrf_hash()
             ]);
         }
@@ -338,10 +342,10 @@ class Dashboard extends BaseController
         }
 
         try {
-            $this->orgTypeModel->deleteOrgType($id);
+            $this->orgTypeModel->updateOrgType($id, ['isactive' => 0]);
             return $this->response->setJSON([
                 'success'  => true,
-                'message'  => 'Record deleted successfully.',
+                'message'  => 'Record deactivate successfully.',
                 'csrfHash' => csrf_hash()
             ]);
         } catch (\Exception $e) {
@@ -448,7 +452,121 @@ class Dashboard extends BaseController
         }
 
         try {
-            $this->vendorModel->deleteVendor($id);
+            $this->vendorModel->updateVendor($id, ['isactive' => 0]);
+            return $this->response->setJSON([
+                'success'  => true,
+                'message'  => 'Record deactivate successfully.',
+                'csrfHash' => csrf_hash()
+            ]);
+        } catch (\Exception $e) {
+            return $this->response->setJSON([
+                'success'  => false,
+                'message'  => 'Error deleting record: ' . $e->getMessage(),
+                'csrfHash' => csrf_hash()
+            ]);
+        }
+    }
+
+
+    // Models Page Render
+    public function models()
+    {
+        if (!session()->get('isLoggedIn')) {
+            return redirect()->to(base_url('/'));
+        }
+
+        $data = [
+            'models'  => $this->modelModel->getAllModels(),
+            'vendors' => $this->vendorModel->getAllVendors()
+        ];
+
+        return view('pages/model', $data);
+    }
+
+    public function getModels()
+    {
+        if (!session()->get('isLoggedIn')) {
+            return $this->response->setJSON(['success' => false, 'message' => 'Unauthorized']);
+        }
+
+        return $this->response->setJSON([
+            'success'  => true,
+            'models'   => $this->modelModel->getAllModels(),
+            'csrfHash' => csrf_hash()
+        ]);
+    }
+
+    public function saveModel()
+    {
+        if (!session()->get('isLoggedIn')) {
+            return $this->response->setJSON(['success' => false, 'message' => 'Unauthorized']);
+        }
+
+        $id = $this->request->getPost('id');
+        $saveData = [
+            'name'      => $this->request->getPost('name'),
+            'vendor_id' => $this->request->getPost('vendor_id'),
+            'isactive'  => $this->request->getPost('isactive') ? 1 : 0,
+        ];
+
+        try {
+            if (!empty($id)) {
+                $this->modelModel->updateModel($id, $saveData);
+                $msg = 'Model updated successfully.';
+            } else {
+                $this->modelModel->createModel($saveData);
+                $msg = 'Model created successfully.';
+            }
+
+            return $this->response->setJSON([
+                'success'  => true,
+                'message'  => $msg,
+                'csrfHash' => csrf_hash()
+            ]);
+        } catch (\Exception $e) {
+            return $this->response->setJSON([
+                'success'  => false,
+                'message'  => 'Error saving data: ' . $e->getMessage(),
+                'csrfHash' => csrf_hash()
+            ]);
+        }
+    }
+
+    public function getModel($id = null)
+    {
+        if (!session()->get('isLoggedIn')) {
+            return $this->response->setJSON(['success' => false, 'message' => 'Unauthorized']);
+        }
+
+        if (!$id) {
+            return $this->response->setJSON(['success' => false, 'message' => 'Invalid ID']);
+        }
+
+        $data = $this->modelModel->getModelById($id);
+
+        if ($data) {
+            return $this->response->setJSON([
+                'success'  => true,
+                'data'     => $data,
+                'csrfHash' => csrf_hash()
+            ]);
+        }
+
+        return $this->response->setJSON([
+            'success'  => false,
+            'message'  => 'Record not found',
+            'csrfHash' => csrf_hash()
+        ]);
+    }
+
+    public function deleteModel($id)
+    {
+        if (!session()->get('isLoggedIn')) {
+            return $this->response->setJSON(['success' => false, 'message' => 'Unauthorized']);
+        }
+
+        try {
+            $this->modelModel->updateModel($id, ['isactive' => 0]);
             return $this->response->setJSON([
                 'success'  => true,
                 'message'  => 'Record deleted successfully.',

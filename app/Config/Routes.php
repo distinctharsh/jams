@@ -51,3 +51,10 @@ $routes->get('dashboard/get-vendors', 'Dashboard::getVendors');
 $routes->get('dashboard/get-vendor/(:num)', 'Dashboard::getVendor/$1');
 $routes->post('dashboard/save-vendor', 'Dashboard::saveVendor');
 $routes->post('dashboard/delete-vendor/(:num)', 'Dashboard::deleteVendor/$1');
+
+// Model Routes
+$routes->get('dashboard/models', 'Dashboard::models');
+$routes->get('dashboard/get-models', 'Dashboard::getModels');
+$routes->get('dashboard/get-model/(:num)', 'Dashboard::getModel/$1');
+$routes->post('dashboard/save-model', 'Dashboard::saveModel');
+$routes->post('dashboard/delete-model/(:num)', 'Dashboard::deleteModel/$1');
