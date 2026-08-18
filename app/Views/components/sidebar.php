@@ -212,7 +212,11 @@
     <div id="organization" class="page-content">
         <?php 
         $orgModel = new \App\Models\OrganizationModel();
+        $orgTypeModel = new \App\Models\OrgTypeModel();
+
         $orgData['organizations'] = $orgModel->getAllOrganizations();
+        $orgData['orgTypes']      = $orgTypeModel->getAllOrgTypes();
+
         echo view('pages/organization', $orgData);
         ?>
     </div>

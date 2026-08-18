@@ -144,19 +144,15 @@ class Dashboard extends BaseController
     
     public function getOrganizations()
     {
-        if (!session()->get('isLoggedIn')) {
-            return $this->response->setJSON(['success' => false, 'message' => 'Unauthorized']);
-        }
-
-        $organizations = $this->orgModel->getAllOrganizations();
+        $orgModel = new \App\Models\OrganizationModel();
+        $data = $orgModel->getAllOrganizations();
 
         return $this->response->setJSON([
             'success'       => true,
-            'organizations' => $organizations,
+            'organizations' => $data,
             'csrfHash'     => csrf_hash()
         ]);
     }
-
     public function saveOrganization()
     {
         if (!session()->get('isLoggedIn')) {

@@ -22,10 +22,11 @@ class OrganizationModel extends Model
     protected $createdField     = 'created_at';
     protected $updatedField     = 'updated_at';
 
-    // Get all organizations
     public function getAllOrganizations()
     {
-        return $this->orderBy('id', 'DESC')->findAll();
+        return $this->select('mas_organization.*, mas_organization_type.name as org_type_name')
+                    ->join('mas_organization_type', 'mas_organization_type.id = mas_organization.org_type', 'left')
+                    ->findAll();
     }
 
     // Get organization by ID

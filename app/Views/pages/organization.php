@@ -20,7 +20,7 @@
     </div>
 
     <!-- Data Table Card -->
-    <div class="gov-card overflow-hidden">
+    <div class="gov-card p-4 overflow-hidden">
         <div class="overflow-x-auto">
             <table class="w-full text-sm gov-table" id="orgTable">
                 <thead class="bg-[#1e4d7b] text-white">
@@ -50,7 +50,7 @@
                                 </td>
                                 <td class="px-5 py-4">
                                     <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-blue-50 text-[#1e4d7b] border border-blue-200">
-                                        Type <?= esc($org['org_type']) ?>
+                                        <?= esc($org['org_type_name'] ?? $org['type_name'] ?? $org['org_type']) ?>
                                     </span>
                                 </td>
                                 <td class="px-5 py-4 text-center">
@@ -87,13 +87,6 @@
                                 </td>
                             </tr>
                         <?php endforeach; ?>
-                    <?php else: ?>
-                        <tr>
-                            <td colspan="6" class="text-center py-12">
-                                <i class="fa-solid fa-sitemap text-slate-300 text-5xl mb-3 block"></i>
-                                <p class="text-slate-500 font-medium">No organization records found.</p>
-                            </td>
-                        </tr>
                     <?php endif; ?>
                 </tbody>
             </table>
@@ -134,10 +127,13 @@
                     </label>
                     <select name="org_type" id="org_type" class="w-full px-3.5 py-2.5 text-sm bg-slate-50 border border-slate-300 rounded-lg focus:ring-2 focus:ring-[#1e4d7b] focus:border-[#1e4d7b] focus:bg-white outline-none transition" required>
                         <option value="" disabled selected>Select Organization Type</option>
-                        <option value="1">Statutory Body</option>
-                        <option value="2">Autonomous Body</option>
-                        <option value="3">UGC</option>
-                        <option value="4">Other</option>
+                        <?php if(!empty($orgTypes)): ?>
+                            <?php foreach($orgTypes as $type): ?>
+                                <option value="<?= esc($type['id']) ?>">
+                                    <?= esc($type['name']) ?>
+                                </option>
+                            <?php endforeach; ?>
+                        <?php endif; ?>
                     </select>
                 </div>
 
@@ -174,11 +170,75 @@
     </div>
 </div>
 
-<!-- Scripts -->
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="<?= base_url('assets/js/tost.js') ?>"></script>
+
+<style>
+/* Datatables Custom Tailwind Styling */
+.dataTables_wrapper .dataTables_length select {
+    padding: 4px 28px 4px 10px !important;
+    border-radius: 6px;
+    border: 1px solid #cbd5e1;
+}
+.dataTables_wrapper .dataTables_filter input {
+    padding: 6px 12px !important;
+    border-radius: 6px;
+    border: 1px solid #cbd5e1;
+    margin-left: 8px;
+    outline: none;
+}
+.dataTables_wrapper .dataTables_filter input:focus {
+    border-color: #1e4d7b;
+}
+.dataTables_wrapper .dataTables_paginate .paginate_button.current {
+    background: #1e4d7b !important;
+    color: white !important;
+    border: 1px solid #1e4d7b !important;
+    border-radius: 6px;
+}
+.dataTables_wrapper .dataTables_paginate .paginate_button:hover {
+    background: #163a5d !important;
+    color: white !important;
+    border: 1px solid #163a5d !important;
+    border-radius: 6px;
+}
+</style>
+
 <script>
 $(document).ready(function() {
+    let dataTableInstance = null;
+
+    function initDataTable() {
+        if ($.fn && $.fn.DataTable) {
+            if ($.fn.DataTable.isDataTable('#orgTable')) {
+                $('#orgTable').DataTable().destroy();
+            }
+
+            dataTableInstance = $('#orgTable').DataTable({
+                "pageLength": 10,
+                "lengthMenu": [10, 25, 50, 100],
+                "responsive": true,
+                "autoWidth": false,
+                "columnDefs": [
+                    { "orderable": false, "targets": [3, 4, 5] }
+                ],
+                "language": {
+                    "search": "_INPUT_",
+                    "searchPlaceholder": "Search organization...",
+                    "lengthMenu": "Show _MENU_ entries",
+                    "info": "Showing _START_ to _END_ of _TOTAL_ entries",
+                    "paginate": {
+                        "previous": "<i class='fas fa-chevron-left text-xs'></i>",
+                        "next": "<i class='fas fa-chevron-right text-xs'></i>"
+                    }
+                }
+            });
+        } else {
+            console.error("DataTables plugin is not loaded properly.");
+        }
+    }
+
+    initDataTable();
+
     function openModal() {
         $('#orgModal').removeClass('hidden');
     }
@@ -267,44 +327,50 @@ $(document).ready(function() {
     }
     
     function renderOrganizationsTable(organizations) {
+        if ($.fn.DataTable.isDataTable('#orgTable')) {
+            $('#orgTable').DataTable().destroy();
+        }
+
         let tbody = $('#orgTable tbody');
         tbody.empty();
         
         if(organizations.length === 0) {
             tbody.html('<tr><td colspan="6" class="text-center py-12"><i class="fa-solid fa-sitemap text-slate-300 text-5xl mb-3 block"></i><p class="text-slate-500 font-medium">No organization records found.</p></td></tr>');
-            return;
+        } else {
+            organizations.forEach(function(org, index) {
+                let typeDisplayName = org.org_type_name || org.type_name || org.org_type;
+
+                let row = '<tr class="hover:bg-slate-50 transition">' +
+                    '<td class="px-5 py-4 text-center font-bold text-[#1e4d7b]">#' + String(index + 1).padStart(3, '0') + '</td>' +
+                    '<td class="px-5 py-4">' +
+                        '<div class="font-bold text-slate-800">' + org.org_name + '</div>' +
+                        (org.org_description ? '<div class="text-xs text-slate-500 truncate max-w-xs mt-0.5" title="' + org.org_description + '">' + org.org_description + '</div>' : '') +
+                    '</td>' +
+                    '<td class="px-5 py-4">' +
+                        '<span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-blue-50 text-[#1e4d7b] border border-blue-200">' + typeDisplayName + '</span>' +
+                    '</td>' +
+                    '<td class="px-5 py-4 text-center">' +
+                        (org.authorization_letter_required ? 
+                            '<span class="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-semibold bg-amber-50 text-amber-700 border border-amber-200"><i class="fas fa-exclamation-circle text-[10px]"></i> Yes</span>' : 
+                            '<span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-slate-100 text-slate-600 border border-slate-200">No</span>') +
+                    '</td>' +
+                    '<td class="px-5 py-4 text-center">' +
+                        (org.isactive ? 
+                            '<span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg border-l-4 border-green-500 bg-green-50 text-green-700 font-semibold text-xs shadow-sm"><i class="fas fa-check-circle"></i> Active</span>' : 
+                            '<span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg border-l-4 border-red-500 bg-red-50 text-red-700 font-semibold text-xs shadow-sm"><i class="fas fa-times-circle"></i> Inactive</span>') +
+                    '</td>' +
+                    '<td class="px-5 py-4 text-right pr-6">' +
+                        '<div class="flex justify-end gap-2">' +
+                            '<button class="w-9 h-9 rounded-lg bg-blue-50 text-[#1e4d7b] hover:bg-blue-100 transition edit-btn" data-id="' + org.id + '" title="Edit"><i class="fas fa-pen-to-square"></i></button>' +
+                            '<button class="w-9 h-9 rounded-lg bg-red-50 text-red-600 hover:bg-red-100 transition delete-btn" data-id="' + org.id + '" title="Delete"><i class="fas fa-trash-can"></i></button>' +
+                        '</div>' +
+                    '</td>' +
+                    '</tr>';
+                tbody.append(row);
+            });
         }
         
-        organizations.forEach(function(org, index) {
-            let row = '<tr class="hover:bg-slate-50 transition">' +
-                '<td class="px-5 py-4 text-center font-bold text-[#1e4d7b]">#' + String(index + 1).padStart(3, '0') + '</td>' +
-                '<td class="px-5 py-4">' +
-                    '<div class="font-bold text-slate-800">' + org.org_name + '</div>' +
-                    (org.org_description ? '<div class="text-xs text-slate-500 truncate max-w-xs mt-0.5" title="' + org.org_description + '">' + org.org_description + '</div>' : '') +
-                '</td>' +
-                '<td class="px-5 py-4">' +
-                    '<span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-blue-50 text-[#1e4d7b] border border-blue-200">Type ' + org.org_type + '</span>' +
-                '</td>' +
-                '<td class="px-5 py-4 text-center">' +
-                    (org.authorization_letter_required ? 
-                        '<span class="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-semibold bg-amber-50 text-amber-700 border border-amber-200"><i class="fas fa-exclamation-circle text-[10px]"></i> Yes</span>' : 
-                        '<span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-slate-100 text-slate-600 border border-slate-200">No</span>') +
-                '</td>' +
-                '<td class="px-5 py-4 text-center">' +
-                    (org.isactive ? 
-                        '<span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg border-l-4 border-green-500 bg-green-50 text-green-700 font-semibold text-xs shadow-sm"><i class="fas fa-check-circle"></i> Active</span>' : 
-                        '<span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg border-l-4 border-red-500 bg-red-50 text-red-700 font-semibold text-xs shadow-sm"><i class="fas fa-times-circle"></i> Inactive</span>') +
-                '</td>' +
-                '<td class="px-5 py-4 text-right pr-6">' +
-                    '<div class="flex justify-end gap-2">' +
-                        '<button class="w-9 h-9 rounded-lg bg-blue-50 text-[#1e4d7b] hover:bg-blue-100 transition edit-btn" data-id="' + org.id + '" title="Edit"><i class="fas fa-pen-to-square"></i></button>' +
-                        '<button class="w-9 h-9 rounded-lg bg-red-50 text-red-600 hover:bg-red-100 transition delete-btn" data-id="' + org.id + '" title="Delete"><i class="fas fa-trash-can"></i></button>' +
-                    '</div>' +
-                '</td>' +
-                '</tr>';
-            tbody.append(row);
-        });
-        
+        initDataTable();
         attachEventListeners();
     }
     
