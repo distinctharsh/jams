@@ -329,15 +329,15 @@ $(document).ready(function() {
         } else {
             orgTypes.forEach(function(type, index) {
                 let row = '<tr class="hover:bg-slate-50/80 transition-colors duration-150">' +
-                    '<td class="px-5 py-4 text-center font-bold text-[#1e4d7b]">#' + String(index + 1).padStart(3, '0') + '</td>' +
+                    '<td class="px-5 py-4 text-left font-bold text-[#1e4d7b]">#' + String(index + 1).padStart(3, '0') + '</td>' +
                     '<td class="px-5 py-4 font-bold text-slate-800">' + type.name + '</td>' +
                     '<td class="px-5 py-4 text-slate-600">' + (type['competent_authority'] ? type['competent_authority'] : '<span class="text-slate-400 italic">N/A</span>') + '</td>' +
-                    '<td class="px-5 py-4 text-center">' +
+                    '<td class="px-5 py-4 text-left">' +
                         (type.is_ugc_id_required == 1 ? 
                             '<span class="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-semibold bg-amber-50 text-amber-700 border border-amber-200"><i class="fas fa-check text-[10px]"></i> Yes</span>' : 
                             '<span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-slate-100 text-slate-600 border border-slate-200">No</span>') +
                     '</td>' +
-                    '<td class="px-5 py-4 text-center">' +
+                    '<td class="px-5 py-4 text-left">' +
                         (type.isactive == 1 ? 
                             '<span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg border-l-4 border-green-500 bg-green-50 text-green-700 font-semibold text-xs shadow-sm"><i class="fas fa-check-circle"></i> Active</span>' : 
                             '<span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg border-l-4 border-red-500 bg-red-50 text-red-700 font-semibold text-xs shadow-sm"><i class="fas fa-times-circle"></i> Inactive</span>') +

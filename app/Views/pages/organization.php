@@ -350,9 +350,13 @@ $(document).ready(function() {
             url: "<?= base_url('dashboard/get-organizations') ?>",
             type: "GET",
             dataType: "json",
+            cache: false,
             success: function(res) {
+                if(res.csrfHash) updateCSRF(res.csrfHash);
                 if(res.success) {
                     renderOrganizationsTable(res.organizations);
+                } else {
+                    showToast('error', res.message || 'Failed to fetch updated data.');
                 }
             },
             error: function() {
@@ -373,28 +377,30 @@ $(document).ready(function() {
             tbody.html('<tr><td colspan="6" class="text-center py-12"><i class="fa-solid fa-sitemap text-slate-300 text-5xl mb-3 block"></i><p class="text-slate-500 font-medium">No organization records found.</p></td></tr>');
         } else {
             organizations.forEach(function(org, index) {
-                let typeDisplayName = org.org_type_name || org.type_name || org.org_type;
+                let typeDisplayName = org.org_type_name || org.type_name || org.org_type || '';
+                let isAuthReq = (org.authorization_letter_required == 1 || org.authorization_letter_required === true || org.authorization_letter_required == '1');
+                let isActive = (org.isactive == 1 || org.isactive === true || org.isactive == '1');
 
-                let row = '<tr class="hover:bg-slate-50 transition">' +
-                    '<td class="px-5 py-4 text-center font-bold text-[#1e4d7b]">' + (index + 1) + '</td>' +
+                let row = '<tr class="hover:bg-slate-50/80 transition-colors duration-150">' +
+                    '<td class="px-5 py-4 text-left font-bold text-[#1e4d7b]">' + (index + 1) + '</td>' +
                     '<td class="px-5 py-4">' +
-                        '<div class="font-bold text-slate-800">' + org.org_name + '</div>' +
+                        '<div class="font-bold text-slate-800">' + (org.org_name ? org.org_name : '') + '</div>' +
                         (org.org_description ? '<div class="text-xs text-slate-500 truncate max-w-xs mt-0.5" title="' + org.org_description + '">' + org.org_description + '</div>' : '') +
                     '</td>' +
                     '<td class="px-5 py-4">' +
-                        '<span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-blue-50 text-[#1e4d7b] border border-blue-200">' + typeDisplayName + '</span>' +
+                        '<span class="inline-flex items-left px-3 py-1 rounded-full text-xs font-semibold bg-blue-50 text-[#1e4d7b] border border-blue-200/80">' + typeDisplayName + '</span>' +
                     '</td>' +
-                    '<td class="px-5 py-4 text-center">' +
-                        (org.authorization_letter_required ? 
+                    '<td class="px-5 py-4 text-left">' +
+                        (isAuthReq ? 
                             '<span class="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-semibold bg-amber-50 text-amber-700 border border-amber-200"><i class="fas fa-exclamation-circle text-[10px]"></i> Yes</span>' : 
                             '<span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-slate-100 text-slate-600 border border-slate-200">No</span>') +
                     '</td>' +
-                    '<td class="px-5 py-4 text-center">' +
-                        (org.isactive ? 
+                    '<td class="px-5 py-4 text-left">' +
+                        (isActive ? 
                             '<span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg border-l-4 border-green-500 bg-green-50 text-green-700 font-semibold text-xs shadow-sm"><i class="fas fa-check-circle"></i> Active</span>' : 
                             '<span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg border-l-4 border-red-500 bg-red-50 text-red-700 font-semibold text-xs shadow-sm"><i class="fas fa-times-circle"></i> Inactive</span>') +
                     '</td>' +
-                    '<td class="px-5 py-4 text-right pr-6">' +
+                    '<td class="px-5 py-4 text-left pr-6">' +
                         '<div class="flex justify-left gap-2">' +
                             '<button class="w-8 h-8 rounded-lg bg-blue-50 text-[#1e4d7b] hover:bg-blue-100 border border-blue-100 transition edit-btn flex items-center justify-center" data-id="' + org.id + '" title="Edit"><i class="fas fa-pen-to-square text-xs"></i></button>' +
                             '<button class="w-8 h-8 rounded-lg bg-red-50 text-red-600 hover:bg-red-100 border border-red-100 transition delete-btn flex items-center justify-center" data-id="' + org.id + '" title="Delete"><i class="fas fa-trash-can text-xs"></i></button>' +
@@ -415,6 +421,7 @@ $(document).ready(function() {
             $.ajax({
                 url: "<?= base_url('dashboard/get-organization/') ?>" + id,
                 type: "GET",
+                cache: false,
                 dataType: "json",
                 success: function(res) {
                     if(res.csrfHash) updateCSRF(res.csrfHash);
@@ -423,8 +430,8 @@ $(document).ready(function() {
                         $('#org_name').val(res.data.org_name);
                         $('#org_type').val(res.data.org_type);
                         $('#org_description').val(res.data.org_description);
-                        $('#auth_req').prop('checked', res.data.authorization_letter_required == 1);
-                        $('#isactive').prop('checked', res.data.isactive == 1);
+                        $('#auth_req').prop('checked', res.data.authorization_letter_required == 1 || res.data.authorization_letter_required == '1');
+                        $('#isactive').prop('checked', res.data.isactive == 1 || res.data.isactive == '1');
                         $('#isActiveContainer').show();
                         $('#modalTitle').html('<i class="fa-solid fa-sitemap text-[#e58500]"></i> Edit Organization');
                         openModal();

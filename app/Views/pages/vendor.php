@@ -303,9 +303,9 @@ $(document).ready(function() {
             vendors.forEach(function(vendor, index) {
                 let isActive = (vendor.isactive == 1 || vendor.isactive == '1');
                 let row = '<tr class="hover:bg-slate-50/80 transition-colors duration-150">' +
-                    '<td class="px-5 py-4 text-center font-bold text-[#1e4d7b]">#' + String(index + 1).padStart(3, '0') + '</td>' +
+                    '<td class="px-5 py-4 text-left font-bold text-[#1e4d7b]">#' + String(index + 1).padStart(3, '0') + '</td>' +
                     '<td class="px-5 py-4 font-bold text-slate-800">' + (vendor.vendor_name ? vendor.vendor_name : '') + '</td>' +
-                    '<td class="px-5 py-4 text-center">' +
+                    '<td class="px-5 py-4 text-left">' +
                         (isActive ? 
                             '<span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg border-l-4 border-green-500 bg-green-50 text-green-700 font-semibold text-xs shadow-sm"><i class="fas fa-check-circle"></i> Active</span>' : 
                             '<span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg border-l-4 border-red-500 bg-red-50 text-red-700 font-semibold text-xs shadow-sm"><i class="fas fa-times-circle"></i> Inactive</span>') +
