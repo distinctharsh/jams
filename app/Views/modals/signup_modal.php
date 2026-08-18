@@ -55,15 +55,6 @@
                                            required>
                                 </div>
                                 <div class="col-md-6">
-                                    <label class="form-label">Employee ID</label>
-                                    <input class="form-control login-input" 
-                                           type="text" 
-                                           id="signup_employee_id" 
-                                           name="employee_id"
-                                           placeholder="Enter employee ID"
-                                           required>
-                                </div>
-                                <div class="col-md-6">
                                     <label class="form-label">Official Email</label>
                                     <input class="form-control login-input" 
                                            type="email" 
