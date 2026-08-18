@@ -30,3 +30,10 @@ $routes->get('new-request', 'Dashboard::newRequest');
 $routes->post('dashboard/submit-request', 'Dashboard::submitRequest');
 $routes->get('dashboard/view-request/(:num)', 'Dashboard::viewRequest/$1');
 $routes->get('dashboard/get-request/(:num)', 'Dashboard::getRequest/$1');
+
+// Organizations Routes
+$routes->get('dashboard/organizations', 'Dashboard::organizations');
+$routes->get('dashboard/get-organizations', 'Dashboard::getOrganizations');
+$routes->post('dashboard/save-organization', 'Dashboard::saveOrganization');
+$routes->get('dashboard/get-organization/(:num)', 'Dashboard::getOrganization/$1');
+$routes->post('dashboard/delete-organization/(:num)', 'Dashboard::deleteOrganization/$1');

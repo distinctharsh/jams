@@ -146,6 +146,8 @@
         <div class="text-[9px] font-bold text-slate-400 uppercase tracking-wider px-3 mt-6 mb-2 nav-label">System</div>
         <a href="#" class="nav-item" onclick="showPage('settings')"><i class="fas fa-sliders"></i> <span>Settings</span></a>
         <a href="#" class="nav-item" onclick="showPage('audit-log')"><i class="fas fa-shield-halved"></i> <span>Audit Log</span></a>
+        <div class="text-[9px] font-bold text-slate-400 uppercase tracking-wider px-3 mt-6 mb-2 nav-label">Admin</div>
+        <a href="#" class="nav-item" onclick="showPage('organization')"><i class="fa-solid fa-sitemap"></i> <span>Manage Organization</span></a>
         </nav>
     </div>
     </aside>
@@ -202,6 +204,15 @@
             }
             ?>
         </div>
+    </div>
+    
+    <!-- Organization Content -->
+    <div id="organization" class="page-content">
+        <?php 
+        $orgModel = new \App\Models\OrganizationModel();
+        $orgData['organizations'] = $orgModel->getAllOrganizations();
+        echo view('pages/organization', $orgData);
+        ?>
     </div>
   </div>
 </div>
