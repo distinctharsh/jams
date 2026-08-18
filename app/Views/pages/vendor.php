@@ -6,7 +6,7 @@
         <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div class="flex items-center gap-3">
                 <div class="w-12 h-12 rounded-xl bg-amber-50 border border-amber-200 flex items-center justify-center shrink-0">
-                    <i class="fa-solid fa-truck-field text-[#e58500] text-xl"></i>
+                   <i class="fa-solid fa-handshake text-[#e58500] text-xl"></i>
                 </div>
                 <div>
                     <h2 class="text-xl font-bold text-[#1e4d7b]">Manage Vendors</h2>
