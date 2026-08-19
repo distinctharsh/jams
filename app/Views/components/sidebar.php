@@ -177,11 +177,6 @@
         ?>
     </div>
     
-    <!-- Users Content -->
-    <div id="users" class="page-content">
-        <?php include APPPATH.'Views/pages/users.php'; ?>
-    </div>
-    
     <!-- Analytics Content -->
     <div id="analytics" class="page-content">
         <?php include APPPATH.'Views/pages/analytics.php'; ?>
@@ -207,6 +202,21 @@
             }
             ?>
         </div>
+    </div>
+
+    <!-- Users Content -->
+    <div id="users" class="page-content">
+        <?php 
+        $userModel    = new \App\Models\UserModel();
+        $orgModel     = new \App\Models\OrganizationModel();
+        $orgTypeModel = new \App\Models\OrgTypeModel();
+
+        $userData['users']         = $userModel->getAllUsers();
+        $userData['organizations'] = $orgModel->getAllOrganizations();
+        $userData['orgTypes']      = $orgTypeModel->getAllOrgTypes();
+
+        echo view('pages/users', $userData);
+        ?>
     </div>
     
     <!-- Organization Content -->

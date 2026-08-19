@@ -58,3 +58,10 @@ $routes->get('dashboard/get-models', 'Dashboard::getModels');
 $routes->get('dashboard/get-model/(:num)', 'Dashboard::getModel/$1');
 $routes->post('dashboard/save-model', 'Dashboard::saveModel');
 $routes->post('dashboard/delete-model/(:num)', 'Dashboard::deleteModel/$1');
+
+// User Routes
+$routes->get('dashboard/users', 'Dashboard::users');
+$routes->get('dashboard/get-users', 'Dashboard::getUsers');
+$routes->post('dashboard/save-user', 'Dashboard::saveUser');
+$routes->get('dashboard/get-user/(:num)', 'Dashboard::getUser/$1');
+$routes->post('dashboard/delete-user/(:num)', 'Dashboard::deleteUser/$1');

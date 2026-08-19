@@ -1236,6 +1236,141 @@
       .gov-table th, .gov-table td{ padding:12px; font-size:13px; }
       .calendar-cell{ height:34px; font-size:11px; }
   }
+
+  /* Notification Popover Dropdown Styling */
+    #notificationDropdown {
+      position: relative;
+      display: inline-block;
+    }
+
+    #notificationDropdown::after {
+      content: '';
+      position: absolute;
+      top: 100%;
+      left: 0;
+      right: 0;
+      height: 12px;
+      display: block;
+    }
+
+    .notification-popover {
+      display: none;
+      position: absolute;
+      top: calc(100% + 8px);
+      right: 0;
+      width: 320px;
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      border-radius: 14px;
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.12);
+      z-index: 1000;
+      overflow: hidden;
+      animation: fadeInDown 0.2s ease-out forwards;
+    }
+
+    #notificationDropdown:hover .notification-popover,
+    .notification-popover:hover {
+      display: block;
+    }
+
+    .notif-header {
+      padding: 12px 16px;
+      background: #f8fafc;
+      border-bottom: 1px solid #e2e8f0;
+    }
+
+    .notif-body {
+      max-height: 280px;
+      overflow-y: auto;
+    }
+
+    .notif-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      padding: 12px 16px;
+      border-bottom: 1px solid #f1f5f9;
+      text-decoration: none;
+      transition: background-color 0.2s ease;
+    }
+
+    .notif-item:hover {
+      background-color: #f8fafc;
+    }
+
+    .notif-item.unread {
+      background-color: #f0f7ff;
+    }
+
+    .notif-item.unread:hover {
+      background-color: #e5f1ff;
+    }
+
+    .notif-icon {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .notif-content {
+      flex: 1;
+    }
+
+    .notif-title {
+      font-size: 12px;
+      font-weight: 700;
+      color: #1e293b;
+      margin: 0;
+      line-height: 1.3;
+    }
+
+    .notif-sub {
+      font-size: 11px;
+      color: #64748b;
+      margin: 2px 0 4px 0;
+      line-height: 1.3;
+    }
+
+    .notif-time {
+      font-size: 10px;
+      color: #94a3b8;
+      font-weight: 500;
+    }
+
+    .notif-footer {
+      padding: 10px 16px;
+      background: #f8fafc;
+      border-top: 1px solid #e2e8f0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 11px;
+      font-weight: 600;
+    }
+
+    .notif-footer a {
+      color: #64748b;
+      text-decoration: none;
+    }
+
+    .notif-footer a:hover {
+      color: #e58500;
+    }
+
+    @keyframes fadeInDown {
+      from {
+        opacity: 0;
+        transform: translateY(-8px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
   </style>
 </head>
 <body>
@@ -1308,7 +1443,6 @@
   }
   
   document.addEventListener('DOMContentLoaded', function() {
-    // Update request count in sidebar
     setTimeout(function() {
       const requestCount = document.querySelectorAll('#requests table tbody tr').length;
       const requestBadge = document.getElementById('request-count');
@@ -1328,6 +1462,90 @@
       }
     });
   });
+
+
+
+// Notification popup functions
+  let notificationTimer = null;
+
+  function hideNotification() {
+      const popup = document.getElementById('complaintNotification');
+      if (popup) {
+          popup.style.transform = 'translateX(-400px)';
+      }
+      
+      if (notificationTimer) {
+          clearTimeout(notificationTimer);
+      }
+      notificationTimer = setTimeout(showNotification, 10000);
+  }
+
+  function showNotification() {
+      const popup = document.getElementById('complaintNotification');
+      if (popup) {
+          popup.style.transform = 'translateX(0)';
+      }
+  }
+
+  document.addEventListener('DOMContentLoaded', () => {
+      setTimeout(showNotification, 1000);
+  });
 </script>
+
+    <div id="complaintNotification" style="
+        position: fixed;
+        bottom: 50px;
+        left: 9px;
+        width: 206px;
+        background: linear-gradient(135deg, #1e4d7b 0%, #2f73b3 100%);
+        padding: 0;
+        border-radius: 12px;
+        box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+        transform: translateX(-400px);
+        transition: transform 0.4s ease-in-out;
+        z-index: 9999;
+        overflow: hidden;
+        font-family: 'Inter', sans-serif;
+    ">
+      <div style="
+          background: rgba(255,255,255,0.15);
+          padding: 12px 16px;
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          border-bottom: 1px solid rgba(255,255,255,0.2);
+      ">
+          <div style="display: flex; align-items: center; gap: 8px;">
+              <i class="fa-solid fa-bell" style="color: #fff; font-size: 14px;"></i>
+              <strong style="font-size: 13px; color: #fff; font-weight: 600;">Notification</strong>
+          </div>
+          <button onclick="hideNotification()" style="
+              border: none;
+              background: rgba(255,255,255,0.2);
+              color: #fff;
+              font-size: 16px;
+              cursor: pointer;
+              line-height: 1;
+              padding: 2px 6px;
+              border-radius: 4px;
+          " onmouseover="this.style.background='rgba(255,255,255,0.3)'" onmouseout="this.style.background='rgba(255,255,255,0.2)'">
+              ×
+          </button>
+      </div>
+
+      <div id="notificationContent" style="padding: 14px 16px; background: #ffffff; color: #334155;">
+          <div style="border-left: 4px solid #e58500; padding-left: 10px; margin-bottom: 10px;">
+              <h6 style="margin: 0; font-size: 13px; font-weight: 700; color: #1e4d7b;">
+                  Pending Registration : <span style="color: #e58500;"><?= esc($pending_count ?? 0) ?></span>
+              </h6>
+          </div>
+
+          <div style="border-left: 4px solid #f59e0b; padding-left: 10px;">
+              <h6 style="margin: 0; font-size: 13px; font-weight: 700; color: #1e4d7b;">
+                  Total Registration : <span style="color: #f59e0b;"><?= esc($total_count ?? 0) ?></span>
+              </h6>
+          </div>
+      </div>
+    </div>
 </body>
 </html>

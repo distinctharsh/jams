@@ -6,54 +6,29 @@ use CodeIgniter\Model;
 
 class UserModel extends Model
 {
-    protected $table      = 'users';
+    protected $table      = 'user';
     protected $primaryKey = 'id';
-    protected $useAutoIncrement = true;
-
-    protected $returnType       = 'array';
-
     protected $allowedFields = [
-        'full_name',
+        'name',
         'email',
-        'mobile',
-        'password',
-        'is_active',
-        'created_at',
-        'updated_at'
+        'mobile_no',
+        'organization_id', 
+        'org_type', 'designation', 'authorization_letter', 
+        'isactive', 'salt', 'hash', 'ugc_id'
     ];
 
-    protected $useTimestamps = false;
-    protected $createdField = 'created_at';
-    protected $updatedField = 'updated_at';
-    protected $validationRules = [
-        'full_name' => 'required|min_length[3]|max_length[100]',
-        'email'     => 'required|valid_email|max_length[100]|is_unique[users.email]',
-        'mobile'    => 'required|numeric|min_length[10]|max_length[15]',
-    ];
-
-    protected $validationMessages = [
-        'email' => [
-            'is_unique' => 'This Email is already registered.'
-        ]
-    ];
-
-    // Using password_verify for secure password checking
-    public function verifyPassword($plainPassword, $hashedPassword)
+    public function getAllUsers()
     {
-        return password_verify($plainPassword, $hashedPassword);
+        return $this->db->table($this->table)
+            ->select('user.*, mas_organization.org_name, mas_organization_type.name as org_type_name')
+            ->join('mas_organization', 'mas_organization.id = user.organization_id', 'left')
+            ->join('mas_organization_type', 'mas_organization_type.id = user.org_type', 'left')
+            ->get()
+            ->getResultArray();
     }
 
-    public function findUserByUsername($username)
+    public function getUserById($id)
     {
-        return $this->where('username', $username)
-                    ->where('is_active', true)
-                    ->first();
-    }
-
-    public function findUserByEmail($email)
-    {
-        return $this->where('email', $email)
-                    ->where('is_active', true)
-                    ->first();
+        return $this->asArray()->where(['id' => $id])->first();
     }
 }

@@ -33,11 +33,15 @@ class Dashboard extends BaseController
         if (!session()->get('isLoggedIn')) {
             return redirect()->to(base_url('/'));
         }
+        $pendingCount = $this->userModel->where('isactive', 0)->countAllResults();
+        $totalCount = $this->userModel->countAllResults();
         $data = [
             'user_id'            => session()->get('user_id'),
             'username'           => session()->get('username'),
             'full_name'          => session()->get('full_name'),
             'email'              => session()->get('email'),
+            'pending_count'      => $pendingCount,
+            'total_count'        => $totalCount,
         ];
         return view('dashboard', $data);
     }
@@ -570,6 +574,127 @@ class Dashboard extends BaseController
             return $this->response->setJSON([
                 'success'  => true,
                 'message'  => 'Record deleted successfully.',
+                'csrfHash' => csrf_hash()
+            ]);
+        } catch (\Exception $e) {
+            return $this->response->setJSON([
+                'success'  => false,
+                'message'  => 'Error deleting record: ' . $e->getMessage(),
+                'csrfHash' => csrf_hash()
+            ]);
+        }
+    }
+
+    public function users()
+    {
+        if (!session()->get('isLoggedIn')) {
+            return redirect()->to(base_url('/'));
+        }
+
+        $data = [
+            'users'         => $this->userModel->getAllUsers(),
+            'organizations' => $this->orgModel->getAllOrganizations(),
+            'orgTypes'      => $this->orgTypeModel->getAllOrgTypes()
+        ];
+
+        return view('pages/users', $data);
+    }
+
+    public function getUsers()
+    {
+        if (!session()->get('isLoggedIn')) {
+            return $this->response->setJSON(['success' => false, 'message' => 'Unauthorized']);
+        }
+
+        return $this->response->setJSON([
+            'success'  => true,
+            'users'    => $this->userModel->getAllUsers(),
+            'csrfHash' => csrf_hash()
+        ]);
+    }
+
+    public function saveUser()
+    {
+        if (!session()->get('isLoggedIn')) {
+            return $this->response->setJSON(['success' => false, 'message' => 'Unauthorized']);
+        }
+
+        $id = $this->request->getPost('id');
+        $saveData = [
+            'name'            => $this->request->getPost('name'),
+            'email'           => $this->request->getPost('email'),
+            'mobile_no'       => $this->request->getPost('mobile_no'),
+            'designation'     => $this->request->getPost('designation'),
+            'org_type'        => $this->request->getPost('org_type') ?: null,
+            'organization_id' => $this->request->getPost('organization_id') ?: null,
+            'ugc_id'          => $this->request->getPost('ugc_id'),
+            'isactive'        => $this->request->getPost('isactive') ? 1 : 0,
+        ];
+
+        $file = $this->request->getFile('authorization_letter');
+        if ($file && $file->isValid() && !$file->hasMoved()) {
+            $newName = $file->getRandomName();
+            $file->move(FCPATH . 'uploads/authorization', $newName);
+            $saveData['authorization_letter'] = $newName;
+        }
+
+        try {
+            if (!empty($id)) {
+                $this->userModel->update($id, $saveData);
+                $msg = 'User updated successfully.';
+            } else {
+                $this->userModel->insert($saveData);
+                $msg = 'User created successfully.';
+            }
+
+            return $this->response->setJSON([
+                'success'  => true,
+                'message'  => $msg,
+                'csrfHash' => csrf_hash()
+            ]);
+        } catch (\Exception $e) {
+            return $this->response->setJSON([
+                'success'  => false,
+                'message'  => 'Error saving data: ' . $e->getMessage(),
+                'csrfHash' => csrf_hash()
+            ]);
+        }
+    }
+
+    public function getUser($id = null)
+    {
+        if (!session()->get('isLoggedIn')) {
+            return $this->response->setJSON(['success' => false, 'message' => 'Unauthorized']);
+        }
+
+        $data = $this->userModel->getUserById($id);
+
+        if ($data) {
+            return $this->response->setJSON([
+                'success'  => true,
+                'data'     => $data,
+                'csrfHash' => csrf_hash()
+            ]);
+        }
+
+        return $this->response->setJSON([
+            'success'  => false,
+            'message'  => 'User not found',
+            'csrfHash' => csrf_hash()
+        ]);
+    }
+
+    public function deleteUser($id)
+    {
+        if (!session()->get('isLoggedIn')) {
+            return $this->response->setJSON(['success' => false, 'message' => 'Unauthorized']);
+        }
+
+        try {
+            $this->userModel->update($id, ['isactive' => 0]);
+            return $this->response->setJSON([
+                'success'  => true,
+                'message'  => 'User deactivated successfully.',
                 'csrfHash' => csrf_hash()
             ]);
         } catch (\Exception $e) {
