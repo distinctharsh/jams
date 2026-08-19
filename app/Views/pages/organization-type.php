@@ -180,26 +180,34 @@ $(document).ready(function() {
                     {
                         extend: 'copy',
                         text: '<i class="fas fa-copy me-1"></i> Copy',
+                        title: 'Organization Types',
                         exportOptions: { columns: [0, 1, 2, 3, 4] }
                     },
                     {
                         extend: 'csv',
                         text: '<i class="fas fa-file-csv me-1"></i> CSV',
+                        title: 'Organization Types',
+                        filename: 'Organization Types',
                         exportOptions: { columns: [0, 1, 2, 3, 4] }
                     },
                     {
                         extend: 'excel',
                         text: '<i class="fas fa-file-excel me-1"></i> Excel',
+                        title: 'Organization Types',
+                        filename: 'Organization Types',
                         exportOptions: { columns: [0, 1, 2, 3, 4] }
                     },
                     {
                         extend: 'pdf',
                         text: '<i class="fas fa-file-pdf me-1"></i> PDF',
+                        title: 'Organization Types',
+                        filename: 'Organization Types',
                         exportOptions: { columns: [0, 1, 2, 3, 4] }
                     },
                     {
                         extend: 'print',
                         text: '<i class="fas fa-print me-1"></i> Print',
+                        title: 'Organization Types',
                         exportOptions: { columns: [0, 1, 2, 3, 4] }
                     }
                 ],

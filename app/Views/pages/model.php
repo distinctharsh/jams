@@ -274,26 +274,34 @@ $(document).ready(function() {
                     {
                         extend: 'copy',
                         text: '<i class="fas fa-copy me-1"></i> Copy',
+                        title: 'Models',
                         exportOptions: { columns: [0, 1, 2, 3] }
                     },
                     {
                         extend: 'csv',
                         text: '<i class="fas fa-file-csv me-1"></i> CSV',
+                        title: 'Models',
+                        filename: 'Models',
                         exportOptions: { columns: [0, 1, 2, 3] }
                     },
                     {
                         extend: 'excel',
                         text: '<i class="fas fa-file-excel me-1"></i> Excel',
+                        title: 'Models',
+                        filename: 'Models',
                         exportOptions: { columns: [0, 1, 2, 3] }
                     },
                     {
                         extend: 'pdf',
                         text: '<i class="fas fa-file-pdf me-1"></i> PDF',
+                        title: 'Models',
+                        filename: 'Models',
                         exportOptions: { columns: [0, 1, 2, 3] }
                     },
                     {
                         extend: 'print',
                         text: '<i class="fas fa-print me-1"></i> Print',
+                        title: 'Models',
                         exportOptions: { columns: [0, 1, 2, 3] }
                     }
                 ],

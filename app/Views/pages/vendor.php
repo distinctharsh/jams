@@ -150,26 +150,34 @@ $(document).ready(function() {
                     {
                         extend: 'copy',
                         text: '<i class="fas fa-copy me-1"></i> Copy',
+                        title: 'Vendors',
                         exportOptions: { columns: [0, 1, 2] }
                     },
                     {
                         extend: 'csv',
                         text: '<i class="fas fa-file-csv me-1"></i> CSV',
+                        title: 'Vendors',
+                        filename: 'Vendors',
                         exportOptions: { columns: [0, 1, 2] }
                     },
                     {
                         extend: 'excel',
                         text: '<i class="fas fa-file-excel me-1"></i> Excel',
+                        title: 'Vendors',
+                        filename: 'Vendors',
                         exportOptions: { columns: [0, 1, 2] }
                     },
                     {
                         extend: 'pdf',
                         text: '<i class="fas fa-file-pdf me-1"></i> PDF',
+                        title: 'Vendors',
+                        filename: 'Vendors',
                         exportOptions: { columns: [0, 1, 2] }
                     },
                     {
                         extend: 'print',
                         text: '<i class="fas fa-print me-1"></i> Print',
+                        title: 'Vendors',
                         exportOptions: { columns: [0, 1, 2] }
                     }
                 ],
