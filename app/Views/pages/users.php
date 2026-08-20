@@ -189,19 +189,6 @@
                     <input type="text" name="designation" id="user_designation" class="w-full px-3.5 py-2.5 text-sm bg-slate-50 border border-slate-300 rounded-lg focus:ring-2 focus:ring-[#1e4d7b] focus:border-[#1e4d7b] focus:bg-white outline-none transition" placeholder="e.g. Nodal Officer">
                 </div>
 
-                <div>
-                    <label class="block text-xs font-bold text-slate-600 uppercase tracking-wider mb-1.5">
-                        Org Type
-                    </label>
-                    <select name="org_type" id="user_org_type" class="w-full px-3.5 py-2.5 text-sm bg-slate-50 border border-slate-300 rounded-lg focus:ring-2 focus:ring-[#1e4d7b] focus:border-[#1e4d7b] focus:bg-white outline-none transition">
-                        <option value="">Select Org Type</option>
-                        <?php if(!empty($orgTypes)): ?>
-                            <?php foreach($orgTypes as $type): ?>
-                                <option value="<?= $type['id'] ?>"><?= esc($type['name']) ?></option>
-                            <?php endforeach; ?>
-                        <?php endif; ?>
-                    </select>
-                </div>
 
                 <div>
                     <label class="block text-xs font-bold text-slate-600 uppercase tracking-wider mb-1.5">
@@ -211,7 +198,9 @@
                         <option value="">Select Organization</option>
                         <?php if(!empty($organizations)): ?>
                             <?php foreach($organizations as $org): ?>
-                                <option value="<?= $org['id'] ?>"><?= esc($org['org_name']) ?></option>
+                                <option value="<?= $org['id'] ?>" data-org-type="<?= esc($org['org_type_id'] ?? $org['org_type'] ?? '') ?>">
+                                    <?= esc($org['org_name']) ?>
+                                </option>
                             <?php endforeach; ?>
                         <?php endif; ?>
                     </select>
@@ -219,7 +208,23 @@
 
                 <div>
                     <label class="block text-xs font-bold text-slate-600 uppercase tracking-wider mb-1.5">
-                        UGC ID
+                        Org Type
+                    </label>
+                    <select name="org_type" id="user_org_type" class="w-full px-3.5 py-2.5 text-sm bg-slate-50 border border-slate-300 rounded-lg focus:ring-2 focus:ring-[#1e4d7b] focus:border-[#1e4d7b] focus:bg-white outline-none transition">
+                        <option value="">Select Org Type</option>
+                        <?php if(!empty($orgTypes)): ?>
+                            <?php foreach($orgTypes as $type): ?>
+                                <option value="<?= $type['id'] ?>" data-type-id="<?= $type['id'] ?>" data-ugc-required="<?= esc($type['is_ugc_id_required'] ?? $type['is_ugc_required'] ?? '0') ?>">
+                                    <?= esc($type['name']) ?>
+                                </option>
+                            <?php endforeach; ?>
+                        <?php endif; ?>
+                    </select>
+                </div>
+
+                <div id="user_ugc_container" style="display: none;">
+                    <label class="block text-xs font-bold text-slate-600 uppercase tracking-wider mb-1.5">
+                        UGC ID <span class="text-red-500" id="ugc_star">*</span>
                     </label>
                     <input type="text" name="ugc_id" id="user_ugc_id" class="w-full px-3.5 py-2.5 text-sm bg-slate-50 border border-slate-300 rounded-lg focus:ring-2 focus:ring-[#1e4d7b] focus:border-[#1e4d7b] focus:bg-white outline-none transition" placeholder="e.g. UGC-ADM-001">
                 </div>
@@ -330,6 +335,27 @@ $(document).ready(function() {
     function closeUserModal() { $('#userModal').addClass('hidden'); }
 
     $('.closeUserModal').click(function() { closeUserModal(); });
+    $('#user_organization_id').change(function() {
+        let selectedOrgType = $(this).find(':selected').data('org-type');
+        
+        if (selectedOrgType) {
+            $('#user_org_type').val(selectedOrgType).trigger('change');
+        } else {
+            $('#user_org_type').val('').trigger('change');
+        }
+    });
+
+    $('#user_org_type').change(function() {
+        let isUgcRequired = $(this).find(':selected').data('ugc-required');
+
+        if (parseInt(isUgcRequired) === 1) {
+            $('#user_ugc_container').slideDown(200);
+            $('#user_ugc_id').prop('required', true);
+        } else {
+            $('#user_ugc_container').slideUp(200);
+            $('#user_ugc_id').prop('required', false).val('');
+        }
+    });
 
     function updateCSRF(hash) {
         if(hash) { $('#userForm input[type="hidden"]').first().val(hash); }
@@ -346,6 +372,7 @@ $(document).ready(function() {
         $('#user_id').val('');
         $('#user_isactive').prop('checked', true);
         $('#userIsActiveContainer').hide();
+        $('#user_org_type').val('').trigger('change');
         $('#userModalTitle').html('<i class="fa-solid fa-user-plus text-[#e58500]"></i> Add User');
         openUserModal();
     });
@@ -474,8 +501,8 @@ $(document).ready(function() {
                         $('#user_email').val(res.data.email);
                         $('#user_mobile_no').val(res.data.mobile_no);
                         $('#user_designation').val(res.data.designation);
-                        $('#user_org_type').val(res.data.org_type);
                         $('#user_organization_id').val(res.data.organization_id);
+                        $('#user_org_type').val(res.data.org_type).trigger('change');
                         $('#user_ugc_id').val(res.data.ugc_id);
                         $('#user_isactive').prop('checked', res.data.isactive == 1 || res.data.isactive == '1');
                         $('#userIsActiveContainer').show();
