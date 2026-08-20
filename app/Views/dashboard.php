@@ -1495,7 +1495,7 @@
     <div id="complaintNotification" style="
         position: fixed;
         bottom: 50px;
-        left: 9px;
+        left: 11px;
         width: 206px;
         background: linear-gradient(135deg, #1e4d7b 0%, #2f73b3 100%);
         padding: 0;

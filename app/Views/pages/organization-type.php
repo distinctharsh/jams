@@ -175,7 +175,7 @@ $(document).ready(function() {
                 "lengthMenu": [ [10, 15, 25, 50, 100, -1], [10, 15, 25, 50, 100, "All"] ],
                 "responsive": true,
                 "autoWidth": false,
-                "dom": '<"flex flex-col sm:flex-row sm:items-center justify-between gap-4"<"flex items-center gap-4"Bl>f>rt<"flex flex-col sm:flex-row sm:items-center justify-between gap-4 mt-4"ip>',
+                "dom": '<"flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-3"<"flex items-center gap-4"Bl>f>rt<"flex flex-col sm:flex-row sm:items-center justify-between gap-4 mt-4"ip>',
                 "buttons": [
                     {
                         extend: 'copy',

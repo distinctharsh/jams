@@ -77,7 +77,7 @@
                         <?php foreach($users as $index => $user): ?>
                             <tr class="hover:bg-slate-50/80 transition-colors duration-150">
                                 <td class="px-5 py-4 text-left font-bold text-[#1e4d7b]">
-                                    <?= '#' . str_pad($index + 1, 3, '0', STR_PAD_LEFT) ?>
+                                    <?= $index + 1 ?>
                                 </td>
                                 <td class="px-5 py-4 font-bold text-slate-800">
                                     <?= esc($user['name']) ?>

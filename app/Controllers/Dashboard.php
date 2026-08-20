@@ -7,6 +7,7 @@ use App\Models\RequestModel;
 use App\Models\OrganizationModel;
 use App\Models\VendorModel;
 use App\Models\ModelModel;
+use App\Models\DesignationModel;
 
 class Dashboard extends BaseController
 {
@@ -16,6 +17,7 @@ class Dashboard extends BaseController
     protected $orgTypeModel;
     protected $vendorModel;
     protected $modelModel;
+    protected $desModel;
 
     public function __construct()
     {
@@ -25,6 +27,7 @@ class Dashboard extends BaseController
         $this->orgTypeModel = new \App\Models\OrgTypeModel();
         $this->vendorModel  = new VendorModel();
         $this->modelModel  = new ModelModel();
+        $this->desModel     = new DesignationModel();
     }
 
     public function index()
@@ -134,8 +137,118 @@ class Dashboard extends BaseController
         
         return $this->response->setJSON(['success' => true, 'request' => $request]);
     }
+
+    public function designations()
+    {
+        if (!session()->get('isLoggedIn')) {
+            return redirect()->to(base_url('/'));
+        }
+
+        $data = [
+            'designations' => $this->desModel->getAllDesignations()
+        ];
+
+        return view('pages/designation', $data);
+    }
+
+    public function getDesignations()
+    {
+        if (!session()->get('isLoggedIn')) {
+            return $this->response->setJSON(['success' => false, 'message' => 'Unauthorized']);
+        }
+
+        return $this->response->setJSON([
+            'success'      => true,
+            'designations' => $this->desModel->getAllDesignations(),
+            'csrfHash'     => csrf_hash()
+        ]);
+    }
+
+    public function saveDesignation()
+    {
+        if (!session()->get('isLoggedIn')) {
+            return $this->response->setJSON(['success' => false, 'message' => 'Unauthorized']);
+        }
+
+        $id = $this->request->getPost('id');
+        $saveData = [
+            'name'     => trim($this->request->getPost('name')),
+            'isactive' => $this->request->getPost('isactive') ? 1 : 0,
+        ];
+
+        try {
+            if (!empty($id)) {
+                $this->desModel->update($id, $saveData);
+                $msg = 'Designation updated successfully.';
+            } else {
+                $this->desModel->insert($saveData);
+                $msg = 'Designation created successfully.';
+            }
+
+            return $this->response->setJSON([
+                'success'  => true,
+                'message'  => $msg,
+                'csrfHash' => csrf_hash()
+            ]);
+        } catch (\Exception $e) {
+            return $this->response->setJSON([
+                'success'  => false,
+                'message'  => 'Error saving data: ' . $e->getMessage(),
+                'csrfHash' => csrf_hash()
+            ]);
+        }
+    }
+
+    public function getDesignation($id = null)
+    {
+        if (!session()->get('isLoggedIn')) {
+            return $this->response->setJSON(['success' => false, 'message' => 'Unauthorized']);
+        }
+
+        if (!$id) {
+            return $this->response->setJSON(['success' => false, 'message' => 'Invalid ID']);
+        }
+
+        $data = $this->desModel->getDesignationById($id);
+
+        if ($data) {
+            return $this->response->setJSON([
+                'success'  => true,
+                'data'     => $data,
+                'csrfHash' => csrf_hash()
+            ]);
+        }
+
+        return $this->response->setJSON([
+            'success'  => false,
+            'message'  => 'Record not found',
+            'csrfHash' => csrf_hash()
+        ]);
+    }
+
+    public function deleteDesignation($id)
+    {
+        if (!session()->get('isLoggedIn')) {
+            return $this->response->setJSON(['success' => false, 'message' => 'Unauthorized']);
+        }
+
+        try {
+            $this->desModel->update($id, ['isactive' => 0]);
+
+            return $this->response->setJSON([
+                'success'  => true,
+                'message'  => 'Designation deactivated successfully.',
+                'csrfHash' => csrf_hash()
+            ]);
+        } catch (\Exception $e) {
+            return $this->response->setJSON([
+                'success'  => false,
+                'message'  => 'Error deactivating record: ' . $e->getMessage(),
+                'csrfHash' => csrf_hash()
+            ]);
+        }
+    }
     
-    // Organization
     public function organizations()
     {
         if (!session()->get('isLoggedIn')) {
