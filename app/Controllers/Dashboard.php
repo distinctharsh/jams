@@ -8,6 +8,7 @@ use App\Models\OrganizationModel;
 use App\Models\VendorModel;
 use App\Models\ModelModel;
 use App\Models\DesignationModel;
+use App\Models\RegistrationModel;
 
 class Dashboard extends BaseController
 {
@@ -18,6 +19,7 @@ class Dashboard extends BaseController
     protected $vendorModel;
     protected $modelModel;
     protected $desModel;
+    protected $regModel;
 
     public function __construct()
     {
@@ -28,6 +30,7 @@ class Dashboard extends BaseController
         $this->vendorModel  = new VendorModel();
         $this->modelModel  = new ModelModel();
         $this->desModel     = new DesignationModel();
+        $this->regModel     = new RegistrationModel();
     }
 
     public function index()
@@ -817,5 +820,43 @@ class Dashboard extends BaseController
                 'csrfHash' => csrf_hash()
             ]);
         }
+    }
+
+    public function registrations()
+    {
+        $regModel = new \App\Models\RegistrationModel();
+        $orgModel = new \App\Models\OrganizationModel();
+        $orgTypeModel = new \App\Models\OrgTypeModel();
+
+        $data['registrations'] = $regModel->getRegistrationsWithDetails();
+        $data['organizations'] = $orgModel->findAll();
+        $data['orgTypes']      = $orgTypeModel->findAll();
+
+        return view('dashboard/registrations', $data);
+    }
+
+    public function approveRegistration()
+    {
+        $regId      = $this->request->getPost('reg_id');
+        $action     = $this->request->getPost('action');
+        $remarks    = $this->request->getPost('remarks');
+        $approvedBy = session()->get('user_id') ?? 1;
+
+        $regModel = new \App\Models\RegistrationModel();
+        $result   = $regModel->approveRegistrationSp($regId, $approvedBy, $action, $remarks);
+
+        if (isset($result['success']) && $result['success'] == 1) {
+            return $this->response->setJSON([
+                'success'  => true,
+                'message'  => $result['message'],
+                'csrfHash' => csrf_hash()
+            ]);
+        }
+
+        return $this->response->setJSON([
+            'success'  => false,
+            'message'  => $result['error_message'] ?? $result['message'] ?? 'Action failed.',
+            'csrfHash' => csrf_hash()
+        ]);
     }
 }

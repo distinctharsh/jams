@@ -146,12 +146,13 @@
         <a href="#" class="nav-item" onclick="showPage('settings')"><i class="fas fa-sliders"></i> <span>Settings</span></a>
         <a href="#" class="nav-item" onclick="showPage('audit-log')"><i class="fas fa-shield-halved"></i> <span>Audit Log</span></a>
         <div class="text-[9px] font-bold text-slate-400 uppercase tracking-wider px-3 mt-6 mb-2 nav-label">Admin</div>
+        <a href="#" class="nav-item" onclick="showPage('registration')"><i class="fas fa-id-card"></i> <span>Pending Registration</span></a>
         <a href="#" class="nav-item" onclick="showPage('users')"><i class="fas fa-users"></i> <span>Users</span></a>
-        <a href="#" class="nav-item" onclick="showPage('designation')"><i class="fas fa-users"></i> <span>Designation</span></a>
         <a href="#" class="nav-item" onclick="showPage('organization')"><i class="fa-solid fa-sitemap"></i> <span>Manage Organization</span></a>
         <a href="#" class="nav-item" onclick="showPage('organization-type')"><i class="fa-solid fa-layer-group"></i> <span>Organization Types</span></a>
         <a href="#" class="nav-item" onclick="showPage('vendor')"><i class="fas fa-handshake"></i> <span>Vendor</span></a>
         <a href="#" class="nav-item" onclick="showPage('model')"><i class="fas fa-microchip"></i> <span>Model</span></a>
+        <a href="#" class="nav-item" onclick="showPage('designation')"><i class="fas fa-user-tag"></i> <span>Designation</span></a>
         </nav>
     </div>
     </aside>
@@ -211,14 +212,34 @@
         $userModel    = new \App\Models\UserModel();
         $orgModel     = new \App\Models\OrganizationModel();
         $orgTypeModel = new \App\Models\OrgTypeModel();
+        $designationModel = new \App\Models\DesignationModel();
+        $roleModel        = new \App\Models\RoleModel();
 
         $userData['users']         = $userModel->getAllUsers();
         $userData['organizations'] = $orgModel->getAllOrganizations();
         $userData['orgTypes']      = $orgTypeModel->getAllOrgTypes();
+        $userData['designations']  = $designationModel->findAll();
+        $userData['roles']         = $roleModel->findAll();
 
         echo view('pages/users', $userData);
         ?>
     </div>
+
+    <!-- Registration Content -->
+    <div id="registration" class="page-content">
+        <?php 
+        $regModel     = new \App\Models\RegistrationModel();
+        $orgModel     = new \App\Models\OrganizationModel();
+        $orgTypeModel = new \App\Models\OrgTypeModel();
+
+        $regData['registrations'] = $regModel->getRegistrationsWithDetails();
+        $regData['organizations'] = $orgModel->getAllOrganizations();
+        $regData['orgTypes']      = $orgTypeModel->getAllOrgTypes();
+
+        echo view('pages/registrations', $regData);
+        ?>
+    </div>
+
 
     <!-- Designation Content -->
     <div id="designation" class="page-content">

@@ -72,3 +72,7 @@ $routes->get('dashboard/get-designations', 'Dashboard::getDesignations');
 $routes->get('dashboard/get-designation/(:num)', 'Dashboard::getDesignation/$1');
 $routes->post('dashboard/save-designation', 'Dashboard::saveDesignation');
 $routes->post('dashboard/delete-designation/(:num)', 'Dashboard::deleteDesignation/$1');
+
+// Registration Routes
+$routes->get('dashboard/registrations', 'Dashboard::registrations');
+$routes->post('dashboard/approve-registration', 'Dashboard::approveRegistration');

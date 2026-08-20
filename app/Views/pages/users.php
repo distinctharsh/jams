@@ -64,6 +64,7 @@
                         <th class="px-5 py-3.5 text-left font-semibold uppercase tracking-wider text-xs">Email</th>
                         <th class="px-5 py-3.5 text-left font-semibold uppercase tracking-wider text-xs">Mobile No</th>
                         <th class="px-5 py-3.5 text-left font-semibold uppercase tracking-wider text-xs">Designation</th>
+                        <th class="px-5 py-3.5 text-left font-semibold uppercase tracking-wider text-xs">Role</th>
                         <th class="px-5 py-3.5 text-left font-semibold uppercase tracking-wider text-xs">Org Type</th>
                         <th class="px-5 py-3.5 text-left font-semibold uppercase tracking-wider text-xs">Organization</th>
                         <th class="px-5 py-3.5 text-left font-semibold uppercase tracking-wider text-xs">UGC ID</th>
@@ -89,7 +90,10 @@
                                     <?= esc($user['mobile_no'] ?? 'N/A') ?>
                                 </td>
                                 <td class="px-5 py-4 text-slate-600 font-medium">
-                                    <?= esc($user['designation'] ?? 'N/A') ?>
+                                    <?= esc($user['designation_name'] ?? $user['designation'] ?? 'N/A') ?>
+                                </td>
+                                <td class="px-5 py-4 text-slate-600 font-medium">
+                                    <?= esc($user['role_name'] ?? $user['role'] ?? 'N/A') ?>
                                 </td>
                                 <td class="px-5 py-4 text-slate-600 font-medium">
                                     <?= esc($user['org_type_name'] ?? 'N/A') ?>
@@ -184,11 +188,31 @@
 
                 <div>
                     <label class="block text-xs font-bold text-slate-600 uppercase tracking-wider mb-1.5">
-                        Designation
+                        Designation <span class="text-red-500">*</span>
                     </label>
-                    <input type="text" name="designation" id="user_designation" class="w-full px-3.5 py-2.5 text-sm bg-slate-50 border border-slate-300 rounded-lg focus:ring-2 focus:ring-[#1e4d7b] focus:border-[#1e4d7b] focus:bg-white outline-none transition" placeholder="e.g. Nodal Officer">
+                    <select name="designation_id" id="user_designation_id" class="w-full px-3.5 py-2.5 text-sm bg-slate-50 border border-slate-300 rounded-lg focus:ring-2 focus:ring-[#1e4d7b] focus:border-[#1e4d7b] focus:bg-white outline-none transition" required>
+                        <option value="">Select Designation</option>
+                        <?php if(!empty($designations)): ?>
+                            <?php foreach($designations as $desig): ?>
+                                <option value="<?= $desig['id'] ?>"><?= esc($desig['name']) ?></option>
+                            <?php endforeach; ?>
+                        <?php endif; ?>
+                    </select>
                 </div>
 
+                <div>
+                    <label class="block text-xs font-bold text-slate-600 uppercase tracking-wider mb-1.5">
+                        Role <span class="text-red-500">*</span>
+                    </label>
+                    <select name="role_id" id="user_role_id" class="w-full px-3.5 py-2.5 text-sm bg-slate-50 border border-slate-300 rounded-lg focus:ring-2 focus:ring-[#1e4d7b] focus:border-[#1e4d7b] focus:bg-white outline-none transition" required>
+                        <option value="">Select Role</option>
+                        <?php if(!empty($roles)): ?>
+                            <?php foreach($roles as $role): ?>
+                                <option value="<?= $role['id'] ?>"><?= esc($role['name']) ?> (<?= esc($role['code']) ?>)</option>
+                            <?php endforeach; ?>
+                        <?php endif; ?>
+                    </select>
+                </div>
 
                 <div>
                     <label class="block text-xs font-bold text-slate-600 uppercase tracking-wider mb-1.5">
@@ -274,41 +298,41 @@ $(document).ready(function() {
                 "autoWidth": false,
                 "dom": '<"flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-3"<"flex items-center gap-4"Bl>f>rt<"flex flex-col sm:flex-row sm:items-center justify-between gap-4 mt-4"ip>',
                 "columnDefs": [
-                    { "orderable": false, "targets": [8, 10] }
+                    { "orderable": false, "targets": [9, 11] }
                 ],
                 "buttons": [
                     {
                         extend: 'copy',
                         text: '<i class="fas fa-copy me-1"></i> Copy',
                         title: 'Users',
-                        exportOptions: { columns: [0, 1, 2, 3, 4, 5, 6, 7, 9] }
+                        exportOptions: { columns: [0, 1, 2, 3, 4, 5, 6, 7, 8, 10] }
                     },
                     {
                         extend: 'csv',
                         text: '<i class="fas fa-file-csv me-1"></i> CSV',
                         title: 'Users',
                         filename: 'Users',
-                        exportOptions: { columns: [0, 1, 2, 3, 4, 5, 6, 7, 9] }
+                        exportOptions: { columns: [0, 1, 2, 3, 4, 5, 6, 7, 8, 10] }
                     },
                     {
                         extend: 'excel',
                         text: '<i class="fas fa-file-excel me-1"></i> Excel',
                         title: 'Users',
                         filename: 'Users',
-                        exportOptions: { columns: [0, 1, 2, 3, 4, 5, 6, 7, 9] }
+                        exportOptions: { columns: [0, 1, 2, 3, 4, 5, 6, 7, 8, 10] }
                     },
                     {
                         extend: 'pdf',
                         text: '<i class="fas fa-file-pdf me-1"></i> PDF',
                         title: 'Users',
                         filename: 'Users',
-                        exportOptions: { columns: [0, 1, 2, 3, 4, 5, 6, 7, 9] }
+                        exportOptions: { columns: [0, 1, 2, 3, 4, 5, 6, 7, 8, 10] }
                     },
                     {
                         extend: 'print',
                         text: '<i class="fas fa-print me-1"></i> Print',
                         title: 'Users',
-                        exportOptions: { columns: [0, 1, 2, 3, 4, 5, 6, 7, 9] }
+                        exportOptions: { columns: [0, 1, 2, 3, 4, 5, 6, 7, 8, 10] }
                     }
                 ],
                 "language": {
@@ -370,6 +394,8 @@ $(document).ready(function() {
         csrfInput.attr('name', csrfName).val(csrfVal);
 
         $('#user_id').val('');
+        $('#user_designation_id').val('');
+        $('#user_role_id').val('');
         $('#user_isactive').prop('checked', true);
         $('#userIsActiveContainer').hide();
         $('#user_org_type').val('').trigger('change');
@@ -379,7 +405,7 @@ $(document).ready(function() {
 
     attachUserEventListeners();
 
-    // AJAX Form Submit with File & Checkbox Support
+    // AJAX Form Submit
     $('#userForm').submit(function(e) {
         e.preventDefault();
         $('#saveUserBtn').prop('disabled', true).text('Saving...');
@@ -448,7 +474,7 @@ $(document).ready(function() {
         tbody.empty();
 
         if(!users || users.length === 0) {
-            tbody.html('<tr><td colspan="11" class="text-center py-12"><i class="fa-solid fa-users text-slate-300 text-5xl mb-3 block"></i><p class="text-slate-500 font-medium">No user records found.</p></td></tr>');
+            tbody.html('<tr><td colspan="12" class="text-center py-12"><i class="fa-solid fa-users text-slate-300 text-5xl mb-3 block"></i><p class="text-slate-500 font-medium">No user records found.</p></td></tr>');
         } else {
             users.forEach(function(user, index) {
                 let isActive = (user.isactive == 1 || user.isactive == '1');
@@ -457,11 +483,12 @@ $(document).ready(function() {
                     '<span class="text-xs text-slate-400">None</span>';
 
                 let row = '<tr class="hover:bg-slate-50/80 transition-colors duration-150">' +
-                    '<td class="px-5 py-4 text-left font-bold text-[#1e4d7b]">#' + String(index + 1).padStart(3, '0') + '</td>' +
+                    '<td class="px-5 py-4 text-left font-bold text-[#1e4d7b]">' + (index + 1) + '</td>' +
                     '<td class="px-5 py-4 font-bold text-slate-800">' + (user.name ? user.name : '') + '</td>' +
                     '<td class="px-5 py-4 text-slate-600 font-medium">' + (user.email ? user.email : '') + '</td>' +
                     '<td class="px-5 py-4 text-slate-600 font-medium">' + (user.mobile_no ? user.mobile_no : 'N/A') + '</td>' +
-                    '<td class="px-5 py-4 text-slate-600 font-medium">' + (user.designation ? user.designation : 'N/A') + '</td>' +
+                    '<td class="px-5 py-4 text-slate-600 font-medium">' + (user.designation_name ? user.designation_name : (user.designation ? user.designation : 'N/A')) + '</td>' +
+                    '<td class="px-5 py-4 text-slate-600 font-medium">' + (user.role_name ? user.role_name : (user.role ? user.role : 'N/A')) + '</td>' +
                     '<td class="px-5 py-4 text-slate-600 font-medium">' + (user.org_type_name ? user.org_type_name : 'N/A') + '</td>' +
                     '<td class="px-5 py-4 text-slate-600 font-medium">' + (user.org_name ? user.org_name : 'N/A') + '</td>' +
                     '<td class="px-5 py-4"><span class="inline-flex items-center px-2.5 py-1 rounded-md text-xs font-semibold bg-amber-50 text-[#e58500] border border-amber-200">' + (user.ugc_id ? user.ugc_id : 'N/A') + '</span></td>' +
@@ -496,15 +523,40 @@ $(document).ready(function() {
                 success: function(res) {
                     if(res.csrfHash) updateCSRF(res.csrfHash);
                     if(res.success) {
-                        $('#user_id').val(res.data.id);
-                        $('#user_name').val(res.data.name);
-                        $('#user_email').val(res.data.email);
-                        $('#user_mobile_no').val(res.data.mobile_no);
-                        $('#user_designation').val(res.data.designation);
-                        $('#user_organization_id').val(res.data.organization_id);
-                        $('#user_org_type').val(res.data.org_type).trigger('change');
-                        $('#user_ugc_id').val(res.data.ugc_id);
-                        $('#user_isactive').prop('checked', res.data.isactive == 1 || res.data.isactive == '1');
+                        let user = res.data;
+                        $('#user_id').val(user.id);
+                        $('#user_name').val(user.name);
+                        $('#user_email').val(user.email);
+                        $('#user_mobile_no').val(user.mobile_no);
+                        
+                        let desigVal = user.designation_id !== undefined && user.designation_id !== null ? user.designation_id : user.designation;
+                        if (desigVal !== null && desigVal !== undefined) {
+                            $('#user_designation_id').val(desigVal.toString()).trigger('change');
+                        } else {
+                            $('#user_designation_id').val('').trigger('change');
+                        }
+
+                        let roleVal = user.role_id !== undefined && user.role_id !== null ? user.role_id : user.role;
+                        if (roleVal !== null && roleVal !== undefined) {
+                            $('#user_role_id').val(roleVal.toString()).trigger('change');
+                        } else {
+                            $('#user_role_id').val('').trigger('change');
+                        }
+
+                        if (user.organization_id) {
+                            $('#user_organization_id').val(user.organization_id.toString()).trigger('change');
+                        } else {
+                            $('#user_organization_id').val('').trigger('change');
+                        }
+
+                        if (user.org_type) {
+                            $('#user_org_type').val(user.org_type.toString()).trigger('change');
+                        } else {
+                            $('#user_org_type').val('').trigger('change');
+                        }
+
+                        $('#user_ugc_id').val(user.ugc_id || '');
+                        $('#user_isactive').prop('checked', user.isactive == 1 || user.isactive == '1');
                         $('#userIsActiveContainer').show();
                         $('#userModalTitle').html('<i class="fa-solid fa-user-pen text-[#e58500]"></i> Edit User');
                         openUserModal();
