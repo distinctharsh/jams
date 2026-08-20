@@ -1,5 +1,4 @@
 <div class="space-y-6">
-    <!-- Header -->
     <div class="gov-card p-6">
         <div class="flex items-center gap-3">
             <div class="w-12 h-12 rounded-xl bg-amber-50 border border-amber-200 flex items-center justify-center shrink-0">
@@ -12,7 +11,6 @@
         </div>
     </div>
 
-    <!-- Data Table -->
     <div class="gov-card p-5 overflow-hidden shadow-sm border border-slate-200 rounded-xl bg-white">
         <div class="overflow-x-auto">
             <table class="w-full text-sm gov-table rounded-lg overflow-hidden" id="registrationTable">
@@ -85,7 +83,6 @@
     </div>
 </div>
 
-<!-- Modal: Dynamic Action Approval/Rejection Modal -->
 <div id="actionModal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
     <div class="bg-white rounded-2xl shadow-xl w-full max-w-md overflow-hidden">
         <div class="px-6 py-4 bg-slate-50 border-b border-slate-200 flex items-center justify-between">
@@ -113,7 +110,6 @@
     </div>
 </div>
 
-<!-- Scripts & Styling -->
 <link rel="stylesheet" href="<?= base_url('assets/css/buttons.dataTables.min.css') ?>">
 <script src="<?= base_url('assets/js/jquery-3.7.0.min.js') ?>"></script>
 <script src="<?= base_url('assets/js/tost.js') ?>"></script>
@@ -126,7 +122,6 @@
 <script src="<?= base_url('assets/js/buttons.print.min.js') ?>"></script>
 
 <style>
-/* Custom Styled DataTables Layout */
 .dataTables_wrapper { font-family: inherit; }
 
 .dataTables_wrapper .dataTables_length,
@@ -307,13 +302,12 @@ $(document).ready(function() {
         if(hash) $('input[type="hidden"][name^="csrf"]').val(hash);
     }
 
-    // Approve Button Click -> Opens Dynamic Modal with Green Accent
     $(document).on('click', '.approve-reg-btn', function() {
         let id = $(this).data('id');
         let name = $(this).data('name');
 
         $('#action_reg_id').val(id);
-        $('#action_type').val(4); // Status 4 = Approved
+        $('#action_type').val(4);
         $('#action_applicant_name').text(name);
         $('#action_remarks').val('');
 
@@ -321,7 +315,6 @@ $(document).ready(function() {
         $('#remarksLabel').text('Remarks (Optional)');
         $('#action_remarks').attr('placeholder', 'Enter approval remarks (optional)...');
 
-        // Style Button for Approval
         $('#submitActionBtn')
             .removeClass('bg-red-600 hover:bg-red-700')
             .addClass('bg-green-600 hover:bg-green-700')
@@ -330,21 +323,18 @@ $(document).ready(function() {
         $('#actionModal').removeClass('hidden');
     });
 
-    // Reject Button Click -> Opens Dynamic Modal with Red Accent
     $(document).on('click', '.reject-reg-btn', function() {
         let id = $(this).data('id');
         let name = $(this).data('name');
 
         $('#action_reg_id').val(id);
-        $('#action_type').val(5); // Status 5 = Rejected
+        $('#action_type').val(5);
         $('#action_applicant_name').text(name);
         $('#action_remarks').val('');
 
         $('#actionModalHeaderTitle').text('Reject Application');
         $('#remarksLabel').text('Reason / Remarks');
         $('#action_remarks').attr('placeholder', 'Enter reason for rejection...');
-
-        // Style Button for Rejection
         $('#submitActionBtn')
             .removeClass('bg-green-600 hover:bg-green-700')
             .addClass('bg-red-600 hover:bg-red-700')
@@ -353,7 +343,6 @@ $(document).ready(function() {
         $('#actionModal').removeClass('hidden');
     });
 
-    // Submit Modal Form (Approve or Reject via AJAX)
     $('#actionForm').submit(function(e) {
         e.preventDefault();
         
