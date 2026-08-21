@@ -250,17 +250,6 @@
 <script>
 $(document).ready(function() {
     let registrationDataTable = null;
-    let activeFilter = 'Pending';
-
-    $.fn.dataTable.ext.search.push(
-        function(settings, data, dataIndex) {
-            if (!activeFilter || activeFilter === 'All') {
-                return true;
-            }
-            let statusText = data[5] || '';
-            return statusText.indexOf(activeFilter) !== -1;
-        }
-    );
 
     function initDataTable() {
         if ($.fn && $.fn.DataTable) {
@@ -310,7 +299,7 @@ $(document).ready(function() {
                     }
                 ],
                 "columnDefs": [
-                    { "orderable": false, "targets": [5] }
+                    { "orderable": false, "targets": [5, 6] }
                 ],
                 "language": {
                     "search": "_INPUT_",
@@ -326,14 +315,14 @@ $(document).ready(function() {
                 }
             });
 
-            registrationDataTable.draw();
+            registrationDataTable.column(5).search('Pending').draw();
         }
     }
 
     initDataTable();
 
     $('.status-filter-btn').on('click', function() {
-        activeFilter = $(this).data('filter');
+        let activeFilter = $(this).data('filter');
         $('.status-filter-btn')
             .removeClass('bg-amber-500 bg-green-600 bg-red-600 text-white shadow-sm')
             .addClass('text-slate-600 hover:text-slate-800 hover:bg-slate-200');
@@ -352,7 +341,7 @@ $(document).ready(function() {
         }
 
         if (registrationDataTable) {
-            registrationDataTable.draw();
+            registrationDataTable.column(5).search(activeFilter).draw();
         }
     });
 
