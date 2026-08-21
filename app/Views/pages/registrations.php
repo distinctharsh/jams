@@ -20,6 +20,7 @@
                         <th class="px-5 py-3.5 text-left font-semibold uppercase tracking-wider text-xs">Applicant Name</th>
                         <th class="px-5 py-3.5 text-left font-semibold uppercase tracking-wider text-xs">Contact Info</th>
                         <th class="px-5 py-3.5 text-left font-semibold uppercase tracking-wider text-xs">Organization</th>
+                        <th class="px-5 py-3.5 text-left font-semibold uppercase tracking-wider text-xs">Auth Letter</th>
                         <th class="px-5 py-3.5 text-left font-semibold uppercase tracking-wider text-xs">Status</th>
                         <th class="px-5 py-3.5 text-left pr-6 font-semibold uppercase tracking-wider text-xs">Actions</th>
                     </tr>
@@ -42,6 +43,15 @@
                                 <td class="px-5 py-4 text-xs text-slate-700">
                                     <div class="font-semibold"><?= esc($reg['organization_name'] ?? 'N/A') ?></div>
                                     <div class="text-slate-500"><?= esc($reg['org_type_name'] ?? 'N/A') ?></div>
+                                </td>
+                                <td class="px-5 py-4 text-left">
+                                    <?php if(!empty($reg['authorization_letter'])): ?>
+                                        <a href="<?= base_url('uploads/authorization/'.$reg['authorization_letter']) ?>" target="_blank" class="inline-flex items-center gap-1 text-xs text-[#1e4d7b] hover:underline font-semibold">
+                                            <i class="fas fa-file-pdf text-red-500"></i> View Doc
+                                        </a>
+                                    <?php else: ?>
+                                        <span class="text-xs text-slate-400">None</span>
+                                    <?php endif; ?>
                                 </td>
                                 <td class="px-5 py-4 text-left" data-order="<?= $reg['current_status'] ?? 1 ?>">
                                     <?php if(($reg['current_status'] ?? 1) == 1): ?>
