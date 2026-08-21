@@ -108,8 +108,8 @@
                                 </td>
                                 <td class="px-5 py-4 text-left">
                                     <?php if(!empty($user['authorization_letter'])): ?>
-                                        <a href="<?= base_url('uploads/authorization/'.$user['authorization_letter']) ?>" target="_blank" class="inline-flex items-center gap-1 text-xs text-[#1e4d7b] hover:underline font-semibold">
-                                            <i class="fas fa-file-pdf text-red-500"></i> View Doc
+                                        <a href="<?= base_url('uploads/authorization/'.$user['authorization_letter']) ?>" target="_blank" class="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-slate-100 hover:bg-slate-200 text-[#1e4d7b] transition shadow-sm" title="View Document">
+                                            <i class="fas fa-eye text-sm"></i>
                                         </a>
                                     <?php else: ?>
                                         <span class="text-xs text-slate-400">None</span>

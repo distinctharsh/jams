@@ -1,12 +1,27 @@
 <div class="space-y-6">
     <div class="gov-card p-6">
-        <div class="flex items-center gap-3">
-            <div class="w-12 h-12 rounded-xl bg-amber-50 border border-amber-200 flex items-center justify-center shrink-0">
-               <i class="fas fa-user-plus text-[#e58500] text-xl"></i>
+        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <div class="flex items-center gap-3">
+                <div class="w-12 h-12 rounded-xl bg-amber-50 border border-amber-200 flex items-center justify-center shrink-0">
+                <i class="fas fa-user-plus text-[#e58500] text-xl"></i>
+                </div>
+                <div>
+                    <h2 class="text-xl font-bold text-[#1e4d7b]">Registration Pending for Approval</h2>
+                    <p class="text-xs text-slate-500 mt-0.5">Manage user registration applications and approvals.</p>
+                </div>
             </div>
-            <div>
-                <h2 class="text-xl font-bold text-[#1e4d7b]">Registration Pending for Approval</h2>
-                <p class="text-xs text-slate-500 mt-0.5">Manage user registration applications and approvals.</p>
+
+            <!-- Status Filter Buttons -->
+            <div class="flex items-center gap-2 bg-slate-100 p-1 rounded-xl border border-slate-200 shrink-0">
+                <button type="button" data-filter="Pending" class="status-filter-btn px-4 py-1.5 text-xs font-semibold rounded-lg bg-amber-500 text-white shadow-sm transition">
+                    <i class="fas fa-clock me-1"></i> Pending
+                </button>
+                <button type="button" data-filter="Approved" class="status-filter-btn px-4 py-1.5 text-xs font-semibold rounded-lg text-slate-600 hover:text-slate-800 hover:bg-slate-200 transition">
+                    <i class="fas fa-check-circle me-1 filter-icon text-green-600"></i> Approved
+                </button>
+                <button type="button" data-filter="Rejected" class="status-filter-btn px-4 py-1.5 text-xs font-semibold rounded-lg text-slate-600 hover:text-slate-800 hover:bg-slate-200 transition">
+                    <i class="fas fa-times-circle me-1 filter-icon text-red-600"></i> Rejected
+                </button>
             </div>
         </div>
     </div>
@@ -34,7 +49,7 @@
                                 </td>
                                 <td class="px-5 py-4 font-bold text-slate-800">
                                     <?= esc($reg['name']) ?>
-                                    <div class="text-xs font-normal text-slate-500"><?= esc($reg['designation'] ?? 'N/A') ?></div>
+                                    <div class="text-xs font-normal text-slate-500"><?= esc($reg['designation'] ?? '') ?></div>
                                 </td>
                                 <td class="px-5 py-4 text-xs text-slate-600">
                                     <div><i class="fas fa-envelope text-slate-400 me-1"></i><?= esc($reg['email']) ?></div>
@@ -46,8 +61,8 @@
                                 </td>
                                 <td class="px-5 py-4 text-left">
                                     <?php if(!empty($reg['authorization_letter'])): ?>
-                                        <a href="<?= base_url('uploads/authorization/'.$reg['authorization_letter']) ?>" target="_blank" class="inline-flex items-center gap-1 text-xs text-[#1e4d7b] hover:underline font-semibold">
-                                            <i class="fas fa-file-pdf text-red-500"></i> View Doc
+                                        <a href="<?= base_url('uploads/authorization/'.$reg['authorization_letter']) ?>" target="_blank" class="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-slate-100 hover:bg-slate-200 text-[#1e4d7b] transition shadow-sm" title="View Document">
+                                            <i class="fas fa-eye text-sm"></i>
                                         </a>
                                     <?php else: ?>
                                         <span class="text-xs text-slate-400">None</span>
@@ -235,6 +250,17 @@
 <script>
 $(document).ready(function() {
     let registrationDataTable = null;
+    let activeFilter = 'Pending';
+
+    $.fn.dataTable.ext.search.push(
+        function(settings, data, dataIndex) {
+            if (!activeFilter || activeFilter === 'All') {
+                return true;
+            }
+            let statusText = data[5] || '';
+            return statusText.indexOf(activeFilter) !== -1;
+        }
+    );
 
     function initDataTable() {
         if ($.fn && $.fn.DataTable) {
@@ -249,8 +275,8 @@ $(document).ready(function() {
                 "autoWidth": false,
                 "dom": '<"flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-3"<"flex items-center gap-4"Bl>f>rt<"flex flex-col sm:flex-row sm:items-center justify-between gap-4 mt-4"ip>',
                 "buttons": [
-                    {
-                        extend: 'copy',
+                    { 
+                        extend: 'copy', 
                         text: '<i class="fas fa-copy me-1"></i> Copy',
                         title: 'Registrations',
                         exportOptions: { columns: [0, 1, 2, 3, 4] }
@@ -299,10 +325,36 @@ $(document).ready(function() {
                     }
                 }
             });
+
+            registrationDataTable.draw();
         }
     }
 
     initDataTable();
+
+    $('.status-filter-btn').on('click', function() {
+        activeFilter = $(this).data('filter');
+        $('.status-filter-btn')
+            .removeClass('bg-amber-500 bg-green-600 bg-red-600 text-white shadow-sm')
+            .addClass('text-slate-600 hover:text-slate-800 hover:bg-slate-200');
+
+        $('.status-filter-btn[data-filter="Approved"] i').addClass('text-green-600').removeClass('text-white');
+        $('.status-filter-btn[data-filter="Rejected"] i').addClass('text-red-600').removeClass('text-white');
+
+        if (activeFilter === 'Pending') {
+            $(this).addClass('bg-amber-500 text-white shadow-sm').removeClass('text-slate-600 hover:bg-slate-200');
+        } else if (activeFilter === 'Approved') {
+            $(this).addClass('bg-green-600 text-white shadow-sm').removeClass('text-slate-600 hover:bg-slate-200');
+            $(this).find('i').removeClass('text-green-600').addClass('text-white');
+        } else if (activeFilter === 'Rejected') {
+            $(this).addClass('bg-red-600 text-white shadow-sm').removeClass('text-slate-600 hover:bg-slate-200');
+            $(this).find('i').removeClass('text-red-600').addClass('text-white');
+        }
+
+        if (registrationDataTable) {
+            registrationDataTable.draw();
+        }
+    });
 
     $('.closeModal').click(function() {
         $('#actionModal').addClass('hidden');
