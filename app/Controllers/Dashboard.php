@@ -39,8 +39,8 @@ class Dashboard extends BaseController
         if (!session()->get('isLoggedIn')) {
             return redirect()->to(base_url('/'));
         }
-        $pendingCount = $this->userModel->where('isactive', 0)->countAllResults();
-        $totalCount = $this->userModel->countAllResults();
+        $pendingCount = $this->regModel->where('isactive_authlink', 0)->countAllResults(); 
+        $totalCount = $this->regModel->countAll();
         $data = [
             'user_id'            => session()->get('user_id'),
             'username'           => session()->get('username'),
