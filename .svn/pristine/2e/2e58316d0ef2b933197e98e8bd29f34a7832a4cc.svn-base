@@ -1,45 +1,124 @@
 <?php
+
 namespace App\Controllers;
-use App\Models\AuthModel;
+use App\Models\UserModel;
+use App\Models\RegistrationModel;
 use CodeIgniter\Database\Exceptions\DatabaseException;
 
 class Auth extends BaseController
 {
-    protected $AuthModel;
+    protected $userModel;
+    protected $registrationModel;
     protected $session;
 
     public function __construct()
     {
-        $this->AuthModel = new AuthModel();
+        $this->userModel = new UserModel();
+        $this->registrationModel = new RegistrationModel();
         $this->session = \Config\Services::session();
+    }
+
+    public function checkLogin()
+    {
+        if (!$this->request->isAJAX()) {
+            return $this->response->setJSON([
+                'success'  => false,
+                'message'  => 'Invalid request',
+                'csrfHash' => csrf_hash()
+            ]);
+        }
+
+        $username = trim($this->request->getPost('username'));
+        $password = trim($this->request->getPost('password')); // Plain password from client
+        $captcha  = trim($this->request->getPost('captcha'));
+
+        // Validate CAPTCHA
+        if (!$this->validateCaptcha($captcha)) {
+            return $this->response->setJSON([
+                'success'  => false,
+                'message'  => 'Invalid CAPTCHA code',
+                'csrfHash' => csrf_hash()
+            ]);
+        }
+
+        // XSS Filtering
+        $username = esc($username);
+
+        // Find user
+        $user = $this->userModel->findUserByUsername($username);
+
+        if (!$user) {
+            return $this->response->setJSON([
+                'success'  => false,
+                'message'  => 'User not found',
+                'csrfHash' => csrf_hash()
+            ]);
+        }
+
+        // Verify password using password_verify
+        if (!$this->userModel->verifyPassword($password, $user['password'])) {
+            return $this->response->setJSON([
+                'success'  => false,
+                'message'  => 'Invalid password',
+                'csrfHash' => csrf_hash()
+            ]);
+        }
+
+        // Set Session
+        $this->session->set([
+            'user_id'    => $user['id'],
+            'username'   => $user['username'],
+            'full_name'  => $user['full_name'],
+            'email'      => $user['email'],
+            'isLoggedIn' => true,
+            'login_time' => time()
+        ]);
+
+        $this->session->regenerate();
+
+        return $this->response->setJSON([
+            'success'   => true,
+            'message'   => 'Login successful',
+            'redirect'  => base_url('dashboard'),
+            'csrfHash'  => csrf_hash()
+        ]);
     }
 
     private function generateCaptcha()
     {
         $session = \Config\Services::session();
+
         $characters = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
         $captcha = '';
+
         for ($i = 0; $i < 6; $i++) {
             $captcha .= $characters[random_int(0, strlen($characters) - 1)];
         }
+
         $session->set('captcha_text', strtoupper($captcha));
+
         log_message(
             'debug',
             'CAPTCHA GENERATED: ' . strtoupper($captcha)
         );
+
         return strtoupper($captcha);
     }
 
     private function validateCaptcha($userInput)
     {
         $session = \Config\Services::session();
+
         $sessionCaptcha = $session->get('captcha_text');
+
         $userCaptcha = strtoupper(
             trim((string) $userInput)
         );
+
         $storedCaptcha = strtoupper(
             trim((string) $sessionCaptcha)
         );
+
         log_message(
             'debug',
             'CAPTCHA DEBUG | User: ' .
@@ -47,6 +126,7 @@ class Auth extends BaseController
             ' | Session: ' .
             $storedCaptcha
         );
+
         if (
             empty($storedCaptcha) ||
             empty($userCaptcha) ||
@@ -54,8 +134,10 @@ class Auth extends BaseController
         ) {
             return false;
         }
+
         // CAPTCHA is single-use
         $session->remove('captcha_text');
+
         return true;
     }
 
@@ -69,12 +151,22 @@ class Auth extends BaseController
                 'csrfHash' => csrf_hash()
             ]);
         }
+
         $captcha = $this->generateCaptcha();
+
         return $this->response->setJSON([
             'success'   => true,
             'captcha'   => $captcha,
             'csrfHash'  => csrf_hash()
         ]);
+    }
+
+    public function logout()
+    {
+        session()->destroy();
+
+        return redirect()->to(base_url('/'))
+                         ->with('success', 'Logged out successfully');
     }
 
     private function isValidEmail(string $email): bool
@@ -129,6 +221,8 @@ class Auth extends BaseController
     /**
      * =========================================================
      * REGISTER USER
+     * =========================================================
+     *
      * =========================================================
      */
     public function register()
@@ -300,11 +394,11 @@ class Auth extends BaseController
         }
 
        
-        $AuthModel =
-            new \App\Models\AuthModel();
+        $registrationModel =
+            new \App\Models\RegistrationModel();
 
         
-        if ($AuthModel->userEmailExists($email)) {
+        if ($registrationModel->userEmailExists($email)) {
 
             return $this->response->setJSON([
                 'success'  => false,
@@ -320,7 +414,7 @@ class Auth extends BaseController
         try {
 
            
-            $result = $AuthModel->registerUser(
+            $result = $registrationModel->registerUser(
                 $fullName,
                 $email,
                 $mobile,
@@ -432,7 +526,7 @@ class Auth extends BaseController
 
            
             $linkUpdated =
-                $AuthModel->updateAuthLink(
+                $registrationModel->updateAuthLink(
                     $registrationId,
                     $authLink
                 );
@@ -586,7 +680,7 @@ class Auth extends BaseController
         }
 
        
-        $registration = $this->AuthModel
+        $registration = $this->registrationModel
             ->where('id', $regId)
             ->first();
 
@@ -703,7 +797,7 @@ class Auth extends BaseController
                 $newFileName
             );
 
-            $updated = $this->AuthModel
+            $updated = $this->registrationModel
                 ->update(
                     $regId,
                     [
@@ -1199,7 +1293,7 @@ class Auth extends BaseController
          * GET REGISTRATION
          * =====================================================
          */
-        $registration = $this->AuthModel
+        $registration = $this->registrationModel
             ->where('id', $regId)
             ->first();
 

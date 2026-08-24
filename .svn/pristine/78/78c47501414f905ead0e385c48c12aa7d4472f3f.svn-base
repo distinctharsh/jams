@@ -1,0 +1,149 @@
+<?php
+
+namespace App\Models;
+
+use CodeIgniter\Model;
+
+class RegistrationModel extends Model
+{
+    protected $table      = 'registration';
+    protected $primaryKey = 'id';
+
+    protected $returnType = 'array';
+
+    protected $allowedFields = [
+        'reg_no',
+        'name',
+        'email',
+        'mobile_no',
+        'organization_id',
+        'org_type',
+        'designation',
+        'ugc_id',
+        'auth_link',
+        'auth_link_generated_at',
+        'isactive_authlink',
+        'authorization_letter'
+    ];
+
+    protected $useTimestamps = false;
+
+
+    /**
+     * ---------------------------------------------------------
+     * CALL REGISTER USER STORED PROCEDURE
+     * ---------------------------------------------------------
+     */
+    public function registerUser(
+        string $name,
+        string $email,
+        string $mobile,
+        int $organizationId,
+        int $orgType,
+        ?string $ugcId = null
+    ): ?array {
+
+        $db = \Config\Database::connect();
+
+        $query = $db->query(
+            "CALL register_user(?, ?, ?, ?, ?, ?)",
+            [
+                $name,
+                $email,
+                $mobile,
+                $organizationId,
+                $orgType,
+                $ugcId
+            ]
+        );
+
+        $result = $query->getRowArray();
+
+        /*
+         * Clear MySQL stored procedure result sets.
+         */
+        while ($db->connID->more_results()) {
+
+            $db->connID->next_result();
+        }
+
+        return $result ?: null;
+    }
+
+
+    /*
+     * =========================================================
+     * EMAIL EXISTS IN USER TABLE
+     * =========================================================
+     */
+    public function userEmailExists(string $email): bool
+    {
+        $email = strtolower(trim($email));
+
+        return $this->db
+            ->table('user')
+            ->where('LOWER(email)', $email)
+            ->countAllResults() > 0;
+    }
+
+
+    /**
+     * ---------------------------------------------------------
+     * UPDATE AUTHORIZATION LINK
+     * ---------------------------------------------------------
+     */
+    public function updateAuthLink(
+        int $registrationId,
+        string $authLink
+    ): bool {
+
+        return $this
+            ->where('id', $registrationId)
+            ->set([
+                'auth_link'              => $authLink,
+                'auth_link_generated_at' => date('Y-m-d H:i:s'),
+                'isactive_authlink'      => 1
+            ])
+            ->update();
+    }
+
+
+    /**
+     * ---------------------------------------------------------
+     * FIND BY REGISTRATION ID
+     * ---------------------------------------------------------
+     */
+    public function findById(int $id): ?array
+    {
+        return $this
+            ->where('id', $id)
+            ->first();
+    }
+
+
+    /**
+     * ---------------------------------------------------------
+     * FIND BY REGISTRATION NUMBER
+     * ---------------------------------------------------------
+     */
+    public function findByRegNo(string $regNo): ?array
+    {
+        return $this
+            ->where('reg_no', $regNo)
+            ->first();
+    }
+
+
+    /**
+     * ---------------------------------------------------------
+     * FIND ACTIVE AUTH LINK
+     * ---------------------------------------------------------
+     */
+    public function findActiveAuthLink(int $registrationId): ?array
+    {
+        return $this
+            ->where('id', $registrationId)
+            ->where('isactive_authlink', 1)
+            ->first();
+    }
+}

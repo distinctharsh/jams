@@ -1,0 +1,30 @@
+ERROR - 2026-08-12 12:21:20 --> Column 'authorization_letter' cannot be null
+in SYSTEMPATH\Database\MySQLi\Connection.php on line 300.
+ 1 SYSTEMPATH\Database\MySQLi\Connection.php(300): mysqli->query('INSERT INTO `user_authorization` (`user_id`, `full_name`, `email`, `mobile`, `body_name`, `body_type`, `ugc_details`, `authorization_letter`, `status`, `remarks`, `approved_by`, `approved_at`, `created_at`, `updated_at`) VALUES (21, \'Rohit\', \'rkcsid1234@gmail.com\', \'1234567890\', \'Ministry/Department\', \'UGC\', \'PMO\', NULL, 0, NULL, NULL, NULL, \'2026-08-12 12:21:20\', \'2026-08-12 12:21:20\')', 0)
+ 2 SYSTEMPATH\Database\BaseConnection.php(908): CodeIgniter\Database\MySQLi\Connection->execute('INSERT INTO `user_authorization` (`user_id`, `full_name`, `email`, `mobile`, `body_name`, `body_type`, `ugc_details`, `authorization_letter`, `status`, `remarks`, `approved_by`, `approved_at`, `created_at`, `updated_at`) VALUES (21, \'Rohit\', \'rkcsid1234@gmail.com\', \'1234567890\', \'Ministry/Department\', \'UGC\', \'PMO\', NULL, 0, NULL, NULL, NULL, \'2026-08-12 12:21:20\', \'2026-08-12 12:21:20\')')
+ 3 SYSTEMPATH\Database\BaseConnection.php(825): CodeIgniter\Database\BaseConnection->simpleQuery('INSERT INTO `user_authorization` (`user_id`, `full_name`, `email`, `mobile`, `body_name`, `body_type`, `ugc_details`, `authorization_letter`, `status`, `remarks`, `approved_by`, `approved_at`, `created_at`, `updated_at`) VALUES (21, \'Rohit\', \'rkcsid1234@gmail.com\', \'1234567890\', \'Ministry/Department\', \'UGC\', \'PMO\', NULL, 0, NULL, NULL, NULL, \'2026-08-12 12:21:20\', \'2026-08-12 12:21:20\')')
+ 4 SYSTEMPATH\Database\BaseBuilder.php(2355): CodeIgniter\Database\BaseConnection->query('INSERT INTO `user_authorization` (`user_id`, `full_name`, `email`, `mobile`, `body_name`, `body_type`, `ugc_details`, `authorization_letter`, `status`, `remarks`, `approved_by`, `approved_at`, `created_at`, `updated_at`) VALUES (:user_id:, :full_name:, :email:, :mobile:, :body_name:, :body_type:, :ugc_details:, :authorization_letter:, :status:, :remarks:, :approved_by:, :approved_at:, :created_at:, :updated_at:)', [...], false)
+ 5 SYSTEMPATH\Model.php(357): CodeIgniter\Database\BaseBuilder->insert()
+ 6 SYSTEMPATH\BaseModel.php(899): CodeIgniter\Model->doInsert([...])
+ 7 SYSTEMPATH\Model.php(670): CodeIgniter\BaseModel->insert([...], true)
+ 8 APPPATH\Controllers\Auth.php(318): CodeIgniter\Model->insert([...])
+ 9 SYSTEMPATH\CodeIgniter.php(974): App\Controllers\Auth->register()
+10 SYSTEMPATH\CodeIgniter.php(520): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Auth))
+11 SYSTEMPATH\CodeIgniter.php(363): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+12 SYSTEMPATH\Boot.php(417): CodeIgniter\CodeIgniter->run()
+13 SYSTEMPATH\Boot.php(68): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+14 FCPATH\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+CRITICAL - 2026-08-12 12:44:39 --> ErrorException: Undefined variable $body_name
+[Method: GET, Route: auth/authorization]
+in APPPATH\Views\auth\authorization.php on line 478.
+ 1 APPPATH\Views\auth\authorization.php(478): CodeIgniter\Debug\Exceptions->errorHandler(2, 'Undefined variable $body_name', 'C:\\xampp\\htdocs\\jams-nic\\app\\Views\\auth\\authorization.php', 478)
+ 2 SYSTEMPATH\View\View.php(240): include('C:\\xampp\\htdocs\\jams-nic\\app\\Views\\auth\\authorization.php')
+ 3 SYSTEMPATH\View\View.php(243): CodeIgniter\View\View->CodeIgniter\View\{closure}()
+ 4 SYSTEMPATH\Common.php(1268): CodeIgniter\View\View->render('auth/authorization', [], true)
+ 5 APPPATH\Controllers\Auth.php(447): view('auth/authorization', [...])
+ 6 SYSTEMPATH\CodeIgniter.php(974): App\Controllers\Auth->authorization()
+ 7 SYSTEMPATH\CodeIgniter.php(520): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\Auth))
+ 8 SYSTEMPATH\CodeIgniter.php(363): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 9 SYSTEMPATH\Boot.php(417): CodeIgniter\CodeIgniter->run()
+10 SYSTEMPATH\Boot.php(68): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+11 FCPATH\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))

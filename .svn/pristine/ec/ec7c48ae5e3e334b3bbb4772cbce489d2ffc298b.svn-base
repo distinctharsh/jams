@@ -16,7 +16,7 @@ class App extends BaseConfig
      *
      * E.g., http://example.com/
      */
-    public string $baseURL = 'http://localhost:8080/';
+    public string $baseURL = 'http://jams-nic.test:8080/';
 
     public string $authorizationTokenSecret ='7fK9vQ2mX8rT4pL6N3zW5yH1cD9sA7eB2uG8jM4qR6xP1nV5kS3dF9wZ2hC8tY6';
     
