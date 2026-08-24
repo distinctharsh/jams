@@ -1,0 +1,3811 @@
+<?php echo view('header/header'); ?>
+<style>
+/* =========================================================
+   1. FIXED HEADER OVERLAP & MARGIN CORRECTION
+   ========================================================= */
+main.signup-page-main {
+    padding-top: 200px !important; /* Header ke niche gap */
+    padding-bottom: 60px !important;
+    background: #f8fafc;
+    min-height: 85vh;
+    display: block !important;
+}
+
+/* =========================================================
+   2. BALANCED MEDIUM SIGNUP CARD
+   ========================================================= */
+.signup-card {
+    background: #ffffff;
+    border-radius: 14px;
+    border: 1px solid #e2e8f0;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+    padding: 30px 35px !important;
+    width: 100%;
+}
+
+/* Header Branding inside Card */
+.form-header-title {
+    color: #0f172a;
+    font-weight: 700;
+    font-size: 22px !important;
+}
+
+.form-header-subtitle {
+    color: #64748b;
+    font-size: 13.5px !important;
+}
+
+.header-divider {
+    height: 3px;
+    width: 365px;
+    background: linear-gradient(90deg, #0d6efd, #ff9933);
+    border-radius: 2px;
+    margin-top: 6px;
+    margin-bottom: 18px;
+}
+
+/* =========================================================
+   3. FORM CONTROLS & INPUTS
+   ========================================================= */
+.form-label {
+    color: #334155;
+    font-weight: 600;
+    margin-bottom: 5px !important;
+    font-size: 14px !important;
+}
+
+.login-input, .form-select.login-input {
+    height: 42px !important;
+    border-radius: 7px;
+    border: 1px solid #cbd5e1;
+    font-size: 14px !important;
+    padding: 7px 12px;
+}
+
+.login-input:focus, .form-select.login-input:focus {
+    border-color: #0d6efd;
+    box-shadow: 0 0 0 0.15rem rgba(13, 110, 253, 0.15);
+}
+
+.input-group-text {
+    background: #f1f5f9;
+    border-color: #cbd5e1;
+    color: #0d6efd;
+    padding: 0 10px;
+}
+
+/* Submit Button */
+.login-submit {
+    background: #0d6efd;
+    color: #ffffff;
+    border: none;
+    border-radius: 7px;
+    padding: 11px 20px !important;
+    font-size: 14.5px !important;
+    font-weight: 600;
+    transition: all 0.2s ease;
+    box-shadow: 0 4px 12px rgba(13, 110, 253, 0.2);
+}
+
+.login-submit:hover {
+    background: #0b5ed7;
+    color: #ffffff;
+    box-shadow: 0 6px 16px rgba(13, 110, 253, 0.3);
+}
+
+/* CAPTCHA Box */
+.captcha-box {
+    height: 42px !important;
+    border: 1px solid #cbd5e1;
+    border-radius: 7px;
+    background: #f8fafc;
+}
+
+.captcha-text {
+    /* font-size: 17px !important; */
+    font-weight: 700;
+    letter-spacing: 3px;
+    color: #0d6efd;
+    user-select: none;
+    font-family: 'Courier New', monospace;
+}
+
+/* Toast Container */
+#toastContainer {
+    width: 350px;
+    max-width: 95%;
+    z-index: 99999;
+    top: 20px !important;
+    right: 20px !important;
+}
+
+.toast {
+    width: 100%;
+    min-height: 55px;
+    border-radius: 8px;
+    font-size: 14px;
+}
+
+/* ==========================================
+   CAPTCHA
+========================================== */
+
+.captcha-box {
+    height: 44px;
+    border: 1px dashed #9fb3c8;
+    border-radius: 9px;
+    background:
+        linear-gradient(
+            135deg,
+            #f8fafc,
+            #eef4f8
+        );
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 12px 0 15px;
+    overflow: hidden;
+}
+
+.captcha-text {
+    font-family: "Courier New", monospace;
+    font-size: 18px;
+    font-weight: 800;
+    letter-spacing: 4px;
+    color: #1e3a5f;
+    user-select: none;
+    text-decoration: line-through;
+    text-decoration-thickness: 1px;
+}
+
+.captcha-refresh {
+    width: 32px;
+    height: 32px;
+    border: 0;
+    border-radius: 7px;
+    background: #e3edf6;
+    color: #1e4d7b;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all .2s ease;
+}
+
+.captcha-refresh:hover {
+    background: #1e4d7b;
+    color: #fff;
+    transform: rotate(20deg);
+}
+
+.captcha-refresh i {
+    font-size: 17px;
+}
+/* ==========================================
+   CREATE ACCOUNT BUTTON
+========================================== */
+
+.signup-submit {
+    height: 46px;
+    border: none;
+    border-radius: 9px;
+    background: linear-gradient(
+        135deg,
+        #1e4d7b,
+        #28618f
+    );
+    color: #fff;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: .2px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 15px;
+    box-shadow: 0 5px 14px rgba(30, 77, 123, .18);
+    transition: all .25s ease;
+}
+
+.signup-submit:hover {
+    background: linear-gradient(
+        135deg,
+        #173d63,
+        #1e4d7b
+    );
+    color: #fff;
+    transform: translateY(-1px);
+    box-shadow: 0 7px 18px rgba(30, 77, 123, .25);
+}
+
+.signup-submit:active {
+    transform: translateY(0);
+}
+/* ================================
+   SIGNUP FORM PROFESSIONAL STYLE
+================================ */
+
+.signup-label {
+    color: #26374a;
+    font-size: 12.5px;
+    font-weight: 600;
+    margin-bottom: 5px;
+    letter-spacing: 0.1px;
+}
+
+.signup-label i {
+    color: #1e4d7b;
+    font-size: 12px;
+}
+
+/* Input Group */
+.signup-input-group {
+    border-radius: 6px;
+    overflow: hidden;
+}
+
+/* Left Icon */
+.signup-input-group .input-group-text {
+    min-width: 42px;
+    justify-content: center;
+    background: #f4f7fa;
+    border: 1px solid #ced6df;
+    border-right: 0;
+    color: #1e4d7b;
+    font-size: 15px;
+}
+
+/* Input / Select */
+.signup-input-group .form-control,
+.signup-input-group .form-select {
+    border: 1px solid #ced6df;
+    border-left: 0;
+    color: #26374a;
+    font-size: 13px;
+    min-height: 38px;
+}
+
+/* Placeholder */
+.signup-input-group .form-control::placeholder {
+    color: #8a96a3;
+    font-size: 12.5px;
+}
+
+/* Focus */
+.signup-input-group:focus-within .input-group-text {
+    background: #eef5fb;
+    border-color: #1e4d7b;
+    color: #1e4d7b;
+}
+
+.signup-input-group:focus-within .form-control,
+.signup-input-group:focus-within .form-select {
+    border-color: #1e4d7b;
+    box-shadow: none;
+}
+
+/* Select Arrow / Text */
+.signup-input-group .form-select {
+    cursor: pointer;
+    padding-top: 7px;
+    padding-bottom: 7px;
+}
+
+/* CAPTCHA */
+.captcha-box {
+    min-height: 38px;
+    border: 1px solid #ced6df;
+    border-radius: 6px;
+    background: #f7f9fb;
+}
+
+.captcha-text {
+    color: #26374a;
+    font-size: 15px;
+    letter-spacing: 3px;
+}
+
+.captcha-box button {
+    color: #1e4d7b !important;
+}
+
+.captcha-box button:hover {
+    color: #163b60 !important;
+    transform: rotate(20deg);
+    transition: 0.2s ease;
+}
+
+/* Terms */
+/* .signup-terms {
+    color: #596675;
+    font-size: 12px;
+}
+
+.signup-terms .form-check-input {
+    border-color: #9da9b5;
+    cursor: pointer;
+}
+
+.signup-terms .form-check-input:checked {
+    background-color: #1e4d7b;
+    border-color: #1e4d7b;
+}
+
+.signup-terms i {
+    color: #1e4d7b;
+} */
+
+/* Login Link */
+.signup-login-link {
+    color: #657180;
+    font-size: 12.5px;
+}
+
+.signup-login-link > span i {
+    color: #1e4d7b;
+}
+
+.signup-login-link a {
+    color: #1e4d7b;
+}
+
+.signup-login-link a:hover {
+    color: #163b60;
+}
+
+/* Submit Button */
+.signup-submit {
+    min-height: 40px;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.2px;
+}
+
+.signup-submit i {
+    font-size: 14px;
+}
+
+.registration-header {
+    background: #1e4d7b;
+    padding: 15px 18px;
+    border-radius: 6px;
+}
+
+.registration-header-content {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.title-logo {
+    width: 55px;
+    height: 55px;
+    object-fit: contain;
+    background: #fff;
+    padding: 5px;
+    border-radius: 6px;
+}
+
+.form-header-title {
+    color: #fff !important;
+    font-weight: 700;
+}
+
+.form-header-subtitle {
+    color: #fff !important;
+    opacity: 0.9;
+    font-size: 14px;
+}
+
+.header-divider {
+    height: 2px;
+    background: rgba(255,255,255,0.7);
+    margin-top: 12px;
+}
+
+/* =========================================================
+   REGISTRATION SUCCESS MODAL
+========================================================= */
+
+.registration-success-modal {
+    border: none;
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.18);
+}
+
+
+/* =========================================================
+   SUCCESS HEADER
+========================================================= */
+
+.success-header {
+    background: linear-gradient(
+        135deg,
+        #174a78,
+        #1e5d91
+    );
+
+    color: #ffffff;
+    padding: 20px 24px;
+    border-bottom: 0;
+}
+
+.success-header-content {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.success-icon {
+    width: 48px;
+    height: 48px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    background: #ffffff;
+    color: #198754;
+
+    border-radius: 50%;
+    font-size: 22px;
+
+    flex-shrink: 0;
+}
+
+.success-header .modal-title {
+    font-size: 20px;
+    font-weight: 700;
+    margin: 0;
+}
+
+.success-subtitle {
+    margin: 4px 0 0;
+    font-size: 13px;
+    color: rgba(255, 255, 255, 0.85);
+}
+
+
+/* =========================================================
+   BODY
+========================================================= */
+
+.registration-success-modal .modal-body {
+    padding: 25px;
+    background: #ffffff;
+}
+
+
+/* =========================================================
+   SUCCESS MESSAGE
+========================================================= */
+
+.success-message-box {
+    display: flex;
+    gap: 15px;
+
+    padding: 17px 18px;
+
+    background: #f0fdf4;
+    border: 1px solid #bbf7d0;
+
+    border-radius: 12px;
+    margin-bottom: 22px;
+}
+
+.success-message-icon {
+    color: #198754;
+    font-size: 28px;
+    padding-top: 2px;
+}
+
+.success-message-box h6 {
+    margin: 0 0 6px;
+    color: #166534;
+    font-size: 16px;
+    font-weight: 700;
+}
+
+.success-message-box p {
+    margin: 0 0 5px;
+    color: #475467;
+    font-size: 13px;
+    line-height: 1.6;
+}
+
+
+/* =========================================================
+   REGISTRATION DETAILS
+========================================================= */
+
+.registration-details {
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    overflow: hidden;
+    margin-bottom: 22px;
+}
+
+.details-heading {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+
+    background: #f5f8fb;
+
+    padding: 13px 17px;
+
+    color: #174a78;
+
+    font-size: 14px;
+    font-weight: 700;
+
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.details-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+}
+
+.detail-item {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+
+    padding: 14px 17px;
+
+    border-bottom: 1px solid #edf1f5;
+}
+
+.detail-item:nth-child(odd) {
+    border-right: 1px solid #edf1f5;
+}
+
+.detail-label {
+    font-size: 11px;
+    color: #667085;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+}
+
+.detail-value {
+    font-size: 14px;
+    color: #243447;
+    font-weight: 600;
+    word-break: break-word;
+}
+
+.registration-number {
+    color: #174a78;
+    font-weight: 700;
+}
+
+
+/* =========================================================
+   NEXT STEP
+========================================================= */
+
+.next-step-box {
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 18px;
+
+    margin-bottom: 20px;
+}
+
+.next-step-title {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+
+    color: #174a78;
+
+    font-size: 14px;
+    font-weight: 700;
+
+    margin-bottom: 18px;
+}
+
+.registration-steps {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+}
+
+.registration-step {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+    text-align: center;
+
+    width: 24%;
+}
+
+.step-icon {
+    width: 38px;
+    height: 38px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 50%;
+
+    font-size: 14px;
+
+    margin-bottom: 8px;
+}
+
+.registration-step.completed .step-icon {
+    background: #198754;
+    color: #ffffff;
+}
+
+.registration-step.active .step-icon {
+    background: #174a78;
+    color: #ffffff;
+}
+
+.registration-step.pending .step-icon {
+    background: #eef2f6;
+    color: #667085;
+}
+
+.step-content strong {
+    display: block;
+
+    font-size: 11px;
+    color: #344054;
+
+    line-height: 1.4;
+}
+
+.step-content span {
+    display: block;
+
+    margin-top: 3px;
+
+    font-size: 10px;
+    color: #667085;
+
+    line-height: 1.4;
+}
+
+.step-line {
+    height: 2px;
+    flex: 1;
+
+    background: #dfe5eb;
+
+    margin: 18px 5px 0;
+}
+
+
+/* =========================================================
+   IMPORTANT NOTE
+========================================================= */
+
+.important-note {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+
+    padding: 13px 15px;
+
+    background: #fff8e6;
+    border: 1px solid #f3dfaa;
+
+    border-radius: 10px;
+
+    color: #6b5b2a;
+
+    font-size: 12px;
+    line-height: 1.55;
+}
+
+.important-note > i {
+    color: #d88a00;
+    font-size: 16px;
+    margin-top: 2px;
+}
+
+.important-note strong {
+    color: #735d19;
+}
+
+
+/* =========================================================
+   FOOTER
+========================================================= */
+
+.success-footer {
+    background: #f8fafc;
+    border-top: 1px solid #e8edf2;
+
+    padding: 14px 24px;
+}
+
+.success-close-btn {
+    min-width: 125px;
+
+    background: #174a78;
+    border-color: #174a78;
+
+    border-radius: 7px;
+
+    font-size: 13px;
+    font-weight: 600;
+
+    padding: 9px 18px;
+}
+
+.success-close-btn:hover {
+    background: #123b60;
+    border-color: #123b60;
+}
+
+
+/* =========================================================
+   MOBILE
+========================================================= */
+
+@media (max-width: 767px) {
+
+    .registration-success-modal {
+        margin: 10px;
+    }
+
+    .registration-success-modal .modal-body {
+        padding: 18px;
+    }
+
+    .success-header {
+        padding: 17px;
+    }
+
+    .success-header .modal-title {
+        font-size: 17px;
+    }
+
+    .details-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .detail-item:nth-child(odd) {
+        border-right: 0;
+    }
+
+    .registration-steps {
+        flex-direction: column;
+        gap: 12px;
+    }
+
+    .registration-step {
+        width: 100%;
+
+        flex-direction: row;
+        align-items: center;
+
+        text-align: left;
+        gap: 10px;
+    }
+
+    .step-icon {
+        margin-bottom: 0;
+        flex-shrink: 0;
+    }
+
+    .step-line {
+        display: none;
+    }
+
+}
+
+</style>
+
+<style>
+/* =========================================================
+  SUCCESS  MODAL DIALOG MODAL
+   OFFICIAL WHITE DOCUMENT STYLE
+========================================================= */
+.auth-modal-dialog {
+    width: 96%;
+    max-width: 1100px;
+    margin: 1rem auto;
+}
+
+/* =========================================================
+   MAIN MODAL
+   ========================================================= */
+.auth-gov-modal {
+    position: relative;
+    width: 100%;
+    max-height: calc(100vh - 30px);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    border: 1px solid #c8cdd3;
+    border-radius: 4px;
+    background: #ffffff;
+    box-shadow: 0 15px 45px rgba(0, 0, 0, 0.18);
+}
+
+/* =========================================================
+   GOVERNMENT HEADER
+   ========================================================= */
+.auth-gov-header {
+    position: relative;
+    flex-shrink: 0;
+    padding: 16px 55px 14px;
+    border-bottom: 1px solid #cfd4d9;
+    background: #ffffff;
+    color: #1f2937;
+    text-align: center;
+}
+
+/* =========================================================
+   GOVERNMENT EMBLEM
+   ========================================================= */
+.auth-emblem-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 7px;
+}
+.auth-emblem-wrapper .title-logo {
+    display: block;
+    width: 58px;
+    height: 58px;
+    object-fit: contain;
+}
+
+/* =========================================================
+   HEADER MAIN TITLE
+   ========================================================= */
+.auth-header-main {
+    font-size: 19px;
+    font-weight: 800;
+    letter-spacing: 0.7px;
+    line-height: 1.4;
+    color: #173f67;
+}
+
+/* =========================================================
+   HEADER SUBTITLE
+   ========================================================= */
+.auth-header-subtitle {
+    margin-top: 4px;
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 0.4px;
+    line-height: 1.4;
+    color: #4f5964;
+}
+
+/* =========================================================
+   CLOSE BUTTON
+   ========================================================= */
+.auth-close {
+    position: absolute;
+    top: 14px;
+    right: 17px;
+    z-index: 10;
+    opacity: 0.65;
+    filter: none;
+}
+.auth-close:hover {
+    opacity: 1;
+}
+
+/* =========================================================
+   LETTER BODY
+   ========================================================= */
+.auth-letter-body {
+    flex: 1;
+    min-height: 0;
+    padding: 18px 30px 16px;
+    background: #ffffff;
+    overflow: hidden;
+}
+
+/* =========================================================
+   OLD REFERENCE ROW - HIDDEN
+   ========================================================= */
+.auth-reference-row {
+    display: none !important;
+}
+
+/* =========================================================
+   LETTER HEADING
+   ========================================================= */
+.auth-letter-heading {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 15px;
+    margin: 14px 0 16px;
+}
+
+/* =========================================================
+   HEADING LINES
+   ========================================================= */
+.auth-heading-line {
+    flex: 1;
+    max-width: 180px;
+    height: 1px;
+    background: #9aa1a8;
+}
+
+/* =========================================================
+   HEADING CONTENT
+   ========================================================= */
+.auth-heading-content {
+    text-align: center;
+    white-space: nowrap;
+}
+.auth-heading-content h4 {
+    margin: 0;
+    font-size: 21px;
+    font-weight: 800;
+    letter-spacing: 1px;
+    line-height: 1.35;
+    color: #173f67;
+}
+.auth-heading-content span {
+    display: block;
+    margin-top: 4px;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.8px;
+    line-height: 1.4;
+    color: #59636e;
+}
+
+/* =========================================================
+   SECTION HEADING
+   ========================================================= */
+.auth-section-heading {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 8px;
+    font-size: 15px;
+    font-weight: 700;
+    line-height: 1.4;
+    color: #173f67;
+}
+.auth-section-heading i {
+    font-size: 16px;
+    color: #173f67;
+}
+
+/* =========================================================
+   APPLICANT DETAILS SECTION
+   ========================================================= */
+.auth-formal-section {
+    margin-bottom: 11px;
+}
+
+/* =========================================================
+   APPLICANT DETAILS TABLE
+   ========================================================= */
+.auth-details-table {
+    width: 100%;
+    border: 1px solid #cfd5db;
+    border-radius: 3px;
+    overflow: hidden;
+    background: #ffffff;
+}
+
+/* =========================================================
+   TABLE ROW
+   ========================================================= */
+.auth-table-row {
+    display: grid;
+    grid-template-columns: 210px 1fr;
+    min-height: 34px;
+    border-bottom: 1px solid #dfe3e7;
+}
+.auth-table-row:last-child {
+    border-bottom: 0;
+}
+
+/* =========================================================
+   TABLE LABEL
+   ========================================================= */
+.auth-table-label {
+    display: flex;
+    align-items: center;
+    padding: 7px 11px;
+    background: #f5f6f7;
+    font-size: 12px;
+    font-weight: 600;
+    line-height: 1.4;
+    color: #3f4852;
+}
+
+/* =========================================================
+   TABLE VALUE
+   ========================================================= */
+.auth-table-value {
+    display: flex;
+    align-items: center;
+    padding: 7px 11px;
+    font-size: 12px;
+    line-height: 1.4;
+    color: #20262d;
+}
+
+/* =========================================================
+   SUBJECT
+   ========================================================= */
+.auth-subject {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    padding: 9px 11px;
+    margin-bottom: 11px;
+    border-top: 1px solid #e1e4e7;
+    border-right: 1px solid #e1e4e7;
+    border-bottom: 1px solid #e1e4e7;
+    border-left: 3px solid #173f67;
+    background: #fafafa;
+    font-size: 12px;
+    line-height: 1.5;
+    color: #303840;
+}
+.auth-subject strong {
+    color: #173f67;
+    white-space: nowrap;
+}
+
+/* =========================================================
+   FORMAL LETTER CONTENT
+   ========================================================= */
+.auth-formal-letter {
+    margin-bottom: 12px;
+    font-size: 12px;
+    line-height: 1.6;
+    color: #303840;
+}
+.auth-formal-letter p {
+    margin-top: 0;
+    margin-bottom: 7px;
+}
+
+/* =========================================================
+   PROCEDURE SECTION
+   ========================================================= */
+.auth-procedure {
+    margin-bottom: 10px;
+}
+
+/* =========================================================
+   PROCEDURE GRID
+   ========================================================= */
+.auth-procedure-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 7px 10px;
+}
+
+/* =========================================================
+   PROCEDURE ITEM
+   ========================================================= */
+.auth-procedure-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-height: 55px;
+    padding: 8px 10px;
+    border: 1px solid #d5dae0;
+    border-radius: 3px;
+    background: #ffffff;
+}
+
+/* =========================================================
+   PROCEDURE NUMBER
+   ========================================================= */
+.auth-number {
+    flex: 0 0 31px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 31px;
+    height: 31px;
+    border-radius: 50%;
+    background: #173f67;
+    color: #ffffff;
+    font-size: 10px;
+    font-weight: 700;
+}
+
+/* =========================================================
+   PROCEDURE CONTENT
+   ========================================================= */
+.auth-procedure-content {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+}
+.auth-procedure-content strong {
+    font-size: 12px;
+    font-weight: 700;
+    line-height: 1.3;
+    color: #26323d;
+}
+.auth-procedure-content span {
+    font-size: 10.5px;
+    line-height: 1.4;
+    color: #59636e;
+}
+
+/* =========================================================
+   FINAL PROCEDURE STEP
+   ========================================================= */
+.auth-final-step {
+    margin-top: 7px;
+    background: #f8fbf8;
+    border-color: #b8cfbd;
+}
+
+/* =========================================================
+   SUCCESS NUMBER
+   ========================================================= */
+.auth-number-success {
+    background: #138808;
+}
+
+/* =========================================================
+   IMPORTANT NOTICE
+   ========================================================= */
+.auth-official-notice {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 8px 10px;
+    margin-bottom: 10px;
+    border: 1px solid #ddd3b9;
+    border-left: 3px solid #b58a28;
+    border-radius: 3px;
+    background: #fffdf7;
+}
+
+/* =========================================================
+   NOTICE ICON
+   ========================================================= */
+.auth-notice-icon {
+    flex: 0 0 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: #f5edda;
+    color: #9a7624;
+    font-size: 12px;
+}
+
+/* =========================================================
+   NOTICE TITLE
+   ========================================================= */
+.auth-notice-title {
+    margin-bottom: 4px;
+    font-size: 11px;
+    font-weight: 800;
+    line-height: 1.3;
+    color: #765b18;
+}
+
+/* =========================================================
+   NOTICE LIST
+   ========================================================= */
+.auth-notice-content ul {
+    margin: 0;
+    padding-left: 17px;
+}
+.auth-notice-content li {
+    margin-bottom: 3px;
+    font-size: 10.5px;
+    line-height: 1.4;
+    color: #554a30;
+}
+.auth-notice-content li:last-child {
+    margin-bottom: 0;
+}
+
+/* =========================================================
+   ACTION SECTION
+   ========================================================= */
+.auth-action-section {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 15px;
+    padding: 9px 11px;
+    margin-bottom: 9px;
+    border: 1px solid #cdd4db;
+    border-radius: 3px;
+    background: #ffffff;
+}
+
+/* =========================================================
+   ACTION TEXT
+   ========================================================= */
+.auth-action-text {
+    min-width: 0;
+}
+
+/* =========================================================
+   ACTION TITLE
+   ========================================================= */
+.auth-action-title {
+    margin-bottom: 3px;
+    font-size: 13px;
+    font-weight: 800;
+    line-height: 1.3;
+    color: #173f67;
+}
+
+/* =========================================================
+   ACTION DESCRIPTION
+   ========================================================= */
+.auth-action-description {
+    font-size: 10.5px;
+    line-height: 1.4;
+    color: #59636e;
+}
+
+/* =========================================================
+   PROCEED BUTTON
+   ========================================================= */
+.auth-proceed-btn {
+    flex-shrink: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    padding: 10px 17px;
+    border: 1px solid #173f67;
+    border-radius: 3px;
+    background: #173f67;
+    color: #ffffff;
+    text-decoration: none;
+    font-size: 11px;
+    font-weight: 700;
+    transition: all 0.2s ease;
+}
+.auth-proceed-btn:hover {
+    background: #ffffff;
+    color: #173f67;
+    border-color: #173f67;
+}
+
+/* =========================================================
+   OFFICIAL DECLARATION
+   ========================================================= */
+.auth-declaration {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    padding-top: 6px;
+    border-top: 1px solid #dfe3e7;
+    color: #626b75;
+    font-size: 10px;
+    line-height: 1.4;
+    text-align: center;
+}
+.auth-declaration i {
+    font-size: 11px;
+    color: #173f67;
+}
+
+/* =========================================================
+   FOOTER
+   ========================================================= */
+.auth-gov-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 15px;
+    flex-shrink: 0;
+    padding: 9px 22px;
+    border-top: 1px solid #d1d6db;
+    background: #ffffff;
+    color: #4b5560;
+    font-size: 10px;
+    line-height: 1.4;
+}
+
+/* =========================================================
+   FOOTER LEFT / RIGHT
+   ========================================================= */
+.auth-footer-left,
+.auth-footer-right {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+/* =========================================================
+   FOOTER LOCK ICON
+   ========================================================= */
+.auth-footer-left i {
+    font-size: 11px;
+    color: #173f67;
+}
+
+/* =========================================================
+   FOOTER RIGHT
+   ========================================================= */
+.auth-footer-right {
+    gap: 12px;
+}
+
+/* =========================================================
+   FOOTER CLOSE BUTTON
+   ========================================================= */
+.auth-close-btn {
+    padding: 5px 14px;
+    border: 1px solid #9ca4ac;
+    border-radius: 3px;
+    background: #ffffff;
+    color: #34404b;
+    font-size: 10px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+.auth-close-btn:hover {
+    background: #173f67;
+    border-color: #173f67;
+    color: #ffffff;
+}
+
+/* =========================================================
+   DESKTOP HEIGHT OPTIMIZATION
+   ========================================================= */
+@media (max-height: 850px) {
+    .auth-gov-header {
+        padding: 10px 50px 9px;
+    }
+    .auth-emblem-wrapper {
+        margin-bottom: 4px;
+    }
+    .auth-emblem-wrapper .title-logo {
+        width: 48px;
+        height: 48px;
+    }
+    .auth-header-main {
+        font-size: 16px;
+    }
+    .auth-header-subtitle {
+        font-size: 10px;
+    }
+    .auth-letter-body {
+        padding: 12px 24px 10px;
+    }
+    .auth-letter-heading {
+        margin: 9px 0 10px;
+    }
+    .auth-heading-content h4 {
+        font-size: 18px;
+    }
+    .auth-formal-letter {
+        margin-bottom: 8px;
+        font-size: 11px;
+        line-height: 1.45;
+    }
+    .auth-formal-letter p {
+        margin-bottom: 5px;
+    }
+    .auth-table-row {
+        min-height: 30px;
+    }
+    .auth-table-label,
+    .auth-table-value {
+        padding: 5px 9px;
+        font-size: 11px;
+    }
+    .auth-procedure-item {
+        min-height: 46px;
+        padding: 6px 8px;
+    }
+    .auth-procedure-content strong {
+        font-size: 11px;
+    }
+    .auth-procedure-content span {
+        font-size: 9px;
+    }
+    .auth-official-notice {
+        padding: 6px 9px;
+        margin-bottom: 7px;
+    }
+    .auth-notice-content li {
+        font-size: 9px;
+    }
+    .auth-action-section {
+        padding: 7px 9px;
+        margin-bottom: 6px;
+    }
+    .auth-declaration {
+        font-size: 9px;
+    }
+    .auth-gov-footer {
+        padding: 7px 18px;
+    }
+}
+
+/* =========================================================
+   MOBILE (max-width: 768px)
+   ========================================================= */
+@media (max-width: 768px) {
+    .auth-modal-dialog {
+        width: 98%;
+        margin: 0.5rem auto;
+    }
+    .auth-gov-modal {
+        max-height: calc(100vh - 10px);
+    }
+    .auth-gov-header {
+        padding: 11px 45px 10px;
+    }
+    .auth-emblem-wrapper .title-logo {
+        width: 45px;
+        height: 45px;
+    }
+    .auth-header-main {
+        font-size: 14px;
+        letter-spacing: 0.4px;
+    }
+    .auth-header-subtitle {
+        font-size: 9px;
+    }
+    .auth-letter-body {
+        padding: 12px 14px;
+    }
+    .auth-letter-heading {
+        gap: 8px;
+        margin: 10px 0 12px;
+    }
+    .auth-heading-line {
+        max-width: 50px;
+    }
+    .auth-heading-content h4 {
+        font-size: 16px;
+    }
+    .auth-heading-content span {
+        font-size: 9px;
+    }
+    .auth-table-row {
+        grid-template-columns: 135px 1fr;
+        min-height: 32px;
+    }
+    .auth-table-label {
+        padding: 6px 8px;
+        font-size: 10px;
+    }
+    .auth-table-value {
+        padding: 6px 8px;
+        font-size: 10px;
+    }
+    .auth-subject {
+        font-size: 10.5px;
+    }
+    .auth-formal-letter {
+        font-size: 10.5px;
+        line-height: 1.5;
+    }
+    .auth-procedure-grid {
+        grid-template-columns: 1fr;
+    }
+    .auth-procedure-item {
+        min-height: 50px;
+    }
+    .auth-procedure-content strong {
+        font-size: 10.5px;
+    }
+    .auth-procedure-content span {
+        font-size: 9px;
+    }
+    .auth-official-notice {
+        gap: 7px;
+        padding: 7px;
+    }
+    .auth-notice-content li {
+        font-size: 9px;
+    }
+    .auth-action-section {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 9px;
+    }
+    .auth-proceed-btn {
+        width: 100%;
+        justify-content: center;
+    }
+    .auth-gov-footer {
+        flex-direction: column;
+        gap: 6px;
+        text-align: center;
+    }
+    .auth-footer-left,
+    .auth-footer-right {
+        justify-content: center;
+        flex-wrap: wrap;
+    }
+}
+
+/* =========================================================
+   VERY SMALL MOBILE (max-width: 480px)
+   ========================================================= */
+@media (max-width: 480px) {
+    .auth-gov-header {
+        padding: 9px 35px 8px;
+    }
+    .auth-emblem-wrapper .title-logo {
+        width: 40px;
+        height: 40px;
+    }
+    .auth-header-main {
+        font-size: 12px;
+    }
+    .auth-header-subtitle {
+        font-size: 8px;
+    }
+    .auth-letter-body {
+        padding: 10px;
+    }
+    .auth-heading-content h4 {
+        font-size: 14px;
+    }
+    .auth-heading-content span {
+        font-size: 8px;
+    }
+    .auth-table-row {
+        grid-template-columns: 115px 1fr;
+    }
+    .auth-table-label,
+    .auth-table-value {
+        font-size: 9px;
+    }
+    .auth-formal-letter {
+        font-size: 10px;
+    }
+    .auth-subject {
+        font-size: 10px;
+    }
+    .auth-section-heading {
+        font-size: 12px;
+    }
+}
+</style>
+
+<style>
+    /* =========================================================
+   GOVERNMENT AUTHORIZATION LETTER MODAL
+   OFFICIAL WHITE DOCUMENT STYLE
+   ========================================================= */
+.modal-backdrop.show {
+    opacity: 0.55;
+}
+
+/* =========================================================
+   MODAL DIALOG
+   ========================================================= */
+.auth-modal-dialog {
+    width: 96%;
+    max-width: 1100px;
+    margin: 0.75rem auto;
+    min-height: calc(100vh - 1.5rem);
+    display: flex;
+    align-items: center;
+}
+
+/* =========================================================
+   MAIN MODAL
+   ========================================================= */
+.auth-gov-modal {
+    width: 100%;
+    max-height: calc(100vh - 1.5rem);
+    border: 1px solid #c8cdd3;
+    border-radius: 4px;
+    background: #ffffff;
+    box-shadow: 0 15px 45px rgba(0, 0, 0, 0.20);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+/* =========================================================
+   GOVERNMENT HEADER
+   ========================================================= */
+.auth-gov-header {
+    position: relative;
+    background: #ffffff;
+    color: #1f2937;
+    text-align: center;
+    padding: 12px 55px 11px;
+    flex-shrink: 0;
+    border-bottom: 1px solid #cfd4d9;
+}
+
+/* =========================================================
+   EMBLEM
+   ========================================================= */
+.auth-emblem-wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 4px;
+}
+
+.auth-emblem-wrapper .title-logo {
+    width: 50px;
+    height: 50px;
+    object-fit: contain;
+    display: block;
+}
+
+/* =========================================================
+   HEADER TITLE
+   ========================================================= */
+.auth-header-main {
+    color: #173f67;
+    font-size: 19px;
+    font-weight: 800;
+    letter-spacing: 0.7px;
+    line-height: 1.25;
+}
+
+/* =========================================================
+   HEADER SUBTITLE
+   ========================================================= */
+.auth-header-subtitle {
+    margin-top: 3px;
+    color: #59636e;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    line-height: 1.3;
+}
+
+/* =========================================================
+   CLOSE BUTTON
+   ========================================================= */
+.auth-close {
+    position: absolute;
+    top: 12px;
+    right: 16px;
+    z-index: 20;
+    opacity: 0.7;
+    color: #333333;
+}
+
+.auth-close:hover {
+    opacity: 1;
+}
+
+/* =========================================================
+   REFERENCE ROW — COMPLETELY HIDDEN
+   ========================================================= */
+.auth-reference-row {
+    display: none !important;
+}
+
+/* =========================================================
+   LETTER BODY
+   ========================================================= */
+.auth-letter-body {
+    padding: 15px 30px 13px;
+    background: #ffffff;
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
+/* =========================================================
+   CUSTOM SCROLLBAR
+   ========================================================= */
+.auth-letter-body::-webkit-scrollbar {
+    width: 6px;
+}
+
+.auth-letter-body::-webkit-scrollbar-track {
+    background: #f1f3f5;
+}
+
+.auth-letter-body::-webkit-scrollbar-thumb {
+    background: #aeb7c1;
+    border-radius: 10px;
+}
+
+.auth-letter-body::-webkit-scrollbar-thumb:hover {
+    background: #7f8a95;
+}
+
+/* =========================================================
+   LETTER HEADING
+   ========================================================= */
+.auth-letter-heading {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 14px;
+    margin: 8px 0 14px;
+}
+
+/* =========================================================
+   HEADING LINES
+   ========================================================= */
+.auth-heading-line {
+    height: 1px;
+    flex: 1;
+    max-width: 180px;
+    background: #9ca5ae;
+}
+
+/* =========================================================
+   HEADING CONTENT
+   ========================================================= */
+.auth-heading-content {
+    text-align: center;
+    white-space: nowrap;
+}
+
+.auth-heading-content h4 {
+    margin: 0;
+    color: #173f67;
+    font-size: 22px;
+    font-weight: 800;
+    letter-spacing: 1px;
+    line-height: 1.25;
+}
+
+.auth-heading-content span {
+    display: block;
+    margin-top: 3px;
+    color: #59636e;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.8px;
+    line-height: 1.3;
+}
+
+/* =========================================================
+   SECTION HEADING
+   ========================================================= */
+.auth-section-heading {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 7px;
+    color: #173f67;
+    font-size: 14px;
+    font-weight: 700;
+    line-height: 1.3;
+}
+
+.auth-section-heading i {
+    color: #173f67;
+    font-size: 15px;
+}
+
+/* =========================================================
+   APPLICANT SECTION
+   ========================================================= */
+.auth-formal-section {
+    margin-bottom: 10px;
+}
+
+/* =========================================================
+   DETAILS TABLE
+   ========================================================= */
+.auth-details-table {
+    width: 100%;
+    border: 1px solid #cbd2d9;
+    border-radius: 3px;
+    overflow: hidden;
+    background: #ffffff;
+}
+
+/* =========================================================
+   TABLE ROW
+   ========================================================= */
+.auth-table-row {
+    display: grid;
+    grid-template-columns: 210px 1fr;
+    min-height: 34px;
+    border-bottom: 1px solid #dfe3e7;
+}
+
+.auth-table-row:last-child {
+    border-bottom: none;
+}
+
+/* =========================================================
+   TABLE LABEL
+   ========================================================= */
+.auth-table-label {
+    display: flex;
+    align-items: center;
+    padding: 6px 10px;
+    background: #f3f5f7;
+    color: #3f4852;
+    font-size: 14px;
+    font-weight: 600;
+    line-height: 1.3;
+}
+
+/* =========================================================
+   TABLE VALUE
+   ========================================================= */
+.auth-table-value {
+    display: flex;
+    align-items: center;
+    padding: 6px 10px;
+    color: #20262d;
+    font-size: 14px;
+    line-height: 1.3;
+}
+
+/* =========================================================
+   SUBJECT
+   ========================================================= */
+.auth-subject {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    padding: 8px 11px;
+    margin-bottom: 10px;
+    background: #fafafa;
+    border: 1px solid #d9dee3;
+    border-left: 3px solid #173f67;
+    color: #303840;
+    font-size: 14px;
+    line-height: 1.45;
+}
+
+.auth-subject strong {
+    color: #173f67;
+    white-space: nowrap;
+}
+
+/* =========================================================
+   FORMAL LETTER
+   ========================================================= */
+.auth-formal-letter {
+    margin-bottom: 10px;
+    color: #303840;
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+.auth-formal-letter p {
+    margin-top: 0;
+    margin-bottom: 5px;
+}
+
+.auth-formal-letter p:last-child {
+    margin-bottom: 0;
+}
+
+/* =========================================================
+   PROCEDURE
+   ========================================================= */
+.auth-procedure {
+    margin-bottom: 9px;
+}
+
+/* =========================================================
+   PROCEDURE GRID
+   ========================================================= */
+.auth-procedure-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 6px 9px;
+}
+
+/* =========================================================
+   PROCEDURE ITEM
+   ========================================================= */
+.auth-procedure-item {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    min-height: 50px;
+    padding: 7px 9px;
+    background: #ffffff;
+    border: 1px solid #d2d8de;
+    border-radius: 3px;
+}
+
+/* =========================================================
+   PROCEDURE NUMBER
+   ========================================================= */
+.auth-number {
+    flex: 0 0 32px;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background: #173f67;
+    color: #ffffff;
+    font-size: 10px;
+    font-weight: 700;
+}
+
+/* =========================================================
+   PROCEDURE CONTENT
+   ========================================================= */
+.auth-procedure-content {
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.auth-procedure-content strong {
+    color: #26323d;
+    font-size: 14px;
+    font-weight: 700;
+    line-height: 1.25;
+}
+
+.auth-procedure-content span {
+    color: #59636e;
+    font-size: 11px;
+    line-height: 1.3;
+}
+
+/* =========================================================
+   FINAL STEP
+   ========================================================= */
+.auth-final-step {
+    grid-column: 1 / -1;
+    margin-top: 1px;
+    background: #f7fbf7;
+    border-color: #b7d1bc;
+}
+
+/* =========================================================
+   SUCCESS NUMBER
+   ========================================================= */
+.auth-number-success {
+    background: #138808;
+}
+
+/* =========================================================
+   IMPORTANT NOTICE
+   ========================================================= */
+.auth-official-notice {
+    display: flex;
+    align-items: flex-start;
+    gap: 9px;
+    padding: 8px 10px;
+    margin-bottom: 9px;
+    background: #fffdf7;
+    border: 1px solid #ddd2b4;
+    border-left: 3px solid #b78a25;
+    border-radius: 3px;
+}
+
+/* =========================================================
+   NOTICE ICON
+   ========================================================= */
+.auth-notice-icon {
+    width: 28px;
+    height: 28px;
+    flex: 0 0 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #f5ecd5;
+    border-radius: 50%;
+    color: #9a7624;
+    font-size: 12px;
+}
+
+/* =========================================================
+   NOTICE TITLE
+   ========================================================= */
+.auth-notice-title {
+    margin-bottom: 3px;
+    color: #765b18;
+    font-size: 12px;
+    font-weight: 800;
+    line-height: 1.3;
+}
+
+/* =========================================================
+   NOTICE LIST
+   ========================================================= */
+.auth-notice-content ul {
+    margin: 0;
+    padding-left: 17px;
+}
+
+.auth-notice-content li {
+    margin-bottom: 2px;
+    color: #554a30;
+    font-size: 11px;
+    line-height: 1.35;
+}
+
+.auth-notice-content li:last-child {
+    margin-bottom: 0;
+}
+
+/* =========================================================
+   ACTION SECTION
+   ========================================================= */
+.auth-action-section {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 15px;
+    padding: 9px 11px;
+    margin-bottom: 8px;
+    background: #ffffff;
+    border: 1px solid #cbd4dc;
+    border-radius: 3px;
+}
+
+/* =========================================================
+   ACTION TEXT
+   ========================================================= */
+.auth-action-text {
+    flex: 1;
+    min-width: 0;
+}
+
+/* =========================================================
+   ACTION TITLE
+   ========================================================= */
+.auth-action-title {
+    margin-bottom: 2px;
+    color: #173f67;
+    font-size: 14px;
+    font-weight: 800;
+    line-height: 1.3;
+}
+
+/* =========================================================
+   ACTION DESCRIPTION
+   ========================================================= */
+.auth-action-description {
+    color: #59636e;
+    font-size: 11px;
+    line-height: 1.35;
+}
+
+/* =========================================================
+   PROCEED BUTTON
+   ========================================================= */
+.auth-proceed-btn {
+    flex: 0 0 auto;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    min-width: 205px;
+    padding: 10px 17px;
+    border: 1px solid #173f67;
+    border-radius: 3px;
+    background: #173f67;
+    color: #ffffff;
+    text-decoration: none;
+    font-size: 12px;
+    font-weight: 700;
+    line-height: 1.2;
+    white-space: nowrap;
+    transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+}
+
+.auth-proceed-btn:hover {
+    background: #ffffff;
+    color: #173f67;
+    border-color: #173f67;
+}
+
+.auth-proceed-btn i {
+    font-size: 12px;
+}
+
+/* =========================================================
+   DECLARATION
+   ========================================================= */
+.auth-declaration {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    padding-top: 6px;
+    color: #626b75;
+    border-top: 1px solid #dfe3e7;
+    font-size: 10px;
+    line-height: 1.35;
+    text-align: center;
+}
+
+.auth-declaration i {
+    color: #173f67;
+    font-size: 11px;
+}
+
+/* =========================================================
+   FOOTER
+   ========================================================= */
+.auth-gov-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 15px;
+    padding: 8px 20px;
+    flex-shrink: 0;
+    background: #ffffff;
+    color: #4b5560;
+    border-top: 1px solid #d1d6db;
+    font-size: 10px;
+    line-height: 1.3;
+}
+
+/* =========================================================
+   FOOTER LEFT / RIGHT
+   ========================================================= */
+.auth-footer-left,
+.auth-footer-right {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.auth-footer-right {
+    gap: 12px;
+}
+
+.auth-footer-left i {
+    color: #173f67;
+    font-size: 11px;
+}
+
+/* =========================================================
+   FOOTER CLOSE BUTTON
+   ========================================================= */
+.auth-close-btn {
+    padding: 5px 14px;
+    border: 1px solid #9ca4ac;
+    border-radius: 3px;
+    background: #ffffff;
+    color: #34404b;
+    font-size: 10px;
+    line-height: 1.2;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.auth-close-btn:hover {
+    background: #173f67;
+    border-color: #173f67;
+    color: #ffffff;
+}
+
+/* =========================================================
+   HEADER + FOOTER WHITE BACKGROUND OVERRIDE
+   ========================================================= */
+.auth-gov-header,
+.auth-gov-footer {
+    background: #ffffff !important;
+}
+
+/* =========================================================
+   MEDIA QUERIES
+   ========================================================= */
+
+/* Large screens with enough height */
+@media (min-width: 769px) and (min-height: 850px) {
+    .auth-letter-body {
+        overflow-y: auto;
+        scrollbar-width: thin;
+    }
+}
+
+/* Medium height screens */
+@media (max-height: 850px) and (min-width: 769px) {
+    .auth-modal-dialog {
+        margin: 0.35rem auto;
+        min-height: calc(100vh - 0.7rem);
+    }
+    .auth-gov-modal {
+        max-height: calc(100vh - 0.7rem);
+    }
+    .auth-gov-header {
+        padding: 8px 50px 7px;
+    }
+    .auth-emblem-wrapper {
+        margin-bottom: 2px;
+    }
+    .auth-emblem-wrapper .title-logo {
+        width: 40px;
+        height: 40px;
+    }
+    .auth-header-main {
+        font-size: 16px;
+    }
+    .auth-header-subtitle {
+        font-size: 9px;
+    }
+    .auth-letter-body {
+        padding: 10px 25px 10px;
+    }
+    .auth-letter-heading {
+        margin: 6px 0 9px;
+    }
+    .auth-heading-content h4 {
+        font-size: 19px;
+    }
+    .auth-heading-content span {
+        font-size: 10px;
+    }
+    .auth-section-heading {
+        font-size: 13px;
+        margin-bottom: 5px;
+    }
+    .auth-formal-section {
+        margin-bottom: 7px;
+    }
+    .auth-table-row {
+        min-height: 29px;
+    }
+    .auth-table-label,
+    .auth-table-value {
+        padding: 5px 9px;
+        font-size: 12px;
+    }
+    .auth-subject {
+        padding: 6px 9px;
+        margin-bottom: 7px;
+        font-size: 12px;
+    }
+    .auth-formal-letter {
+        margin-bottom: 7px;
+        font-size: 12px;
+        line-height: 1.35;
+    }
+    .auth-formal-letter p {
+        margin-bottom: 4px;
+    }
+    .auth-procedure {
+        margin-bottom: 7px;
+    }
+    .auth-procedure-grid {
+        gap: 5px 8px;
+    }
+    .auth-procedure-item {
+        min-height: 42px;
+        padding: 5px 8px;
+    }
+    .auth-number {
+        width: 28px;
+        height: 28px;
+        flex-basis: 28px;
+    }
+    .auth-procedure-content strong {
+        font-size: 12px;
+    }
+    .auth-procedure-content span {
+        font-size: 9.5px;
+    }
+    .auth-official-notice {
+        padding: 6px 9px;
+        margin-bottom: 6px;
+    }
+    .auth-notice-icon {
+        width: 24px;
+        height: 24px;
+        flex-basis: 24px;
+    }
+    .auth-notice-title {
+        font-size: 10px;
+    }
+    .auth-notice-content li {
+        font-size: 9.5px;
+        line-height: 1.25;
+    }
+    .auth-action-section {
+        padding: 6px 9px;
+        margin-bottom: 5px;
+    }
+    .auth-action-title {
+        font-size: 12px;
+    }
+    .auth-action-description {
+        font-size: 9.5px;
+    }
+    .auth-proceed-btn {
+        min-width: 185px;
+        padding: 8px 13px;
+        font-size: 10px;
+    }
+    .auth-declaration {
+        padding-top: 4px;
+        font-size: 8.5px;
+    }
+    .auth-gov-footer {
+        padding: 6px 18px;
+        font-size: 9px;
+    }
+    .auth-close-btn {
+        padding: 4px 12px;
+        font-size: 9px;
+    }
+}
+
+/* Tablets & smaller screens (max-width: 900px) */
+@media (max-width: 900px) {
+    .auth-modal-dialog {
+        width: 98%;
+    }
+    .auth-letter-body {
+        padding-left: 18px;
+        padding-right: 18px;
+    }
+    .auth-table-row {
+        grid-template-columns: 180px 1fr;
+    }
+}
+
+/* Mobile (max-width: 768px) */
+@media (max-width: 768px) {
+    .auth-modal-dialog {
+        width: 98%;
+        margin: 0.35rem auto;
+        min-height: calc(100vh - 0.7rem);
+    }
+    .auth-gov-modal {
+        max-height: calc(100vh - 0.7rem);
+    }
+    .auth-gov-header {
+        padding: 10px 42px 9px;
+    }
+    .auth-emblem-wrapper .title-logo {
+        width: 44px;
+        height: 44px;
+    }
+    .auth-header-main {
+        font-size: 15px;
+    }
+    .auth-header-subtitle {
+        font-size: 9px;
+    }
+    .auth-letter-body {
+        padding: 12px;
+        overflow-y: auto;
+    }
+    .auth-letter-heading {
+        gap: 8px;
+        margin: 8px 0 12px;
+    }
+    .auth-heading-line {
+        max-width: 60px;
+    }
+    .auth-heading-content h4 {
+        font-size: 17px;
+    }
+    .auth-heading-content span {
+        font-size: 9px;
+    }
+    .auth-table-row {
+        grid-template-columns: 140px 1fr;
+    }
+    .auth-table-label,
+    .auth-table-value {
+        font-size: 11px;
+        padding: 6px 8px;
+    }
+    .auth-subject {
+        font-size: 11px;
+    }
+    .auth-formal-letter {
+        font-size: 11px;
+        line-height: 1.45;
+    }
+    .auth-procedure-grid {
+        grid-template-columns: 1fr;
+    }
+    .auth-final-step {
+        grid-column: auto;
+    }
+    .auth-procedure-content strong {
+        font-size: 11px;
+    }
+    .auth-procedure-content span {
+        font-size: 9px;
+    }
+    .auth-action-section {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    .auth-proceed-btn {
+        width: 100%;
+        min-width: 0;
+    }
+    .auth-gov-footer {
+        flex-direction: column;
+        gap: 6px;
+        text-align: center;
+    }
+    .auth-footer-left,
+    .auth-footer-right {
+        justify-content: center;
+        flex-wrap: wrap;
+    }
+}
+
+/* Small phones (max-width: 480px) */
+@media (max-width: 480px) {
+    .auth-header-main {
+        font-size: 13px;
+    }
+    .auth-heading-content h4 {
+        font-size: 15px;
+    }
+    .auth-heading-content span {
+        font-size: 8px;
+    }
+    .auth-table-row {
+        grid-template-columns: 115px 1fr;
+    }
+    .auth-table-label,
+    .auth-table-value {
+        font-size: 10px;
+    }
+    .auth-formal-letter {
+        font-size: 10.5px;
+    }
+    .auth-subject {
+        font-size: 10px;
+    }
+}
+</style>
+<style>
+.signup-input-group .select2-container {
+    flex: 1 1 auto;
+    width: 1% !important;
+}
+
+.signup-input-group .select2-container .select2-selection--single {
+    height: 38px;
+    border: 1px solid #ced4da;
+    border-radius: 0 6px 6px 0;
+    display: flex;
+    align-items: center;
+}
+
+.signup-input-group .select2-container .select2-selection__rendered {
+    line-height: 36px;
+    padding-left: 12px;
+    font-size: 14px;
+}
+
+.signup-input-group .select2-container .select2-selection__arrow {
+    height: 36px;
+}
+
+.select2-dropdown {
+    font-size: 14px;
+}
+
+.select2-results__option {
+    padding: 8px 12px;
+}.signup-input-group select.select2-hidden-accessible {
+    display: none !important;
+}</style>
+<!-- Main Wrapper -->
+<main class="main signup-page-main">
+    <div id="toastContainer" class="position-fixed"></div>
+    <div class="container mt-2">
+        <div class="row justify-content-center">
+            <div class="col-lg-7 col-md-9">
+                <div class="signup-card">
+                    <!-- Form Title & Subtitle -->
+                    <div class="mb-3 registration-header">
+                        <div class="registration-header-content">
+                            <img src="<?= base_url('assets/image/Emblem_of_India.svg.webp') ?>"
+                                 alt="Jammers Approval Management System"
+                                 class="title-logo">
+
+                            <div>
+                                <h3 class="form-header-title mb-1">
+                                    JAMS - User Registration
+                                </h3>
+
+                                <p class="form-header-subtitle mb-0">
+                                    Cabinet Secretariat — JAMMERS Approval Management System
+                                </p>
+                            </div>
+                        </div>
+                        <!-- <div class="header-divider"></div> -->
+                    </div>
+                    <form id="signupForm">
+                        <input type="hidden" name="csrf_token" value="<?= csrf_hash() ?>">
+                        <div class="row g-2 text-start">
+                            <!-- Full Name -->
+                            <div class="col-md-6 mb-2">
+                                <label class="form-label signup-label">
+                                    <i class="bi bi-person-fill me-1"></i>
+                                    Full Name
+                                </label>
+                                <div class="input-group signup-input-group">
+                                    <span class="input-group-text">
+                                        <i class="bi bi-person"></i>
+                                    </span>
+                                    <input class="form-control login-input"
+                                           type="text"
+                                           id="signup_full_name"
+                                           name="full_name"
+                                           placeholder="Enter full name"
+                                           required>
+                                </div>
+                            </div>
+                            <!-- Official Email -->
+                            <div class="col-md-6 mb-2">
+                                <label class="form-label signup-label">
+                                    <i class="bi bi-envelope-fill me-1"></i>
+                                    Official Email
+                                </label>
+                                <div class="input-group signup-input-group">
+                                    <span class="input-group-text">
+                                        <i class="bi bi-envelope"></i>
+                                    </span>
+                                    <input class="form-control login-input"
+                                           type="email"
+                                           id="signup_email"
+                                           name="email"
+                                           placeholder="Enter official email"
+                                           required>
+                                </div>
+                            </div>
+
+                            <!-- Mobile Number -->
+                            <div class="col-md-6 mb-2">
+                                <label class="form-label signup-label">
+                                    <i class="bi bi-phone-fill me-1"></i>
+                                    Mobile Number
+                                </label>
+                                <div class="input-group signup-input-group">
+                                    <span class="input-group-text">
+                                        <i class="bi bi-phone"></i>
+                                    </span>
+                                    <input class="form-control login-input"
+                                           type="text"
+                                           id="signup_mobile"
+                                           name="mobile"
+                                           placeholder="Enter mobile number"
+                                           required>
+                                </div>
+                            </div>
+
+                            <!-- Body Name -->
+                            <div class="col-md-6 mb-2">
+                                <label class="form-label signup-label">
+                                    <i class="bi bi-building-fill me-1"></i>
+                                    Examination Body Name
+                                </label>
+                                <div class="input-group signup-input-group">
+                                    <span class="input-group-text">
+                                        <i class="bi bi-building"></i>
+                                    </span>
+                                    <select class="form-select login-input select2-body-name"
+                                            id="signup_body_name"
+                                            name="body_name"
+                                            required>
+                                        <option value="" selected disabled>
+                                            Select Body Name
+                                        </option>
+                                        <?php if (!empty($organizations)): ?>
+                                            <?php foreach ($organizations as $org): ?>
+                                                <option value="<?= esc($org['org_name']) ?>"
+                                                        data-org-type="<?= esc($org['org_type']) ?>">
+                                                    <?= esc($org['org_name']) ?>
+                                                </option>
+                                            <?php endforeach; ?>
+                                        <?php endif; ?>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <!-- Body Type -->
+                            <div class="col-md-12 mb-2">
+                                <label class="form-label signup-label">
+                                    <i class="bi bi-diagram-3-fill me-1"></i>
+                                    Examination Body Type
+                                </label>
+                                <div class="input-group signup-input-group">
+                                    <span class="input-group-text">
+                                        <i class="bi bi-diagram-3"></i>
+                                    </span>
+                                    <select class="form-select login-input"
+                                            id="signup_body_type"
+                                            name="body_type"
+                                            required>
+                                        <option value="" selected disabled>
+                                            Select Body Type
+                                        </option>
+                                        <?php if (!empty($organization_types)): ?>
+                                            <?php foreach ($organization_types as $type): ?>
+                                                <option value="<?= esc($type['name']) ?>" 
+                                                        data-type-id="<?= esc($type['id']) ?>" 
+                                                        data-ugc-required="<?= esc($type['is_ugc_id_required']) ?>">
+                                                    <?= esc($type['name']) ?>
+                                                </option>
+                                            <?php endforeach; ?>
+                                        <?php endif; ?>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <!-- Dynamic UGC / Other Details -->
+                            <div class="col-12 mb-2"
+                                 id="ugc_input_container"
+                                 style="display:none;">
+                                <label class="form-label signup-label">
+                                    <i class="bi bi-info-circle-fill me-1"></i>
+                                    Specify UGC / Examination Body Details
+                                </label>
+                                <div class="input-group signup-input-group">
+                                    <span class="input-group-text">
+                                        <i class="bi bi-pencil-square"></i>
+                                    </span>
+                                    <input class="form-control login-input"
+                                           type="text"
+                                           id="signup_ugc_details"
+                                           name="ugc_details"
+                                           placeholder="Enter details for selected body type">
+                                </div>
+                            </div>
+
+                            <!-- CAPTCHA -->
+                            <div class="col-12 mb-1">
+                                <label class="form-label signup-label">
+                                    <i class="bi bi-shield-lock-fill me-1"></i>
+                                    Security Verification
+                                </label>
+
+                                <div class="row g-2">
+                                    <!-- CAPTCHA Input -->
+                                    <div class="col-md-7">
+                                        <div class="input-group signup-input-group">
+                                            <span class="input-group-text">
+                                                <i class="bi bi-shield-check"></i>
+                                            </span>
+                                            <input class="form-control login-input"
+                                                   type="text"
+                                                   id="signup_captcha"
+                                                   name="captcha"
+                                                   placeholder="Enter CAPTCHA code"
+                                                   required>
+                                        </div>
+                                    </div>
+
+                                    <!-- CAPTCHA -->
+                                    <div class="col-md-5">
+                                        <div class="captcha-box d-flex align-items-center justify-content-between px-3">
+                                            <span class="captcha-text fw-bold"
+                                                  id="signupCaptchaText">
+                                                <?= isset($captcha_text)
+                                                    ? esc($captcha_text)
+                                                    : 'ABCDEF' ?>
+                                            </span>
+                                            <button type="button"
+                                                    class="btn btn-sm btn-link text-primary p-0"
+                                                    id="signupRefreshCaptcha"
+                                                    title="Refresh CAPTCHA"
+                                                    aria-label="Refresh CAPTCHA">
+                                                <i class="bi bi-arrow-clockwise fs-5"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Terms -->
+                        <!-- <div class="form-check mt-2 signup-terms">
+                            <input class="form-check-input"
+                                   type="checkbox"
+                                   id="terms"
+                                   required>
+                            <label class="form-check-label"
+                                   for="terms">
+                                I agree to the
+                                <a href="#" class="text-decoration-none">
+                                    Terms & Conditions
+                                </a>.
+                            </label>
+                        </div> -->
+
+                        <!-- Submit -->
+                        <div class="d-grid mt-3">
+                            <button type="submit"
+                                    class="btn login-submit signup-submit"
+                                    id="signupBtn">
+
+                                <i class="bi bi-person-plus-fill me-2"></i>
+                                Create Account
+                            </button>
+                        </div>
+
+                        <!-- Login Redirect -->
+                        <div class="text-center mt-3 pt-2 border-top signup-login-link">
+                            <span>
+                                <i class="bi bi-person-check-fill me-1"></i>
+                                Already have an account?
+                            </span>
+                            <a href="#"
+                               class="fw-semibold text-decoration-none ms-1" data-bs-toggle="modal" data-bs-target="#loginModal">
+                                Login In
+                                <i class="bi bi-arrow-right-short"></i>
+                            </a>
+                        </div>
+                    </form>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+<!-- Email Popup Modal -->
+<div class="modal fade" id="emailPopup" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content registration-success-modal">
+            <!-- HEADER -->
+            <div class="modal-header success-header">
+                <div class="success-header-content">
+                    <div class="success-icon">
+                        <i class="fas fa-check"></i>
+                    </div>
+                    <div>
+                        <h5 class="modal-title" style="color: #ffffff;">
+                            Registration Completed Successfully
+                        </h5>
+
+                        <p class="success-subtitle">
+                            Your registration has been successfully completed.
+                        </p>
+                    </div>
+                </div>
+                <button
+                    type="button"
+                    class="btn-close btn-close-white"
+                    data-bs-dismiss="modal"
+                    aria-label="Close"
+                ></button>
+            </div>
+            <!-- BODY -->
+            <div class="modal-body">
+                <!-- SUCCESS MESSAGE -->
+                <div class="success-message-box">
+                    <div class="success-message-icon">
+                        <i class="fas fa-circle-check"></i>
+                    </div>
+                    <div>
+                        <h6>
+                            Authorization Link Sent Successfully
+                        </h6>
+                        <p>
+                            The authorization link has been shared on your
+                            registered official email address.
+                        </p>
+                        <p class="mb-0">
+                            Please use the link received in your email to
+                            upload the
+                            <strong>Competent Authority signed Authorization Letter</strong>
+                            and complete the remaining registration process.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- REGISTRATION DETAILS -->
+                <div class="registration-details">
+                    <div class="details-heading">
+                        <i class="fas fa-user-check"></i>
+                        <span>Registration Details</span>
+                    </div>
+                    <div class="details-grid">
+                        <!-- REGISTRATION NUMBER -->
+                        <div class="detail-item">
+                            <span class="detail-label">
+                                Registration No.
+                            </span>
+                            <span
+                                class="detail-value registration-number"
+                                id="registrationNumber"
+                            >
+                            -
+                            </span>
+                        </div>
+                        <!-- FULL NAME -->
+                        <div class="detail-item">
+                            <span class="detail-label">
+                                Full Name
+                            </span>
+                            <span
+                                class="detail-value"
+                                id="registrationFullName"
+                            >
+                                -
+                            </span>
+                        </div>
+                        <!-- OFFICIAL EMAIL -->
+                        <div class="detail-item">
+                            <span class="detail-label">
+                                Official Email
+                            </span>
+                            <span
+                                class="detail-value"
+                                id="registrationEmail"
+                            >
+                                -
+                            </span>
+                        </div>
+                        <!-- MOBILE NUMBER -->
+                        <div class="detail-item">
+                            <span class="detail-label">
+                                Mobile Number
+                            </span>
+                            <span
+                                class="detail-value"
+                                id="registrationMobile"
+                            >
+                                -
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- NEXT STEP -->
+                <div class="next-step-box">
+                    <div class="next-step-title">
+                        <i class="fas fa-list-check"></i>
+                        <span>Complete Your Registration</span>
+                    </div>
+                    <div class="registration-steps">
+                        <!-- STEP 1 -->
+                        <div class="registration-step completed">
+                            <div class="step-icon">
+                                <i class="fas fa-check"></i>
+                            </div>
+                            <div class="step-content">
+                                <strong>Registration Submitted</strong>
+                                <span>Completed successfully</span>
+                            </div>
+                        </div>
+                        <div class="step-line"></div>
+                        <!-- STEP 2 -->
+                        <div class="registration-step active">
+                            <div class="step-icon">
+                                <i class="fas fa-envelope"></i>
+                            </div>
+                            <div class="step-content">
+                                <strong>Open Authorization Link</strong>
+                                <span>Check your official email</span>
+                            </div>
+                        </div>
+                        <div class="step-line"></div>
+                        <!-- STEP 3 -->
+                        <div class="registration-step pending">
+                            <div class="step-icon">
+                                <i class="fas fa-file-signature"></i>
+                            </div>
+                            <div class="step-content">
+                                <strong>Upload Signed Letter</strong>
+                                <span>
+                                    Upload the competent authority signed letter
+                                </span>
+                            </div>
+                        </div>
+                        <div class="step-line"></div>
+                        <!-- STEP 4 -->
+                        <div class="registration-step pending">
+                            <div class="step-icon">
+                                <i class="fas fa-user-check"></i>
+                            </div>
+                            <div class="step-content">
+                                <strong>Account Activation</strong>
+                                <span>
+                                    Complete verification to activate your account
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- IMPORTANT NOTE -->
+                <div class="important-note">
+                    <i class="fas fa-circle-info"></i>
+                    <div>
+                        <strong>Important:</strong>
+                        <span>
+                            Please check your registered email inbox and
+                            spam/junk folder for the authorization link.
+                            Your account will be activated after completing
+                            the required verification process.
+                        </span>
+                    </div>
+                </div>
+            </div>
+            <!-- FOOTER -->
+            <div class="modal-footer success-footer">
+                <button
+                    type="button"
+                    class="btn btn-primary success-close-btn"
+                    data-bs-dismiss="modal"
+                >
+                    <i class="fas fa-check me-2"></i>
+                    Continue
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- =========================================================
+ AUTHORIZATION LINK POPUP MODAL
+========================================================= -->
+<div class="modal fade" id="authLinkPopup" tabindex="-1" aria-hidden="true">
+<div class="modal-dialog modal-dialog-centered auth-modal-dialog">
+    <div class="modal-content auth-gov-modal">
+        <!-- =================================================
+             OFFICIAL HEADER
+             ================================================= -->
+        <div class="auth-gov-header">
+            <button type="button" class="btn-close btn-close-white auth-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            <!-- Emblem -->
+            <div class="auth-emblem-wrapper">
+                <img src="<?= base_url('assets/image/Emblem_of_India.svg.webp') ?>" alt="Government of India" class="title-logo">
+            </div>
+            <div class="auth-letter-heading">
+                <div class="auth-heading-line"></div>
+                <div class="auth-heading-content">
+                    <h4>AUTHORIZATION LETTER</h4>
+                    <span>ACCOUNT ACTIVATION NOTICE</span>
+                </div>
+                <div class="auth-heading-line"></div>
+            </div>
+        </div>
+        <!-- =================================================
+             OFFICIAL LETTER BODY
+             ================================================= -->
+        <div class="auth-letter-body">
+            <!-- ---------------------------------------------
+                 APPLICANT DETAILS
+                 --------------------------------------------- -->
+            <div class="auth-formal-section">
+                <div class="auth-section-heading">
+                    <i class="fas fa-user-circle"></i>
+                    Applicant Details
+                </div>
+                <div class="auth-details-table">
+                    <div class="auth-table-row">
+                        <div class="auth-table-label">Name of Applicant</div>
+                        <div class="auth-table-value">
+                            <strong id="authFullName">Rohit</strong>
+                        </div>
+                    </div>
+                    <div class="auth-table-row">
+                        <div class="auth-table-label">Registration Number</div>
+                        <div class="auth-table-value">
+                            <strong id="authLinkRegistrationNo">-</strong>
+                        </div>
+                    </div>
+                    <div class="auth-table-row">
+                        <div class="auth-table-label">Official Email</div>
+                        <div class="auth-table-value" id="authLinkEmail">-</div>
+                    </div>
+                    <div class="auth-table-row">
+                        <div class="auth-table-label">Mobile Number</div>
+                        <div class="auth-table-value" id="authLinkMobile">-</div>
+                    </div>
+                </div>
+            </div>
+            <!-- ---------------------------------------------
+                 SUBJECT
+                 --------------------------------------------- -->
+            <div class="auth-subject">
+                <strong>Subject:</strong>
+                <span>Submission of Authorization Letter for Registration and Account Activation.</span>
+            </div>
+            <!-- ---------------------------------------------
+                 FORMAL LETTER
+                 --------------------------------------------- -->
+            <div class="auth-formal-letter">
+                <p>
+                    <strong>Dear <span id="authMessageName">Rohit</span>,</strong>
+                </p>
+                <p>This is to inform you that your registration on the Authorization &amp; Registration Portal has been completed successfully.</p>
+                <p>In order to proceed with verification and activation of your registered account, you are required to submit a valid <strong>Authorization Letter</strong> corresponding to your registration.</p>
+                <p class="mb-0">You are requested to complete the following procedure through the official Authorization Portal.</p>
+            </div>
+            <!-- ---------------------------------------------
+                 PROCEDURE
+                 --------------------------------------------- -->
+            <div class="auth-procedure">
+                <div class="auth-section-heading">
+                    <i class="fas fa-list-ol"></i>
+                    Authorization Procedure
+                </div>
+                <div class="auth-procedure-grid">
+                    <div class="auth-procedure-item">
+                        <div class="auth-number">01</div>
+                        <div class="auth-procedure-content">
+                            <strong>Access Authorization Portal</strong>
+                            <span>Click the "Proceed to Authorization" button provided below.</span>
+                        </div>
+                    </div>
+                    <div class="auth-procedure-item">
+                        <div class="auth-number">02</div>
+                        <div class="auth-procedure-content">
+                            <strong>Verify Registration Details</strong>
+                            <span>Review the registration and applicant information displayed on the portal.</span>
+                        </div>
+                    </div>
+                    <div class="auth-procedure-item">
+                        <div class="auth-number">03</div>
+                        <div class="auth-procedure-content">
+                            <strong>Upload Authorization Letter</strong>
+                            <span>Upload a valid and duly authorized Authorization Letter against the registered application.</span>
+                        </div>
+                    </div>
+                    <div class="auth-procedure-item">
+                        <div class="auth-number">04</div>
+                        <div class="auth-procedure-content">
+                            <strong>Submit for Verification</strong>
+                            <span>Submit the application for scrutiny, verification and approval by the competent authority.</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="auth-procedure-item auth-final-step">
+                    <div class="auth-number auth-number-success">
+                        <i class="fas fa-check"></i>
+                    </div>
+                    <div class="auth-procedure-content">
+                        <strong>Account Activation</strong>
+                        <span>Upon successful verification and approval, your login credentials will be communicated to your registered official email address.</span>
+                    </div>
+                </div>
+            </div>
+            <!-- ---------------------------------------------
+                 IMPORTANT INSTRUCTIONS
+                 --------------------------------------------- -->
+            <div class="auth-official-notice">
+                <div class="auth-notice-icon">
+                    <i class="fas fa-exclamation-triangle"></i>
+                </div>
+                <div class="auth-notice-content">
+                    <div class="auth-notice-title">IMPORTANT INSTRUCTIONS</div>
+                    <ul>
+                        <li>Upload only a valid Authorization Letter corresponding to the registered application.</li>
+                        <li>Ensure that the document is complete, legible and duly authorized.</li>
+                        <li>Submission of an incorrect or unauthorized document may result in delay in verification and account activation.</li>
+                        <li>Please retain a copy of the submitted document for your official records.</li>
+                    </ul>
+                </div>
+            </div>
+            <!-- ---------------------------------------------
+                 ACTION SECTION
+                 --------------------------------------------- -->
+            <div class="auth-action-section">
+                <div class="auth-action-text">
+                    <div class="auth-action-title">Action Required</div>
+                    <div class="auth-action-description">You are requested to proceed to the Authorization Portal and complete the document submission process.</div>
+                </div>
+                <a href="#" id="authLinkUrl" class="auth-proceed-btn" target="_blank" rel="noopener noreferrer">
+                    <i class="fas fa-file-signature"></i>
+                    Proceed to Authorization
+                    <i class="fas fa-arrow-right"></i>
+                </a>
+            </div>
+            <!-- ---------------------------------------------
+                 OFFICIAL DECLARATION
+                 --------------------------------------------- -->
+            <div class="auth-declaration">
+                <i class="fas fa-shield-alt"></i>
+                <span>This is a system-generated official communication. Please do not modify or share the authorization link with any unauthorized person.</span>
+            </div>
+        </div>
+        <!-- =================================================
+             OFFICIAL FOOTER
+             ================================================= -->
+        <div class="auth-gov-footer">
+            <div class="auth-footer-left">
+                <i class="fas fa-lock"></i>
+                Secure Government Authorization Portal
+            </div>
+            <div class="auth-footer-right">
+                <span>Confidential &amp; Official Use</span>
+                <button type="button" class="auth-close-btn" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+</div>
+<?php echo view('footer/footer'); ?>
+<script>
+function getCSRFHash() {
+    return $('input[name="csrf_token"]').val() || '';
+}
+
+function updateCSRF(hash) {
+    $('input[name="csrf_token"]').val(hash);
+}
+
+function toggleSignupPassword() {
+    const passwordInput = document.getElementById('signup_password');
+    const eyeIcon = document.getElementById('signupEyeIcon');
+    if (passwordInput.type === 'password') {
+        passwordInput.type = 'text';
+        eyeIcon.className = 'bi bi-eye-slash-fill';
+    } else {
+        passwordInput.type = 'password';
+        eyeIcon.className = 'bi bi-eye-fill';
+    }
+}
+
+function refreshSignupCaptcha() {
+    $.ajax({
+        url: "<?= base_url('refresh-captcha') ?>",
+        type: "POST",
+        data: { csrf_token: getCSRFHash() },
+        dataType: "json",
+        headers: { "X-Requested-With": "XMLHttpRequest" },
+        success: function(response) {
+            if (response.csrfHash) updateCSRF(response.csrfHash);
+            if (response.success) {
+                $('#signupCaptchaText').text(response.captcha);
+                $('#signup_captcha').val('');
+            }
+        }
+    });
+}
+
+$(document).ready(function () {
+    refreshSignupCaptcha();
+    $('#signupRefreshCaptcha').on('click', function () {
+        refreshSignupCaptcha();
+    });
+    $('#signup_body_type').on('change', function () {
+        const isUgcRequired = $(this).find(':selected').data('ugc-required');
+
+        if (parseInt(isUgcRequired) === 1) {
+            $('#ugc_input_container')
+                .stop(true, true)
+                .slideDown(200);
+
+            $('#signup_ugc_details')
+                .prop('required', true);
+        } else {
+            $('#ugc_input_container')
+                .stop(true, true)
+                .slideUp(200);
+
+            $('#signup_ugc_details')
+                .prop('required', false)
+                .val('');
+        }
+    });
+    
+    /*
+     * =========================================================
+     * signup_full_name
+     * =========================================================
+     */
+    function validateFullName(name) {
+        name = $.trim(name);
+
+        if (name === '') {
+            return false;
+        }
+
+        // Letters, spaces, hyphens and apostrophes allowed
+        const pattern = /^[A-Za-z]+(?:[ '-][A-Za-z]+)*$/;
+
+        return pattern.test(name);
+    }
+
+    $('#signup_full_name').on('blur', function () {
+
+        const $input = $(this);
+        const name = $.trim($input.val());
+
+        // Remove existing message
+        $input.next('.invalid-feedback').remove();
+
+        if (!validateFullName(name)) {
+
+            $input.addClass('is-invalid');
+
+            $input.after(`
+                <div class="invalid-feedback">
+                    Only letters, spaces, - and ' are allowed.
+                </div>
+            `);
+
+        } else {
+
+            $input.removeClass('is-invalid');
+        }
+    });
+
+
+    /*
+     * =========================================================
+     * BODY NAME CHANGE
+     * =========================================================
+     */
+    $('#signup_body_name').on('change', function () {
+        const selectedOrgType = $(this).find(':selected').data('org-type');
+
+        if (selectedOrgType) {
+            $('#signup_body_type option').each(function () {
+                if ($(this).data('type-id') == selectedOrgType) {
+                    $(this).prop('selected', true);
+                    return false;
+                }
+            });
+
+            $('#signup_body_type').trigger('change');
+        }
+    });
+
+
+    /*
+     * =========================================================
+     * EMAIL VALIDATION
+     * =========================================================
+     */
+    function validateEmail(email) {
+        email = $.trim(email);
+
+        if (email === '') {
+            return false;
+        }
+
+        const pattern = /^[A-Za-z0-9._%+\-]+@[A-Za-z0-9.\-]+\.[A-Za-z]{2,}$/;
+        return pattern.test(email);
+    }
+    /*
+     * =========================================================
+     * MOBILE VALIDATION
+     * EXACTLY 11 DIGITS
+     * =========================================================
+     */
+    function validateMobile(mobile) {
+        mobile = $.trim(mobile);
+        return /^[0-9]{10,11}$/.test(mobile);
+    }
+    /*
+     * =========================================================
+     * EMAIL BLUR
+     * =========================================================
+     */
+    $('#signup_email').on('blur', function () {
+        const email = $.trim($(this).val());
+
+        if (email === '') {
+            return;
+        }
+
+        if (!validateEmail(email)) {
+            $(this).addClass('is-invalid');
+            $(this).siblings('.invalid-feedback').remove();
+            $(this).after(
+                '<div class="invalid-feedback">' +
+                'Please enter a valid email address.' +
+                '</div>'
+            );
+        } else {
+            $(this).removeClass('is-invalid');
+            $(this).siblings('.invalid-feedback').remove();
+        }
+    });
+
+
+    /*
+     * =========================================================
+     * MOBILE INPUT
+     * ONLY NUMBER | MAX 11 DIGITS
+     * =========================================================
+     */
+    $('#signup_mobile').on('input', function () {
+        let value = $(this).val();
+
+        // Remove non-numeric characters
+        value = value.replace(/\D/g, '');
+
+        // Maximum 11 digits
+        if (value.length > 11) {
+            value = value.substring(0, 11);
+        }
+
+        $(this).val(value);
+    });
+
+
+    /*
+     * =========================================================
+     * MOBILE BLUR
+     * =========================================================
+     */
+    $('#signup_mobile').on('blur', function () {
+        const mobile = $.trim($(this).val());
+        if (mobile === '') {
+            return;
+        }
+        if (!validateMobile(mobile)) {
+            $(this).addClass('is-invalid');
+            $(this).siblings('.invalid-feedback').remove();
+
+            $(this).after(
+                '<div class="invalid-feedback">' +
+                'Mobile Number must contain exactly 10 or 11 digits.' +
+                '</div>'
+            );
+        } else {
+            $(this).removeClass('is-invalid');
+            $(this).siblings('.invalid-feedback').remove();
+        }
+    });
+
+
+   
+/* 
+ * =========================================================
+ * SIGNUP FORM SUBMIT
+ * =========================================================
+*/
+$('#signupForm').on('submit', function (e) {
+    e.preventDefault();
+    const fullName = $.trim($('#signup_full_name').val() || '');
+    const email    = $.trim($('#signup_email').val() || '');
+    const mobile   = $.trim($('#signup_mobile').val() || '');
+    const selectedBodyOption = $('#signup_body_name option:selected');
+    const bodyName = selectedBodyOption.attr('data-org-type') || '';
+    const selectedTypeOption = $('#signup_body_type option:selected');
+    const bodyType = selectedTypeOption.attr('data-type-id') || '';
+    const ugcRequired = selectedTypeOption.attr('data-ugc-required') || '';
+    const ugcDetails = $.trim($('#signup_ugc_details').val() || '');
+    const captcha = $.trim($('#signup_captcha').val() || '');
+    const csrfToken = $('input[name="csrf_token"]').val() || '';
+    // -----------------------------------------------------
+    // CLIENT VALIDATION
+    // -----------------------------------------------------
+    if (fullName.length < 3) {
+        showToast(
+            'error',
+            'Please enter a valid Full Name.'
+        );
+        $('#signup_full_name').focus();
+        return;
+    }
+    if (!validateEmail(email)) {
+        showToast(
+            'error',
+            'Please enter a valid email address.'
+        );
+        $('#signup_email').focus();
+        return;
+    }
+    if (!validateMobile(mobile)) {
+        showToast(
+            'error',
+            'Mobile Number must contain 10 or 11 digits.'
+        );
+        $('#signup_mobile').focus();
+        return;
+    }
+    if (!bodyName) {
+        showToast(
+            'error',
+            'Please select Body Name.'
+        );
+        $('#signup_body_name').focus();
+        return;
+    }
+    if (!bodyType) {
+        showToast(
+            'error',
+            'Please select Body Type.'
+        );
+        $('#signup_body_type').focus();
+        return;
+    }
+    if (!captcha) {
+        showToast(
+            'error',
+            'Please enter CAPTCHA code.'
+        );
+        $('#signup_captcha').focus();
+        return;
+    }
+    const formData = {
+
+        full_name   : fullName,
+        email       : email,
+        mobile      : mobile,
+        body_name   : bodyName,
+        body_type   : bodyType,
+        ugc_details : ugcDetails,
+        captcha     : captcha,
+        csrf_token  : csrfToken
+
+    };
+    console.log(
+        'Signup Form Data:',
+        formData
+    );
+    $.ajax({
+        url      : "<?= base_url('auth/register') ?>",
+        type     : "POST",
+        data     : formData,
+        dataType : "json",
+        beforeSend : function () {
+
+            $('#signupBtn')
+                .prop('disabled', true)
+                .html(
+                    '<i class="bi bi-hourglass-split me-2"></i>Registering...'
+                );
+
+        },
+        success : function (response) {
+            console.log(
+                'Register Response:',
+                response
+            );
+            if (response.csrfHash) {
+
+                $('input[name="csrf_token"]')
+                    .val(response.csrfHash);
+
+            }
+            if (response.success) {
+                const registrationNo =
+                    response.reg_no || '';
+                const authLink =
+                    response.auth_link ||
+                    response.redirect ||
+                    '';
+                console.log(
+                    'Registration Number:',
+                    registrationNo
+                );
+
+                console.log(
+                    'Authorization Link:',
+                    authLink
+                );
+                if ($('#registrationNumber').length) {
+
+                    $('#registrationNumber')
+                        .text(registrationNo);
+
+                }
+                if (
+                    typeof showEmailPopup === 'function'
+                ) {
+                    showEmailPopup(
+                        registrationNo,
+                        fullName,
+                        email,
+                        mobile,
+                        authLink
+                    );
+                } else {
+                    // Fallback
+                    if (authLink) {
+
+                        window.location.href =
+                            authLink;
+                    }
+                }
+                return;
+            }
+            if (response.errors) {
+                let errors = '';
+                $.each(
+                    response.errors,
+                    function (field, message) {
+
+                        errors +=
+                            message +
+                            '<br>';
+
+                    }
+                );
+                showToast(
+                    'error',
+                    errors
+                );
+            } else {
+                showToast(
+                    'error',
+                    response.message ||
+                    'Registration failed.'
+                );
+            }
+            enableSignupButton();
+        },
+        error : function (xhr) {
+            console.error(
+                'Registration Error:',
+                xhr.responseText
+            );
+            let message =
+                'Server error. Please try again.';
+            if (xhr.responseJSON) {
+                if (xhr.responseJSON.message) {
+                    message =
+                        xhr.responseJSON.message;
+                }
+                if (xhr.responseJSON.errors) {
+                    let errors = '';
+                    $.each(
+                        xhr.responseJSON.errors,
+                        function (field, errorMessage) {
+                            errors +=
+                                errorMessage +
+                                '<br>';
+
+                        }
+                    );
+                    if (errors) {
+
+                        message = errors;
+
+                    }
+                }
+
+            }
+            showToast(
+                'error',
+                message
+            );
+            enableSignupButton();
+        },
+        complete : function () {
+            if (
+                typeof refreshSignupCaptcha ===
+                'function'
+            ) {
+                refreshSignupCaptcha();
+
+            }
+        }
+    });
+});
+
+/* 
+ * =========================================================
+ * ENABLE SIGNUP BUTTON
+ * =========================================================
+ */
+function enableSignupButton() {
+    $('#signupBtn')
+        .prop('disabled', false)
+        .html(
+            '<i class="bi bi-person-plus-fill me-2"></i>Create Account'
+        );
+}
+
+/* 
+ * =========================================================
+ * EMAIL VERIFICATION / REGISTRATION SUCCESS POPUP
+ * =========================================================
+ */
+window.showEmailPopup = function (
+    registrationNo,
+    fullName,
+    email,
+    mobile,
+    authLink
+) {
+    const popupElement = document.getElementById('emailPopup');
+
+    if (!popupElement) {
+        console.warn('emailPopup element not found.');
+
+        if (typeof showAuthLinkPopup === 'function') {
+            showAuthLinkPopup(
+                registrationNo,
+                fullName,
+                email,
+                mobile,
+                authLink
+            );
+        } else if (authLink) {
+            window.location.href = authLink;
+        }
+
+        return;
+    }
+
+    $('#registrationNumber').text(
+        registrationNo || '-'
+    );
+
+    $('#registrationFullName').text(
+        fullName || '-'
+    );
+
+    $('#registrationEmail').text(
+        email || '-'
+    );
+
+    $('#registrationMobile').text(
+        mobile || '-'
+    );
+
+    const emailPopup =
+        bootstrap.Modal.getOrCreateInstance(
+            popupElement
+        );
+
+    $(popupElement).off(
+        'hidden.bs.modal.authFlow'
+    );
+
+    $(popupElement).one(
+        'hidden.bs.modal.authFlow',
+        function () {
+            console.log(
+                'Email verification popup closed.'
+            );
+
+            console.log(
+                'Opening Authorization Link Popup:',
+                authLink
+            );
+
+            if (typeof showAuthLinkPopup === 'function') {
+                showAuthLinkPopup(
+                    registrationNo,
+                    fullName,
+                    email,
+                    mobile,
+                    authLink
+                );
+            } else if (authLink) {
+                window.location.href = authLink;
+            }
+        }
+    );
+
+    emailPopup.show();
+};
+
+/*
+ * =========================================================
+ * AUTHORIZATION LINK POPUP
+ * =========================================================
+ */
+window.showAuthLinkPopup = function (
+    registrationNo,
+    fullName,
+    email,
+    mobile,
+    authUrl
+) {
+    const popupElement =
+        document.getElementById('authLinkPopup');
+    if (!authUrl) {
+        console.error(
+            'Authorization URL is empty.'
+        );
+        showToast(
+            'error',
+            'Authorization link could not be generated.'
+        );
+        return;
+    }
+    if (!popupElement) {
+        console.warn(
+            'authLinkPopup element not found.'
+        );
+        window.location.href = authUrl;
+        return;
+    }
+    $('#authFullName')
+        .text(fullName || 'Applicant');
+
+    $('#authLinkRegistrationNo')
+        .text(registrationNo || '-');
+
+    $('#authLinkEmail')
+        .text(email || '-');
+
+    $('#authLinkMobile')
+        .text(mobile || '-');
+    $('#authLinkUrl')
+        .attr('href', authUrl);
+    const authLinkPopup =
+        bootstrap.Modal.getOrCreateInstance(
+            popupElement
+        );
+
+    authLinkPopup.show();
+};
+
+/*
+ * =========================================================
+ * AUTHORIZATION LINK CLICK
+ * =========================================================
+ */
+$(document).on('click', '#authLinkUrl', function (e) {
+    const authUrl = $(this).attr('href');
+
+    if (!authUrl || authUrl === '#') {
+        e.preventDefault();
+
+        showToast(
+            'error',
+            'Authorization link is not available.'
+        );
+
+        return false;
+    }
+
+    console.log(
+        'Opening Authorization URL:',
+        authUrl
+    );
+    });
+});
+
+
+document.addEventListener('DOMContentLoaded', function () {
+    const dateElement =
+        document.getElementById('authLetterDate');
+    if (dateElement) {
+        const today = new Date();
+        const options = {
+            day: '2-digit',
+            month: 'long',
+            year: 'numeric'
+        };
+        dateElement.textContent =
+            today.toLocaleDateString('en-IN', options);
+    }
+});
+
+const registrationElement =
+    document.getElementById('authLinkRegistrationNo');
+const registrationHeaderElement =
+    document.getElementById('authLinkRegistrationNoHeader');
+if (registrationElement) {
+    registrationElement.textContent = registrationNo || '-';
+}
+if (registrationHeaderElement) {
+    registrationHeaderElement.textContent = registrationNo || '-';
+}
+
+</script>
+<script>
+$(document).ready(function () {
+
+    $('#signup_body_name').select2({
+        placeholder: 'Select Body Name',
+        allowClear: true,
+        width: '100%',
+        dropdownAutoWidth: true
+    });
+
+});
+</script>
