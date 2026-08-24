@@ -1469,11 +1469,6 @@
       if (popup) {
           popup.style.transform = 'translateX(-400px)';
       }
-      
-      if (notificationTimer) {
-          clearTimeout(notificationTimer);
-      }
-      notificationTimer = setTimeout(showNotification, 10000);
   }
 
   function showNotification() {

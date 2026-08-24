@@ -141,7 +141,7 @@
             <span>New Request</span>
         </a>
         <a href="#" class="nav-item" onclick="showPage('requests')"><i class="fas fa-clipboard-list"></i> <span>Requests <span class="badge" id="request-count">0</span></span></a>
-        <a href="#" class="nav-item" onclick="showPage('analytics')"><i class="fas fa-chart-simple"></i> <span>Analytics</span></a>
+        <a href="#" class="nav-item" onclick="showPage('analytics')"><i class="fas fa-chart-simple"></i> <span>Reports</span></a>
         <div class="text-[9px] font-bold text-slate-400 uppercase tracking-wider px-3 mt-6 mb-2 nav-label">System</div>
         <a href="#" class="nav-item" onclick="showPage('settings')"><i class="fas fa-sliders"></i> <span>Settings</span></a>
         <a href="#" class="nav-item" onclick="showPage('audit-log')"><i class="fas fa-shield-halved"></i> <span>Audit Log</span></a>

@@ -2,7 +2,7 @@
 <div class="gov-card p-6">
     <div class="flex items-center gap-3 mb-6">
         <i class="fas fa-chart-simple text-[#e58500] text-2xl"></i>
-        <h2 class="text-xl font-bold text-[#1e4d7b]">Analytics & Reports</h2>
+        <h2 class="text-xl font-bold text-[#1e4d7b]">Reports</h2>
     </div>
     
     <div class="text-center py-12">
