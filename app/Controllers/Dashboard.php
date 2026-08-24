@@ -837,26 +837,58 @@ class Dashboard extends BaseController
 
     public function approveRegistration()
     {
+        helper('auth');
         $regId      = $this->request->getPost('reg_id');
         $action     = $this->request->getPost('action');
         $remarks    = $this->request->getPost('remarks');
         $approvedBy = session()->get('user_id') ?? 1;
 
         $regModel = new \App\Models\RegistrationModel();
-        $result   = $regModel->approveRegistrationSp($regId, $approvedBy, $action, $remarks);
+        $loginModel = new \App\Models\LoginModel();
 
-        if (isset($result['success']) && $result['success'] == 1) {
+        $registration = $regModel->find($regId);
+        if (!$registration) {
             return $this->response->setJSON([
-                'success'  => true,
-                'message'  => $result['message'],
+                'success'  => false,
+                'message'  => 'Registration record not found',
                 'csrfHash' => csrf_hash()
             ]);
         }
 
-        return $this->response->setJSON([
-            'success'  => false,
-            'message'  => $result['error_message'] ?? $result['message'] ?? 'Action failed.',
-            'csrfHash' => csrf_hash()
-        ]);
+        if ($action == 4) { 
+            $regModel->approveRegistrationSp($regId, $approvedBy, $action, $remarks);
+            $plainPassword = get_default_password(); 
+            $passwordHash  = get_default_password_hash();
+            $existingUser = $loginModel->findUserByEmail($registration['email']);
+            $userData     = [
+                'name'  => $registration['name'],
+                'email' => $registration['email'],
+                'hash'  => $passwordHash
+            ];
+
+            if ($existingUser) {
+                $loginModel->update($existingUser['id'], $userData);
+            } else {
+                $loginModel->insert($userData);
+            }
+
+            return $this->response->setJSON([
+                'success'  => true,
+                'is_approved' => true,
+                'email'       => $registration['email'],
+                'password'    => $plainPassword,
+                'message'     => 'Application Approved Successfully!',
+                'csrfHash'    => csrf_hash()
+            ]);
+        } else {
+            $regModel->approveRegistrationSp($regId, $approvedBy, $action, $remarks);
+
+            return $this->response->setJSON([
+                'success'     => true,
+                'is_approved' => false,
+                'message'     => 'Application Rejected Successfully!',
+                'csrfHash'    => csrf_hash()
+            ]);
+        }
     }
 }

@@ -43,14 +43,22 @@ class RegistrationModel extends Model
     public function approveRegistrationSp($regId, $approvedBy, $action, $remarks)
     {
         $db = \Config\Database::connect();
+        $db->reconnect();
 
         $query = $db->query(
             "CALL approve_registration(?, ?, ?, ?)",
-            [$regId, $approvedBy, $action, $remarks]
+            [(int)$regId, (int)$approvedBy, (int)$action, (string)$remarks]
         );
 
         $result = $query->getRowArray();
-        $db->close();
+        if ($mysqli = $db->connID) {
+            while ($mysqli->more_results() && $mysqli->next_result()) {
+                $extraResult = $mysqli->use_result();
+                if ($extraResult instanceof \mysqli_result) {
+                    $extraResult->free();
+                }
+            }
+        }
 
         return $result;
     }

@@ -6,6 +6,7 @@ class LoginModel extends Model
     protected $table = 'user';
     protected $primaryKey = 'id';
     protected $returnType = 'array';
+    protected $allowedFields = ['name', 'email', 'hash'];
 
     public function findUserByEmail(string $email): ?array
     {

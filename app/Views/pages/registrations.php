@@ -83,7 +83,7 @@
                                 <td class="px-5 py-4 text-left" data-search="<?= $filterCategory ?>" data-order="<?= $status ?>">
                                     <?php if(in_array($status, [1, 2, 3])): ?>
                                         <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg border-l-4 border-amber-500 bg-amber-50 text-amber-700 font-semibold text-xs shadow-sm">
-                                            <i class="fas fa-clock"></i> Pending (Step <?= $status ?>)
+                                            <i class="fas fa-clock"></i> Pending
                                         </span>
                                     <?php elseif($status == 4): ?>
                                         <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg border-l-4 border-green-500 bg-green-50 text-green-700 font-semibold text-xs shadow-sm">
@@ -151,6 +151,36 @@
                 <button type="submit" id="submitActionBtn" class="px-5 py-2 text-white text-sm font-semibold rounded-lg shadow-sm">Submit</button>
             </div>
         </form>
+    </div>
+</div>
+
+<!-- Success / Credentials Modal -->
+<div id="credentialsModal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl shadow-xl w-full max-w-md overflow-hidden">
+        <div class="px-6 py-4 bg-green-50 border-b border-green-100 flex items-center justify-between">
+            <h3 class="text-base font-bold text-green-700 flex items-center gap-2">
+                <i class="fas fa-check-circle"></i> Approval & Mail Sent
+            </h3>
+            <button type="button" class="closeCredModal text-slate-400 hover:text-slate-600 w-8 h-8 rounded-lg flex items-center justify-center">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="p-6 space-y-4">
+            <p class="text-sm text-slate-600">User account generated and mail notification sent successfully.</p>
+            <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 space-y-2">
+                <div>
+                    <span class="text-xs font-semibold text-slate-500 uppercase">User Email</span>
+                    <p class="font-bold text-slate-800 text-sm" id="cred_email"></p>
+                </div>
+                <div>
+                    <span class="text-xs font-semibold text-slate-500 uppercase">Generated Password</span>
+                    <p class="font-mono font-bold text-green-600 text-base" id="cred_password"></p>
+                </div>
+            </div>
+        </div>
+        <div class="px-6 py-3.5 bg-slate-50 border-t flex justify-end">
+            <button type="button" class="closeCredModal px-5 py-2 bg-green-600 text-white text-sm font-semibold rounded-lg shadow-sm hover:bg-green-700">OK</button>
+        </div>
     </div>
 </div>
 
@@ -284,6 +314,11 @@ $(document).ready(function() {
         $('#actionModal').removeClass('hidden');
     });
 
+    $('.closeCredModal').click(function() {
+        $('#credentialsModal').addClass('hidden');
+        location.reload();
+    });
+
     $('#actionForm').submit(function(e) {
         e.preventDefault();
         
@@ -300,10 +335,17 @@ $(document).ready(function() {
                 if(res.csrfHash) updateCSRF(res.csrfHash);
                 if(res.success) {
                     $('#actionModal').addClass('hidden');
-                    if(typeof showToast === "function") {
-                        showToast('success', res.message || 'Action processed successfully!');
+                    
+                    if (res.is_approved) {
+                        $('#cred_email').text(res.email);
+                        $('#cred_password').text(res.password);
+                        $('#credentialsModal').removeClass('hidden');
+                    } else {
+                        if(typeof showToast === "function") {
+                            showToast('success', res.message || 'Action processed successfully!');
+                        }
+                        location.reload();
                     }
-                    location.reload();
                 } else {
                     if(typeof showToast === "function") {
                         showToast('error', res.message || 'Action failed');
