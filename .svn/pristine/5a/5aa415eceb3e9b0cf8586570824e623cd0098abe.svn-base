@@ -1,0 +1,453 @@
+<style>
+#footer{
+    background:#1e4d7b;
+    color:#fff;
+}
+#footer p,
+#footer small{
+    color:#e8edf5;
+}
+.footer-links{
+    padding:0;
+    margin:0;
+}
+.footer-links li{
+    list-style:none;
+    margin-bottom:14px;
+}
+.footer-links a{
+    color:#fff;
+    text-decoration:none;
+    font-weight:500;
+    transition:.3s;
+}
+.footer-links a:hover{
+    color:#FF9933;
+    padding-left:6px;
+}
+.footer-links i{
+    color:#FF9933;
+}
+#footer h3,
+#footer h4{
+    color:#fff;
+}
+#footer img{
+    background:#fff;
+    border-radius:50%;
+    padding:6px;
+.branding {
+    background: #fff;
+    border-bottom: 3px solid #FF9933;
+}
+</style>
+<footer id="footer" class="footer position-relative branding" style="background:#1e4d7b; color:#fff;">
+    <div class="container py-5">
+        <div class="row">
+            <div class="col-lg-8 mb-4">
+                <div class="d-flex align-items-center mb-4">
+                    <div style="margin-left:-2px;">
+                        <h3 class="mb-1 fw-bold" style="color:#FF9933;">
+                            मंत्रिमंडल सचिवालय
+                        </h3>
+                        <h5 class="mb-1 fw-bold text-white">
+                            Cabinet Secretariat
+                        </h5>
+                        <small class="text-light">
+                            Government of India
+                        </small>
+                    </div>
+                </div>
+                <p class="mb-4 text-light"
+                   style="text-align:justify; line-height:1.7; font-size:13px;">
+                    The Cabinet Secretariat is responsible for the administration of the
+                    Government of India (Transaction of Business) Rules, 1961 and the
+                    Government of India (Allocation of Business) Rules, 1961. It facilitates
+                    smooth coordination among Ministries and Departments and provides
+                    secretarial assistance to the Cabinet and its Committees.
+                </p>
+                <div class="row">
+                    <div class="col-md-4 mb-3">
+                        <i class="bi bi-geo-alt-fill text-warning me-2"></i>
+                        Rashtrapati Bhavan,<br>
+                        New Delhi - 110004
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <i class="bi bi-telephone-fill text-warning me-2"></i>
+                        +91-11-2301-0000
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <i class="bi bi-envelope-fill text-warning me-2"></i>
+                        support@cabsec.gov.in
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-4">
+                <h4 class="text-warning fw-bold mb-4">
+                    Quick Links
+                </h4>
+                <ul class="list-unstyled footer-links">
+                    <li>
+                        <a href="<?= base_url() ?>">
+                            <i class="bi bi-chevron-right me-2"></i> Home
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#">
+                            <i class="bi bi-chevron-right me-2"></i> About Us
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#">
+                            <i class="bi bi-chevron-right me-2"></i> Services
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#">
+                            <i class="bi bi-chevron-right me-2"></i> Contact
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <div style="background:#163a5b; padding:18px 0; border-top:1px solid rgba(255,255,255,.15);">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-md-6 text-center text-md-start">
+                    © <?= date('Y'); ?>
+                    <strong style="color:#FF9933;">
+                        Cabinet Secretariat
+                    </strong>
+                    | Government of India.
+                    All Rights Reserved.
+                </div>
+                <div class="col-md-6 text-center text-md-end">
+                    Designed &amp; Developed by
+                    <strong style="color:#FF9933;">
+                        National Informatics Centre (NIC)
+                    </strong>
+                </div>
+            </div>
+        </div>
+    </div>
+</footer>
+<?php 
+$loginModal = APPPATH . 'Views/modals/login_modal.php';
+if (file_exists($loginModal)) {
+    include_once($loginModal);
+}
+?> 
+<a href="#" id="scroll-top" class="scroll-top d-flex align-items-center justify-content-center">
+    <i class="bi bi-arrow-up-short"></i>
+</a>
+<div id="preloader"></div>
+<script src="<?= base_url('assets/vendor/bootstrap/js/bootstrap.bundle.min.js') ?>"></script>
+<script src="<?= base_url('assets/vendor/php-email-form/validate.js') ?>"></script>
+<script src="<?= base_url('assets/vendor/aos/aos.js') ?>"></script>
+<script src="<?= base_url('assets/vendor/glightbox/js/glightbox.min.js') ?>"></script>
+<script src="<?= base_url('assets/vendor/purecounter/purecounter_vanilla.js') ?>"></script>
+<script src="<?= base_url('assets/vendor/swiper/swiper-bundle.min.js') ?>"></script>
+<script src="<?= base_url('assets/js/main.js') ?>"></script>
+<script src="<?= base_url('assets/js/jquery.min.js') ?>"></script>
+<script src="<?= base_url('assets/js/select2.min.js') ?>"></script>
+<script src="<?= base_url('assets/js/tost.js') ?>"></script>
+<script>
+$(document).ready(function () {
+    function getCSRFData() {
+        const meta = document.querySelector(
+            'meta[name="csrf-token"]'
+        );
+        if (!meta) {
+            console.error('CSRF meta tag not found.');
+            return null;
+        }
+        return {
+            name: '<?= csrf_token() ?>',
+            value: meta.getAttribute('content')
+        };
+    }
+    function updateCSRF(hash) {
+        if (!hash) {
+            return;
+        }
+        const meta = document.querySelector(
+            'meta[name="csrf-token"]'
+        );
+        if (meta) {
+            meta.setAttribute('content', hash);
+        }
+        document
+            .querySelectorAll(
+                'input[name="<?= csrf_token() ?>"]'
+            )
+            .forEach(function (input) {
+                input.value = hash;
+            });
+    }
+    $('#toggleLoginPassword').on('click', function () {
+        const password = $('#login_password');
+        const icon = $('#loginEyeIcon');
+        if (password.attr('type') === 'password') {
+            password.attr('type', 'text');
+            icon.attr(
+                'class',
+                'bi bi-eye-slash-fill'
+            );
+        } else {
+            password.attr('type', 'password');
+            icon.attr(
+                'class',
+                'bi bi-eye-fill'
+            );
+        }
+    });
+    window.refreshLoginCaptcha = function () {
+        const csrf = getCSRFData();
+        if (!csrf) {
+            console.error(
+                'Cannot refresh CAPTCHA. CSRF token missing.'
+            );
+            return;
+        }
+        const data = {};
+        data[csrf.name] = csrf.value;
+        $.ajax({
+            url: "<?= base_url('refresh-captcha') ?>",
+            type: 'POST',
+            dataType: 'json',
+            data: data,
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest'
+            },
+            success: function (response) {
+                console.log(
+                    'CAPTCHA RESPONSE:',
+                    response
+                );
+                if (response.csrfHash) {
+                    updateCSRF(
+                        response.csrfHash
+                    );
+                }
+                if (response.success) {
+                    $('#loginCaptchaText')
+                        .text(response.captcha);
+                    $('#login_captcha')
+                        .val('');
+                }
+            },
+            error: function (xhr) {
+                console.error(
+                    'CAPTCHA ERROR:',
+                    xhr.status,
+                    xhr.responseText
+                );
+                if (xhr.status === 403) {
+                    showToast(
+                        'error',
+                        'Security token expired. Page will refresh.'
+                    );
+                    setTimeout(function () {
+                        window.location.reload();
+                    }, 800);
+                }
+            }
+        });
+    };
+    $('#loginForm').on('submit', function (e) {
+        e.preventDefault();
+        const email = $.trim(
+            $('#login_email').val()
+        );
+        const password = $(
+            '#login_password'
+        ).val();
+        const captcha = $.trim(
+            $('#login_captcha').val()
+        ).toUpperCase();
+        if (!email || !password || !captcha) {
+            showToast(
+                'warning',
+                'All fields are required.'
+            );
+            return;
+        }
+        const csrf = getCSRFData();
+        if (!csrf) {
+            showToast(
+                'error',
+                'Security token missing. Please refresh the page.'
+            );
+            return;
+        }
+        $('#loginBtn')
+            .prop('disabled', true)
+            .html(
+                '<span class="spinner-border spinner-border-sm me-2"></span>Logging in...'
+            );
+        const data = {
+            email: email,
+            password: password,
+            captcha: captcha
+        };
+        data[csrf.name] = csrf.value;
+        $.ajax({
+            url: "<?= base_url('login') ?>",
+            type: 'POST',
+            dataType: 'json',
+            data: data,
+            headers: {
+                'X-Requested-With':
+                    'XMLHttpRequest'
+            },
+            success: function (response) {
+                console.log(
+                    'LOGIN RESPONSE:',
+                    response
+                );
+                if (response.csrfHash) {
+                    updateCSRF(
+                        response.csrfHash
+                    );
+                }
+                if (response.success) {
+                    showToast(
+                        'success',
+                        response.message
+                    );
+                    setTimeout(function () {
+                        window.location.href =
+                            response.redirect;
+                    }, 700);
+                    return;
+                }
+                showToast(
+                    'error',
+                    response.message ||
+                    'Login failed.'
+                );
+                $('#login_password').val('');
+                $('#login_captcha').val('');
+                refreshLoginCaptcha();
+            },
+            error: function (xhr) {
+                console.error(
+                    'LOGIN ERROR:',
+                    xhr.status,
+                    xhr.responseText
+                );
+                if (xhr.status === 403) {
+                    showToast(
+                        'error',
+                        'Security token mismatch. Page will refresh.'
+                    );
+                    setTimeout(function () {
+                        window.location.reload();
+                    }, 1000);
+                    return;
+                }
+                let message =
+                    'An error occurred. Please try again.';
+                if (
+                    xhr.responseJSON &&
+                    xhr.responseJSON.message
+                ) {
+                    message =
+                        xhr.responseJSON.message;
+                }
+                showToast(
+                    'error',
+                    message
+                );
+            },
+            complete: function () {
+                $('#loginBtn')
+                    .prop('disabled', false)
+                    .html(
+                        '<i class="bi bi-box-arrow-in-right me-2"></i>Login'
+                    );
+            }
+        });
+    });
+    $('#loginRefreshCaptcha').on(
+        'click',
+        function () {
+            refreshLoginCaptcha();
+        }
+    );
+    $('#loginModal').on(
+        'shown.bs.modal',
+        function () {
+            refreshLoginCaptcha();
+        }
+    );
+    window.toggleLoginPassword = function () {
+        const passwordInput =
+            document.getElementById(
+                'login_password'
+            );
+        const eyeIcon =
+            document.getElementById(
+                'loginEyeIcon'
+            );
+        if (
+            passwordInput.type ===
+            'password'
+        ) {
+            passwordInput.type =
+                'text';
+            eyeIcon.className =
+                'bi bi-eye-slash-fill';
+        } else {
+            passwordInput.type =
+                'password';
+            eyeIcon.className =
+                'bi bi-eye-fill';
+        }
+    };
+    $('#login_email').on(
+        'blur',
+        function () {
+            const $email = $(this);
+            const email = $.trim(
+                $email.val()
+            );
+            $email.removeClass(
+                'is-invalid'
+            );
+            $email
+                .siblings(
+                    '.invalid-feedback'
+                )
+                .remove();
+            if (email === '') {
+                return;
+            }
+            const emailRegex =
+                /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+            if (!emailRegex.test(email)) {
+                $email.addClass(
+                    'is-invalid'
+                );
+                $email.after(
+                    '<div class="invalid-feedback">' +
+                    'Please enter a valid official email address.' +
+                    '</div>'
+                );
+            } else {
+                $email.removeClass(
+                    'is-invalid'
+                );
+                $email
+                    .siblings(
+                        '.invalid-feedback'
+                    )
+                    .remove();
+            }
+        }
+    );
+});
+</script>
+</body>
+</html>

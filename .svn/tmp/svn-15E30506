@@ -1,9 +1,6 @@
 <?php
-
 namespace App\Models;
-
 use CodeIgniter\Model;
-
 class LoginModel extends Model
 {
     protected $table = 'user';
@@ -20,13 +17,10 @@ class LoginModel extends Model
                 return null;
             }
 
-            $user = $this
-                ->where('email', $email)
-                ->first();
-
+            $user = $this->where('email', $email)->first();
             return $user ?: null;
 
-        } catch (\Throwable $e) {
+        } catch (\Exception $e) {
             log_message('error', 'Error in findUserByEmail: ' . $e->getMessage());
             return null;
         }
@@ -41,7 +35,7 @@ class LoginModel extends Model
 
             return password_verify($plainPassword, $hash);
 
-        } catch (\Throwable $e) {
+        } catch (\Exception $e) {
             log_message('error', 'Error in verifyPassword: ' . $e->getMessage());
             return false;
         }
@@ -52,7 +46,7 @@ class LoginModel extends Model
         try {
             return password_hash('jams@2026', PASSWORD_DEFAULT);
 
-        } catch (\Throwable $e) {
+        } catch (\Exception $e) {
             log_message('error', 'Error in getDefaultPasswordHash: ' . $e->getMessage());
             return '';
         }
@@ -69,7 +63,7 @@ class LoginModel extends Model
 
             return $this->update($userId, ['hash' => $hash]);
 
-        } catch (\Throwable $e) {
+        } catch (\Exception $e) {
             log_message('error', 'Error in setDefaultPassword: ' . $e->getMessage());
             return false;
         }
