@@ -6,9 +6,22 @@ use CodeIgniter\Router\RouteCollection;
 $routes->get('/', 'Home::index');
 $routes->get('test-db', 'Test::index');
 
-// Auth Routes
+// Login Routes
+$routes->post(
+    'login',
+    'LoginController::login'
+);
+$routes->get(
+    'logout',
+    'LoginController::logout'
+);
+$routes->post(
+    'refresh-captcha',
+    'LoginController::refreshCaptcha'
+);
+
+// Signup Auth Routes
 $routes->get('signup', 'Auth::signup');
-$routes->post('auth/checkLogin', 'Auth::checkLogin');
 $routes->post('auth/register', 'Auth::register');
 $routes->get(
     'auth/authorization',
@@ -23,7 +36,7 @@ $routes->get(
     'Auth::applicationSubmitted'
 );
 $routes->post('refresh-captcha', 'Auth::refreshCaptcha');
-$routes->get('logout', 'Auth::logout');
+
 
 $routes->get('dashboard', 'Dashboard::index');
 $routes->get('new-request', 'Dashboard::newRequest');

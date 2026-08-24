@@ -164,249 +164,266 @@ if (file_exists($loginModal)) {
 <script src="<?= base_url('assets/vendor/glightbox/js/glightbox.min.js') ?>"></script>
 <script src="<?= base_url('assets/vendor/purecounter/purecounter_vanilla.js') ?>"></script>
 <script src="<?= base_url('assets/vendor/swiper/swiper-bundle.min.js') ?>"></script>
-
 <!-- Main JS -->
 <script src="<?= base_url('assets/js/main.js') ?>"></script>
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="<?= base_url('assets/js/jquery.min.js') ?>"></script>
+<script src="<?= base_url('assets/js/select2.min.js') ?>"></script>
 <script src="<?= base_url('assets/js/tost.js') ?>"></script>
 <script>
-    AOS.init();
+ $(document).ready(function () {
+    /* =========================================================
+       CSRF TOKEN
+    ========================================================= */
+    function getCSRFData() {
+        const input = document.querySelector('#loginForm input[name="csrf_test_name"]');
 
-    // ================================
-    // CSRF Helper Functions
-    // ================================
-    function getCSRFName() {
-        const csrfInput = document.querySelector('input[name="csrf_token"]');
-        return csrfInput ? csrfInput.name : 'csrf_token';
+        if (!input) {
+            console.error('CSRF hidden input not found.');
+            return null;
+        }
+
+        return {
+            name: input.name,
+            value: input.value
+        };
     }
 
-    function getCSRFHash() {
-        const csrfInput = document.querySelector('input[name="csrf_token"]');
-        return csrfInput ? csrfInput.value : '';
-    }
-
+    /* =========================================================
+       UPDATE CSRF
+    ========================================================= */
     function updateCSRF(hash) {
-        const csrfInputs = document.querySelectorAll('input[name="csrf_token"]');
-        csrfInputs.forEach(input => input.value = hash);
-    }
-
-    // ================================
-    // Toggle Password Functions
-    // ================================
-    window.toggleLoginPassword = function() {
-        const passwordInput = document.getElementById('login_password');
-        const eyeIcon = document.getElementById('loginEyeIcon');
-        if (passwordInput.type === 'password') {
-            passwordInput.type = 'text';
-            eyeIcon.className = 'bi bi-eye-slash-fill';
-        } else {
-            passwordInput.type = 'password';
-            eyeIcon.className = 'bi bi-eye-fill';
+        if (!hash) {
+            return;
         }
+
+        document.querySelectorAll('input[name="csrf_test_name"]').forEach(function (input) {
+            input.value = hash;
+        });
     }
 
-    window.toggleSignupPassword = function() {
-        const passwordInput = document.getElementById('signup_password');
-        const eyeIcon = document.getElementById('signupEyeIcon');
-        if (passwordInput.type === 'password') {
-            passwordInput.type = 'text';
-            eyeIcon.className = 'bi bi-eye-slash-fill';
+    /* =========================================================
+       PASSWORD TOGGLE
+    ========================================================= */
+    $('#toggleLoginPassword').on('click', function () {
+        const password = $('#login_password');
+        const icon = $('#loginEyeIcon');
+
+        if (password.attr('type') === 'password') {
+            password.attr('type', 'text');
+            icon.attr('class', 'bi bi-eye-slash-fill');
         } else {
-            passwordInput.type = 'password';
-            eyeIcon.className = 'bi bi-eye-fill';
+            password.attr('type', 'password');
+            icon.attr('class', 'bi bi-eye-fill');
         }
-    }
+    });
 
-    // ================================
-    // Refresh CAPTCHA - Login
-    // ================================
-    window.refreshLoginCaptcha = function() {
-        const csrfHash = getCSRFHash();
-        
+    /* =========================================================
+       REFRESH CAPTCHA
+    ========================================================= */
+    window.refreshLoginCaptcha = function () {
+        const csrf = getCSRFData();
+
+        if (!csrf) {
+            console.error('Cannot refresh CAPTCHA. CSRF missing.');
+            return;
+        }
+
+        const data = {};
+        data[csrf.name] = csrf.value;
+
         $.ajax({
-            url: "<?= base_url('refresh-captcha') ?>",
-            type: "POST",
-            data: {
-                csrf_token: csrfHash
-            },
-            dataType: "json",
+             url: "<?= base_url('refresh-captcha') ?>",
+            type: 'POST',
+            dataType: 'json',
+            data: data,
             headers: {
-                "X-Requested-With": "XMLHttpRequest"
+                'X-Requested-With': 'XMLHttpRequest'
             },
-            success: function(response) {
+            success: function (response) {
+                console.log('CAPTCHA:', response);
+
                 if (response.csrfHash) {
                     updateCSRF(response.csrfHash);
                 }
+
                 if (response.success) {
                     $('#loginCaptchaText').text(response.captcha);
                     $('#login_captcha').val('');
                 }
             },
-            error: function(xhr) {
-                console.error('CAPTCHA refresh error:', xhr);
+            error: function (xhr) {
+                console.error('CAPTCHA ERROR:', xhr.status, xhr.responseText);
+
+                if (xhr.status === 403) {
+                    window.location.reload();
+                }
             }
         });
-    }
+    };
 
-    // ================================
-    // Refresh CAPTCHA - Signup
-    // ================================
-    window.refreshSignupCaptcha = function() {
-        const csrfHash = getCSRFHash();
-        
+    /* =========================================================
+       LOGIN
+    ========================================================= */
+    $('#loginForm').on('submit', function (e) {
+        e.preventDefault();
+
+        const email = $('#login_email').val().trim();
+        const password = $('#login_password').val();
+        const captcha = $('#login_captcha').val().trim().toUpperCase();
+
+        if (!email || !password || !captcha) {
+            showToast('warning', 'All fields are required.');
+            return;
+        }
+
+        const csrf = getCSRFData();
+
+        if (!csrf) {
+            showToast('error', 'Security token missing. Please refresh the page.');
+            return;
+        }
+
+        $('#loginBtn')
+            .prop('disabled', true)
+            .html('<span class="spinner-border spinner-border-sm me-2"></span>Logging in...');
+
+        const data = {
+            email: email,
+            password: password,
+            captcha: captcha
+        };
+
+        data[csrf.name] = csrf.value;
+
         $.ajax({
-            url: "<?= base_url('refresh-captcha') ?>",
-            type: "POST",
-            data: {
-                csrf_token: csrfHash
-            },
-            dataType: "json",
+            url: "<?= base_url('login') ?>",
+            type: 'POST',
+            dataType: 'json',
+            data: data,
             headers: {
-                "X-Requested-With": "XMLHttpRequest"
+                'X-Requested-With': 'XMLHttpRequest'
             },
-            success: function(response) {
+            success: function (response) {
+                console.log('LOGIN RESPONSE:', response);
+
                 if (response.csrfHash) {
                     updateCSRF(response.csrfHash);
                 }
+
                 if (response.success) {
-                    $('#signupCaptchaText').text(response.captcha);
-                    $('#signup_captcha').val('');
+                    showToast('success', response.message);
+
+                    setTimeout(function () {
+                        window.location.href = response.redirect;
+                    }, 700);
+
+                    return;
                 }
+
+                showToast('error', response.message || 'Login failed.');
+                $('#login_password').val('');
+                $('#login_captcha').val('');
+                refreshLoginCaptcha();
             },
-            error: function(xhr) {
-                console.error('CAPTCHA refresh error:', xhr);
-            }
-        });
-    }
+            error: function (xhr) {
+                console.error('LOGIN ERROR:', xhr.status, xhr.responseText);
 
-    // ================================
-    // Document Ready
-    // ================================
-    $(document).ready(function() {
-        // =====================================
-        // Open Login Modal from Signup
-        // =====================================
-        $(document).on('click', '#openLogin', function(e) {
-            e.preventDefault();
-            const signupModal = bootstrap.Modal.getInstance(
-                document.getElementById('signupModal')
-            );
-            if (signupModal) {
-                signupModal.hide();
-            }
-            $('#signupModal').one('hidden.bs.modal', function() {
-                $('.modal-backdrop').remove();
-                $('body').removeClass('modal-open').css({
-                    overflow: '',
-                    paddingRight: ''
-                });
-                const loginModal = new bootstrap.Modal(
-                    document.getElementById('loginModal'),
-                    {
-                        backdrop: 'static',
-                        keyboard: false
-                    }
-                );
-                loginModal.show();
-            });
-        });
+                if (xhr.status === 403) {
+                    showToast('error', 'Security token mismatch. Page will refresh.');
 
-        // =====================================
-        // Login Form Submit - Sending plain password
-        // =====================================
-        $('#loginForm').on('submit', function(e) {
-            e.preventDefault();
-            const username = $('#login_username').val().trim();
-            const password = $('#login_password').val().trim();
-            const captcha = $('#login_captcha').val().trim();
-            
-            if (!username || !password || !captcha) {
-                showToast('warning', 'All fields are required');
-                return;
-            }
-            
-            $('#loginBtn')
-                .prop('disabled', true)
-                .html('<span class="spinner-border spinner-border-sm me-2"></span>Logging in...');
-            
-            $.ajax({
-                url: '<?= base_url('auth/checkLogin') ?>',
-                type: 'POST',
-                dataType: 'json',
-                data: {
-                    username: username,
-                    password: password, // Sending plain password
-                    captcha: captcha,
-                    csrf_token: getCSRFHash()
-                },
-                success: function(response) {
-                    if (response.csrfHash) {
-                        updateCSRF(response.csrfHash);
-                    }
-                    if (response.success) {
-                        showToast('success', response.message);
-                        const loginModal = bootstrap.Modal.getInstance(
-                            document.getElementById('loginModal')
-                        );
-                        if (loginModal) {
-                            loginModal.hide();
-                        }
-                        setTimeout(function() {
-                            window.location.href = response.redirect;
-                        }, 1000);
-                    } else {
-                        let message = response.message || 'Login failed.';
-                        if (response.errors) {
-                            message = Object.values(response.errors).join('<br>');
-                        }
-                        showToast('error', message);
-                        refreshLoginCaptcha();
-                        $('#login_captcha').val('');
-                    }
-                },
-                error: function(xhr) {
-                    let message = 'An error occurred. Please try again.';
-                    if (xhr.responseJSON && xhr.responseJSON.message) {
-                        message = xhr.responseJSON.message;
-                    }
-                    showToast('error', message);
-                    refreshLoginCaptcha();
-                    $('#login_captcha').val('');
-                },
-                complete: function() {
-                    $('#loginBtn')
-                        .prop('disabled', false)
-                        .html('<i class="bi bi-box-arrow-in-right me-2"></i>Login');
+                    setTimeout(function () {
+                        window.location.reload();
+                    }, 1000);
+
+                    return;
                 }
-            });
-        });
 
-        // =====================================
-        // Refresh CAPTCHA Events
-        // =====================================
-        $('#loginRefreshCaptcha').click(function() {
-            refreshLoginCaptcha();
-        });
-        
-        // Refresh CAPTCHA when modals open
-        $('#loginModal').on('shown.bs.modal', function() {
-            refreshLoginCaptcha();
-        });
+                let message = 'An error occurred. Please try again.';
 
-        // =====================================
-        // Cleanup Modals
-        // =====================================
-        $('#loginModal').on('hidden.bs.modal', function() {
-            $('.modal-backdrop').remove();
-            $('body').removeClass('modal-open').css({
-                overflow: '',
-                paddingRight: ''
-            });
-            $('#loginForm')[0].reset();
-            $('#login_captcha').val('');
-        });
+                if (xhr.responseJSON && xhr.responseJSON.message) {
+                    message = xhr.responseJSON.message;
+                }
 
+                showToast('error', message);
+            },
+            complete: function () {
+                $('#loginBtn')
+                    .prop('disabled', false)
+                    .html('<i class="bi bi-box-arrow-in-right me-2"></i>Login');
+            }
+        });
     });
+
+    /* =========================================================
+       CAPTCHA BUTTON
+    ========================================================= */
+    $('#loginRefreshCaptcha').on('click', function () {
+        refreshLoginCaptcha();
+    });
+
+    /* =========================================================
+       MODAL OPEN
+    ========================================================= */
+    $('#loginModal').on('shown.bs.modal', function () {
+        refreshLoginCaptcha();
+    });
+
+    /* =========================================================
+       TOGGLE PASSWORD (Native)
+    ========================================================= */
+    window.toggleLoginPassword = function () {
+        const passwordInput = document.getElementById('login_password');
+        const eyeIcon = document.getElementById('loginEyeIcon');
+
+        if (passwordInput.type === 'password') {
+            passwordInput.type = 'text';
+            eyeIcon.className = 'bi bi-eye-slash-fill';
+        } else {
+            passwordInput.type = 'password';
+            eyeIcon.className = 'bi bi-eye-fill';
+        }
+    };
+
+    /*
+     * =========================================================
+     * EMAIL VALIDATION
+     * =========================================================
+     */
+    $('#login_email').on('blur', function () {
+
+        const $email = $(this);
+        const email = $.trim($email.val());
+
+        // Remove old error
+        $email.removeClass('is-invalid');
+        $email.siblings('.invalid-feedback').remove();
+
+        // Empty email
+        if (email === '') {
+            return;
+        }
+
+        // Email validation
+        const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+
+        if (!emailRegex.test(email)) {
+
+            $email.addClass('is-invalid');
+
+            $email.after(
+                '<div class="invalid-feedback">' +
+                'Please enter a valid official email address.' +
+                '</div>'
+            );
+
+        } else {
+
+            $email.removeClass('is-invalid');
+            $email.siblings('.invalid-feedback').remove();
+        }
+    });
+
+});
 </script>
 </body>
 </html>

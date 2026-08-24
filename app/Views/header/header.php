@@ -246,7 +246,7 @@
   <link href="<?= base_url('assets/vendor/glightbox/css/glightbox.min.css') ?>" rel="stylesheet">
   <link href="<?= base_url('assets/vendor/fontawesome-free/css/all.min.css') ?>" rel="stylesheet">
   <link href="<?= base_url('assets/vendor/swiper/swiper-bundle.min.css') ?>" rel="stylesheet">
-
+  <link rel="stylesheet" href="<?= base_url('assets/css/select2.min.css') ?>">
   <!-- Main CSS -->
   <link href="<?= base_url('assets/css/main.css') ?>" rel="stylesheet">
 </head>
@@ -268,27 +268,20 @@
             <div class="col-12 col-lg-6">
                 <div class="d-flex justify-content-end align-items-center flex-wrap gap-3">
                     <!-- Skip -->
-                    <?php if (session()->has('username')) : ?>
-                        <!-- Dashboard -->
+                    <?php if (!empty(session()->get('isLoggedIn'))) : ?>
                         <a href="<?= base_url('dashboard') ?>" class="gov-link me-2">
                             <i class="fas fa-gauge-high me-1"></i>
-                            <?= esc(session()->get('full_name')) ?>
+                            <?= esc(session()->get('name', 'User')) ?>
                         </a>
-
-                        <!-- Logout -->
                         <a href="<?= base_url('logout') ?>" class="gov-link logout-link">
                             <i class="fas fa-right-from-bracket me-1"></i>
                             Logout
                         </a>
-
                     <?php else : ?>
-
-                        <!-- Login -->
                         <a href="#" class="gov-link" data-bs-toggle="modal" data-bs-target="#loginModal">
                             <i class="fas fa-user-circle me-1"></i>
                             Login
                         </a>
-
                     <?php endif; ?>
                     <!-- Language -->
                     <div class="dropdown d-inline-block">

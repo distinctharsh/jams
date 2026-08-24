@@ -162,7 +162,7 @@
    ========================================================= */
 
 .captcha-box {
-    height: 52px;
+    height: 45px;
     min-width: 170px;
     padding: 0 18px;
     display: flex;
@@ -321,22 +321,27 @@
                             </p>
                             <form id="loginForm">
                                 <?= csrf_field() ?>
-                                <div class="mb-3">
-                                    <label class="form-label fw-semibold">
-                                        Username
+                                 <div class="mb-3">
+                                    <label for="login_email"
+                                           class="form-label fw-semibold">
+                                        Official Email
                                     </label>
                                     <div class="input-group">
                                         <span class="input-group-text">
-                                            <i class="bi bi-person-fill"></i>
+                                            <i class="bi bi-envelope-fill"></i>
                                         </span>
-                                        <input class="form-control login-input" 
-                                               type="text" 
-                                               id="login_username" 
-                                               name="username"
-                                               placeholder="Enter your username"
+                                        <input type="email"
+                                               class="form-control login-input"
+                                               id="login_email"
+                                               name="email"
+                                               placeholder="Enter your official email"
+                                               autocomplete="username"
+                                               maxlength="150"
                                                required>
                                     </div>
                                 </div>
+
+
                                 <div class="mb-4">
                                     <label class="form-label fw-semibold">
                                         Password

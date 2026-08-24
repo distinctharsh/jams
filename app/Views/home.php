@@ -274,32 +274,38 @@
                     </div>
                 </div>
                 <div class="hero-actions" data-aos="fade-right" data-aos-delay="600">
-                <?php if (session()->has('username')) : ?>
-                    <a href="<?= base_url('dashboard') ?>" class="dashboard-card-btn">
-                        <div class="dashboard-icon">
-                            <i class="bi bi-speedometer2"></i>
-                        </div>
+                    <?php if (!empty(session()->get('isLoggedIn'))) : ?>
+                        <a href="<?= base_url('dashboard') ?>"
+                           class="dashboard-card-btn"
+                           target="_blank"
+                           rel="noopener noreferrer">
+                            <div class="dashboard-icon">
+                                <i class="bi bi-speedometer2"></i>
+                            </div>
 
-                        <div class="dashboard-info">
-                            <small>Welcome Back</small>
-                            <h6><?= esc(session()->get('full_name')) ?></h6>
-                        </div>
+                            <div class="dashboard-info">
+                                <small>Welcome Back</small>
+                                <h6><?= esc(session()->get('name', 'User')) ?></h6>
+                            </div>
 
-                        <div class="dashboard-arrow">
-                            <i class="bi bi-arrow-right-circle-fill"></i>
-                        </div>
-                    </a>
-                <?php else : ?>
-                    <button class="btn btn-login" data-bs-toggle="modal" data-bs-target="#loginModal">
-                        <i class="bi bi-box-arrow-in-right me-2"></i>Login
-                    </button>
-                   <!--  <button class="btn btn-signup" data-bs-toggle="modal" data-bs-target="#signupModal">
-                        <i class="bi bi-person-plus me-2"></i>Sign Up
-                    </button> -->
-                    <a href="<?= base_url('signup') ?>" class="btn btn-signup">
-                        <i class="bi bi-person-plus me-2"></i>Sign Up
-                    </a>
-                <?php endif; ?>
+                            <div class="dashboard-arrow">
+                                <i class="bi bi-arrow-right-circle-fill"></i>
+                            </div>
+                        </a>
+                    <?php else : ?>
+                        <button
+                            type="button"
+                            class="btn btn-login"
+                            data-bs-toggle="modal"
+                            data-bs-target="#loginModal">
+                            <i class="bi bi-box-arrow-in-right me-2"></i>
+                            Login
+                        </button>
+                        <a href="<?= base_url('signup') ?>" class="btn btn-signup">
+                            <i class="bi bi-person-plus me-2"></i>
+                            Sign Up
+                        </a>
+                    <?php endif; ?>
                 </div>
             </div>
         </div>
@@ -414,33 +420,31 @@
                         </p>
                     </div>
                 </div>
-                <?php if (session()->has('username')) : ?>
-                    
-                <div class="col-lg-4 text-lg-end">
-                    <a href="<?= base_url('dashboard') ?>" class="dashboard-card-btn">
-                        <div class="dashboard-icon">
-                            <i class="bi bi-speedometer2"></i>
-                        </div>
-
-                        <div class="dashboard-info">
-                            <small>Welcome Back</small>
-                            <h6><?= esc(session()->get('full_name')) ?></h6>
-                        </div>
-
-                        <div class="dashboard-arrow">
-                            <i class="bi bi-arrow-right-circle-fill"></i>
-                        </div>
-                    </a>
-                </div>
+                <?php if (!empty(session()->get('isLoggedIn'))) : ?>
+                    <div class="col-lg-4 text-lg-end">
+                        <a href="<?= base_url('dashboard') ?>"  target="_blank" class="dashboard-card-btn">
+                            <div class="dashboard-icon">
+                                <i class="bi bi-speedometer2"></i>
+                            </div>
+                            <div class="dashboard-info">
+                                <small>Welcome Back</small>
+                                <h6><?= esc(session()->get('name', 'User')) ?></h6>
+                            </div>
+                            <div class="dashboard-arrow">
+                                <i class="bi bi-arrow-right-circle-fill"></i>
+                            </div>
+                        </a>
+                    </div>
                 <?php else : ?>
-                   <div class="col-lg-4 text-lg-end">
-                    <a href="<?= base_url('login') ?>"
-                       class="btn btn-warning px-4 py-3 fw-bold" data-bs-toggle="modal"
-                       data-bs-target="#loginModal">
-                        <i class="bi bi-box-arrow-in-right me-2"></i>
-                        Login to JAMS
-                    </a>
-                </div>
+                    <div class="col-lg-4 text-lg-end">
+                        <a href="#"
+                           class="btn btn-warning px-4 py-3 fw-bold"
+                           data-bs-toggle="modal"
+                           data-bs-target="#loginModal">
+                            <i class="bi bi-box-arrow-in-right me-2"></i>
+                            Login to JAMS
+                        </a>
+                    </div>
                 <?php endif; ?>
             </div>
         </div>

@@ -75,42 +75,42 @@
                 </div>
             </div>
         </div>
-
-      <div class="relative" id="profileDropdown">
-        <button class="profile-trigger" onclick="toggleDropdown()">
-            <div class="profile-avatar">
-                <i class="fas fa-user"> </i>
+        <div class="relative" id="profileDropdown">
+            <button class="profile-trigger" onclick="toggleDropdown()">
+                <div class="profile-avatar">
+                    <i class="fas fa-user"></i>
+                </div>
+                <div class="profile-details">
+                    <span class="profile-name">
+                        <?= esc(session()->get('name', 'User')) ?>
+                    </span>
+                </div>
+                <i class="fas fa-chevron-down dropdown-arrow"></i>
+            </button>
+            <div class="dropdown-menu-gov" id="dropdownMenu">
+                <div class="dropdown-user">
+                    <h5>
+                        <?= esc(session()->get('name', 'User')) ?>
+                    </h5>
+                </div>
+                <a href="#">
+                    <i class="fas fa-user-circle"></i>
+                    <span>My Profile</span>
+                </a>
+                <a href="#">
+                    <i class="fas fa-key"></i>
+                    <span>Change Password</span>
+                </a>
+                <a href="#">
+                    <i class="fas fa-gear"></i>
+                    <span>Settings</span>
+                </a>
+                <div class="dropdown-divider"></div>
+                <a href="<?= base_url('logout') ?>" class="logout">
+                    <i class="fas fa-right-from-bracket"></i>
+                    <span>Logout</span>
+                </a>
             </div>
-            <div class="profile-details">
-                <span class="profile-name"><?= esc(session()->get('full_name')) ?></span>
-                <span class="profile-role">Administrator</span>
-            </div>
-            <i class="fas fa-chevron-down dropdown-arrow"></i>
-        </button>
-        <div class="dropdown-menu-gov" id="dropdownMenu">
-            <div class="dropdown-user">
-                <h5><?= esc(session()->get('full_name')) ?></h5>
-                <small>Cabinet Secretariat</small>
-
-            </div>
-            <a href="#">
-                <i class="fas fa-user-circle"></i>
-                <span>My Profile</span>
-            </a>
-            <a href="#">
-                <i class="fas fa-key"></i>
-                <span>Change Password</span>
-            </a>
-            <a href="#">
-                <i class="fas fa-gear"></i>
-                <span>Settings</span>
-            </a>
-            <div class="dropdown-divider"></div>
-            <a href="<?= base_url('logout') ?>" class="logout">
-                <i class="fas fa-right-from-bracket"></i>
-                <span>Logout</span>
-            </a>
         </div>
-      </div>
     </div>
 </header>
