@@ -45,6 +45,7 @@
                         <?php foreach($registrations as $reg): 
                             $status = intval($reg['current_status'] ?? 1);
                             
+                            // Category definition based on status logic
                             if (in_array($status, [1, 2, 3])) {
                                 $filterCategory = 'Pending';
                             } elseif ($status == 4) {
