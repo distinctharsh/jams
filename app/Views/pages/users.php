@@ -231,14 +231,7 @@
                     <label class="block text-xs font-bold text-slate-600 uppercase tracking-wider mb-1.5">
                         Designation <span class="text-red-500">*</span>
                     </label>
-                    <select name="designation_id" id="user_designation_id" class="w-full px-3.5 py-2.5 text-sm bg-slate-50 border border-slate-300 rounded-lg focus:ring-2 focus:ring-[#1e4d7b] focus:border-[#1e4d7b] focus:bg-white outline-none transition" required>
-                        <option value="">Select Designation</option>
-                        <?php if(!empty($designations)): ?>
-                            <?php foreach($designations as $desig): ?>
-                                <option value="<?= $desig['id'] ?>"><?= esc($desig['name']) ?></option>
-                            <?php endforeach; ?>
-                        <?php endif; ?>
-                    </select>
+                    <input type="text" name="designation" id="user_designation" class="w-full px-3.5 py-2.5 text-sm bg-slate-50 border border-slate-300 rounded-lg focus:ring-2 focus:ring-[#1e4d7b] focus:border-[#1e4d7b] focus:bg-white outline-none transition" placeholder="e.g. Under Secretary" required>
                 </div>
 
                 <div>
@@ -439,7 +432,7 @@ $(document).ready(function() {
         csrfInput.attr('name', csrfName).val(csrfVal);
 
         $('#user_id').val('');
-        $('#user_designation_id').val('');
+        $('#user_designation').val('');
         $('#user_role_id').val([]);
         $('#user_isactive').prop('checked', true);
         $('#userIsActiveContainer').hide();
@@ -533,7 +526,7 @@ $(document).ready(function() {
                     '<td class="px-5 py-4 font-bold text-slate-800">' + (user.name ? user.name : '') + '</td>' +
                     '<td class="px-5 py-4 text-slate-600 font-medium">' + (user.email ? user.email : '') + '</td>' +
                     '<td class="px-5 py-4 text-slate-600 font-medium">' + (user.mobile_no ? user.mobile_no : 'N/A') + '</td>' +
-                    '<td class="px-5 py-4 text-slate-600 font-medium">' + (user.designation_name ? user.designation_name : 'N/A') + '</td>' +
+                    '<td class="px-5 py-4 text-slate-600 font-medium">' + (user.designation ? user.designation : 'N/A') + '</td>' +
                     '<td class="px-5 py-4 text-slate-600 font-medium">' + (user.role_name ? user.role_name : (user.role ? user.role : 'N/A')) + '</td>' +
                     '<td class="px-5 py-4 text-slate-600 font-medium">' + (user.org_type_name ? user.org_type_name : 'N/A') + '</td>' +
                     '<td class="px-5 py-4 text-slate-600 font-medium">' + (user.org_name ? user.org_name : 'N/A') + '</td>' +
@@ -560,74 +553,72 @@ $(document).ready(function() {
     }
 
     function attachUserEventListeners() {
-    $('.edit-user-btn').off('click').on('click', function() {
-        let id = $(this).data('id');
-        $.ajax({
-            url: "<?= base_url('dashboard/get-user/') ?>" + id,
-            type: "GET",
-            dataType: "json",
-            success: function(res) {
-                if(res.csrfHash) updateCSRF(res.csrfHash);
-                if(res.success) {
-                    let user = res.data;
-                    $('#user_id').val(user.id);
-                    $('#user_name').val(user.name);
-                    $('#user_email').val(user.email);
-                    $('#user_mobile_no').val(user.mobile_no);
-                    
-                    let desigVal = user.designation_id ?? user.designation;
-                    if (desigVal !== null && desigVal !== undefined) {
-                        $('#user_designation_id').val(desigVal.toString());
-                    } else {
-                        $('#user_designation_id').val('');
-                    }
-                    let rolesToSelect = [];
-                    if (Array.isArray(user.role_ids)) {
-                        rolesToSelect = user.role_ids.map(String);
-                    } else if (typeof user.role_ids === 'string') {
-                        rolesToSelect = user.role_ids.split(',').map(s => s.trim());
-                    } else if (user.role_id) {
-                        rolesToSelect = [user.role_id.toString()];
-                    }
-                    $('#user_role_id').val(rolesToSelect);
+        $(document).on('click', '.edit-user-btn', function(e) {
+            e.preventDefault();
+            let id = $(this).data('id');
+            $.ajax({
+                url: "<?= base_url('dashboard/get-user/') ?>" + id,
+                type: "GET",
+                dataType: "json",
+                success: function(res) {
+                    if(res.csrfHash) updateCSRF(res.csrfHash);
+                    if(res.success) {
+                        let user = res.data;
+                        $('#user_id').val(user.id);
+                        $('#user_name').val(user.name);
+                        $('#user_email').val(user.email);
+                        $('#user_mobile_no').val(user.mobile_no || '');
+                        $('#user_designation').val(user.designation || '');
+                        let rolesToSelect = [];
+                        if (Array.isArray(user.role_ids)) {
+                            rolesToSelect = user.role_ids.map(String);
+                        } else if (typeof user.role_ids === 'string') {
+                            rolesToSelect = user.role_ids.split(',').map(s => s.trim());
+                        } else if (user.role_id) {
+                            rolesToSelect = [user.role_id.toString()];
+                        }
+                        $('#user_role_id').val(rolesToSelect);
 
-                    if (user.organization_id) {
-                        $('#user_organization_id').val(user.organization_id.toString());
-                    } else {
-                        $('#user_organization_id').val('');
-                    }
-
-                    if (user.org_type) {
-                        $('#user_org_type').val(user.org_type.toString());
-                        let isUgcRequired = $('#user_org_type').find(':selected').data('ugc-required');
-                        if (parseInt(isUgcRequired) === 1) {
-                            $('#user_ugc_container').show();
-                            $('#user_ugc_id').prop('required', true).val(user.ugc_id || '');
+                        if (user.organization_id) {
+                            $('#user_organization_id').val(user.organization_id.toString());
                         } else {
+                            $('#user_organization_id').val('');
+                        }
+
+                        if (user.org_type) {
+                            $('#user_org_type').val(user.org_type.toString());
+                            let $selectedOpt = $('#user_org_type option:selected');
+                            let isUgcRequired = $selectedOpt.data('ugc-required');
+                            if (parseInt(isUgcRequired) === 1) {
+                                $('#user_ugc_container').show();
+                                $('#user_ugc_id').prop('required', true).val(user.ugc_id || '');
+                            } else {
+                                $('#user_ugc_container').hide();
+                                $('#user_ugc_id').prop('required', false).val('');
+                            }
+                        } else {
+                            $('#user_org_type').val('');
                             $('#user_ugc_container').hide();
                             $('#user_ugc_id').prop('required', false).val('');
                         }
+
+                        $('#user_isactive').prop('checked', user.isactive == 1 || user.isactive == '1');
+                        $('#userIsActiveContainer').show();
+                        $('#userModalTitle').html('<i class="fa-solid fa-user-pen text-[#e58500]"></i> Edit User');                  
+                        openUserModal();
                     } else {
-                        $('#user_org_type').val('');
-                        $('#user_ugc_container').hide();
-                        $('#user_ugc_id').prop('required', false).val('');
+                        if(typeof showToast === 'function') showToast('error', res.message || 'Unable to fetch record.');
                     }
-
-                    $('#user_isactive').prop('checked', user.isactive == 1 || user.isactive == '1');
-                    $('#userIsActiveContainer').show();
-                    $('#userModalTitle').html('<i class="fa-solid fa-user-pen text-[#e58500]"></i> Edit User');
-                    openUserModal();
-                } else {
-                    if(typeof showToast === 'function') showToast('error', res.message || 'Unable to fetch record.');
+                },
+                error: function(xhr, status, error) {
+                    console.error("AJAX Error: ", error);
+                    if(typeof showToast === 'function') showToast('error', 'Error fetching user data.');
                 }
-            },
-            error: function() {
-                if(typeof showToast === 'function') showToast('error', 'Error fetching user data.');
-            }
+            });
         });
-    });
 
-        $('.delete-user-btn').off('click').on('click', function() {
+        $(document).on('click', '.delete-user-btn', function(e) {
+            e.preventDefault();
             if(!confirm('Are you sure you want to deactivate this user?')) return;
             let id = $(this).data('id');
 

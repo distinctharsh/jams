@@ -746,7 +746,7 @@ class Dashboard extends BaseController
             'name'            => $this->request->getPost('name'),
             'email'           => $this->request->getPost('email'),
             'mobile_no'       => $this->request->getPost('mobile_no'),
-            'designation'     => $this->request->getPost('designation_id'),
+            'designation'     => $this->request->getPost('designation'),
             'org_type'        => $this->request->getPost('org_type') ?: null,
             'organization_id' => $this->request->getPost('organization_id') ?: null,
             'ugc_id'          => $this->request->getPost('ugc_id'),
