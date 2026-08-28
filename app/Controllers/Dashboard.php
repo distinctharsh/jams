@@ -730,75 +730,80 @@ class Dashboard extends BaseController
     }
 
     public function saveUser()
-    {
-        if (!session()->get('isLoggedIn')) {
-            return $this->response->setJSON(['success' => false, 'message' => 'Unauthorized']);
-        }
+        {
+            if (!session()->get('isLoggedIn')) {
+                return $this->response->setJSON(['success' => false, 'message' => 'Unauthorized']);
+            }
+            helper('auth');
 
-        $id = $this->request->getPost('id');
-        $roleIds  = $this->request->getPost('role_ids');
+            $id = $this->request->getPost('id');
+            $roleIds = $this->request->getPost('role_ids');
 
-        if (empty($roleIds)) {
-            return $this->response->setJSON(['success' => false, 'message' => 'Please select at least one role.']);
-        }
-
-        $saveData = [
-            'name'            => $this->request->getPost('name'),
-            'email'           => $this->request->getPost('email'),
-            'mobile_no'       => $this->request->getPost('mobile_no'),
-            'designation'     => $this->request->getPost('designation'),
-            'org_type'        => $this->request->getPost('org_type') ?: null,
-            'organization_id' => $this->request->getPost('organization_id') ?: null,
-            'ugc_id'          => $this->request->getPost('ugc_id'),
-            'isactive'        => $this->request->getPost('isactive') ? 1 : 0,
-        ];
-
-        $file = $this->request->getFile('authorization_letter');
-        if ($file && $file->isValid() && !$file->hasMoved()) {
-            $newName = $file->getRandomName();
-            $file->move(FCPATH . 'uploads/authorization', $newName);
-            $saveData['authorization_letter'] = $newName;
-        }
-        $db = \Config\Database::connect();
-        $db->transStart();
-
-        try {
-            if (!empty($id)) {
-                $this->userModel->update($id, $saveData);
-                $userId = $id;
-                $db->table('user_role_mapping')->where('user_id', $userId)->delete();
-            } else {
-                $userId = $this->userModel->insert($saveData, true);
+            if (empty($roleIds)) {
+                return $this->response->setJSON(['success' => false, 'message' => 'Please select at least one role.']);
             }
 
-            $roleBatch = [];
-            foreach ($roleIds as $rId) {
-                $roleBatch[] = [
-                    'user_id'  => $userId,
-                    'role_id'  => $rId,
-                    'isactive' => 1
-                ];
-            }
-            $db->table('user_role_mapping')->insertBatch($roleBatch);
-            $db->transComplete();
-            if ($db->transStatus() === false) {
-                return $this->response->setJSON(['success' => false, 'message' => 'Failed to save roles.']);
+            $saveData = [
+                'name'            => $this->request->getPost('name'),
+                'email'           => $this->request->getPost('email'),
+                'mobile_no'       => $this->request->getPost('mobile_no'),
+                'designation'     => $this->request->getPost('designation'),
+                'org_type'        => $this->request->getPost('org_type') ?: null,
+                'organization_id' => $this->request->getPost('organization_id') ?: null,
+                'ugc_id'          => $this->request->getPost('ugc_id'),
+                'isactive'        => $this->request->getPost('isactive') ? 1 : 0,
+            ];
+
+            if (empty($id)) {
+                $saveData['hash'] = get_default_password_hash();
             }
 
-            return $this->response->setJSON([
-                'success'  => true,
-                'message'  => !empty($id) ? 'User updated successfully.' : 'User created successfully.',
-                'csrfHash' => csrf_hash()
-            ]);
-        } catch (\Exception $e) {
-            $db->transRollback();
-            return $this->response->setJSON([
-                'success'  => false,
-                'message'  => 'Error: ' . $e->getMessage(),
-                'csrfHash' => csrf_hash()
-            ]);
+            $file = $this->request->getFile('authorization_letter');
+            if ($file && $file->isValid() && !$file->hasMoved()) {
+                $newName = $file->getRandomName();
+                $file->move(FCPATH . 'uploads/authorization', $newName);
+                $saveData['authorization_letter'] = $newName;
+            }
+            $db = \Config\Database::connect();
+            $db->transStart();
+
+            try {
+                if (!empty($id)) {
+                    $this->userModel->update($id, $saveData);
+                    $userId = $id;
+                    $db->table('user_role_mapping')->where('user_id', $userId)->delete();
+                } else {
+                    $userId = $this->userModel->insert($saveData, true);
+                }
+
+                $roleBatch = [];
+                foreach ($roleIds as $rId) {
+                    $roleBatch[] = [
+                        'user_id'  => $userId,
+                        'role_id'  => $rId,
+                        'isactive' => 1
+                    ];
+                }
+                $db->table('user_role_mapping')->insertBatch($roleBatch);
+                $db->transComplete();
+                if ($db->transStatus() === false) {
+                    return $this->response->setJSON(['success' => false, 'message' => 'Failed to save roles.']);
+                }
+
+                return $this->response->setJSON([
+                    'success'  => true,
+                    'message'  => !empty($id) ? 'User updated successfully.' : 'User created successfully.',
+                    'csrfHash' => csrf_hash()
+                ]);
+            } catch (\Exception $e) {
+                $db->transRollback();
+                return $this->response->setJSON([
+                    'success'  => false,
+                    'message'  => 'Error: ' . $e->getMessage(),
+                    'csrfHash' => csrf_hash()
+                ]);
+            }
         }
-    }
 
     public function getUser($id = null)
     {
@@ -865,41 +870,15 @@ class Dashboard extends BaseController
         $action     = $this->request->getPost('action');
         $remarks    = $this->request->getPost('remarks');
         $approvedBy = session()->get('user_id') ?? 1;
-
         $regModel = new \App\Models\RegistrationModel();
-        //$loginModel = new \App\Models\LoginModel();
-
-        /*$registration = $regModel->find($regId);
-        if (!$registration) {
-            return $this->response->setJSON([
-                'success'  => false,
-                'message'  => 'Registration record not found',
-                'csrfHash' => csrf_hash()
-            ]);
-        }*/
 
         if ($action == 4) { 
-            
             $plainPassword = get_default_password(); 
             $passwordHash  = get_default_password_hash();
             $regModel->approveRegistrationSp($regId, $approvedBy, $action, $remarks,$passwordHash);
-            /*$existingUser = $loginModel->findUserByEmail($registration['email']);
-            $userData     = [
-                'name'  => $registration['name'],
-                'email' => $registration['email'],
-                'hash'  => $passwordHash
-            ];
-
-            /*if ($existingUser) {
-                $loginModel->update($existingUser['id'], $userData);
-            } else {
-                $loginModel->insert($userData);
-            }*/
-
             return $this->response->setJSON([
                 'success'  => true,
                 'is_approved' => true,
-                //'email'       => $registration['email'],
                 'password'    => $plainPassword,
                 'message'     => 'Application Approved Successfully!',
                 'csrfHash'    => csrf_hash()
