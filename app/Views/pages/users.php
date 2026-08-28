@@ -479,7 +479,7 @@ $(document).ready(function() {
             users.forEach(function(user, index) {
                 let isActive = (user.isactive == 1 || user.isactive == '1');
                 let authDoc = user.authorization_letter ? 
-                    '<a href="<?= base_url('uploads/authorization/') ?>' + user.authorization_letter + '" target="_blank" class="inline-flex items-center gap-1 text-xs text-[#1e4d7b] hover:underline font-semibold"><i class="fas fa-file-pdf text-red-500"></i> View Doc</a>' : 
+                    '<a href="<?= base_url('uploads/authorization/') ?>' + user.authorization_letter + '" target="_blank" class="inline-flex items-center gap-1 text-xs text-[#1e4d7b] hover:underline font-semibold"><i class="fas fa-file-pdf text-red-500"></i></a>' : 
                     '<span class="text-xs text-slate-400">None</span>';
 
                 let row = '<tr class="hover:bg-slate-50/80 transition-colors duration-150">' +
@@ -487,7 +487,7 @@ $(document).ready(function() {
                     '<td class="px-5 py-4 font-bold text-slate-800">' + (user.name ? user.name : '') + '</td>' +
                     '<td class="px-5 py-4 text-slate-600 font-medium">' + (user.email ? user.email : '') + '</td>' +
                     '<td class="px-5 py-4 text-slate-600 font-medium">' + (user.mobile_no ? user.mobile_no : 'N/A') + '</td>' +
-                    '<td class="px-5 py-4 text-slate-600 font-medium">' + (user.designation_name ? user.designation_name : (user.designation ? user.designation : 'N/A')) + '</td>' +
+                    '<td class="px-5 py-4 text-slate-600 font-medium">' + (user.designation_name ? user.designation_name : 'N/A') + '</td>' +
                     '<td class="px-5 py-4 text-slate-600 font-medium">' + (user.role_name ? user.role_name : (user.role ? user.role : 'N/A')) + '</td>' +
                     '<td class="px-5 py-4 text-slate-600 font-medium">' + (user.org_type_name ? user.org_type_name : 'N/A') + '</td>' +
                     '<td class="px-5 py-4 text-slate-600 font-medium">' + (user.org_name ? user.org_name : 'N/A') + '</td>' +
