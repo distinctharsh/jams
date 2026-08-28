@@ -99,4 +99,4 @@ $routes->post('dashboard/approve-registration', 'Dashboard::approveRegistration'
 
 $routes->get('uploads/authorization/(:segment)', 'PdfController::viewPdf/$1');
 
-$routes->get('dashboard/(:any)', 'Dashboard::index');
+$routes->get('(:any)', 'Dashboard::index');

@@ -1432,7 +1432,7 @@
     if (pushToHistory) {
       const newUrl = pageId === 'dashboard' 
         ? '<?= base_url('dashboard') ?>' 
-        : '<?= base_url('dashboard') ?>/' + pageId;
+        :  pageId;
         
       history.pushState({ pageId: pageId }, '', newUrl);
     }
