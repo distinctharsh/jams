@@ -35,42 +35,26 @@
 }
 
 /* Custom Stylish Multi-Select Box */
-.custom-multiselect option {
-    padding: 1px 12px;
-    margin-bottom: 3px;
-    border-radius: 6px;
-    font-size: 13px;
-    font-weight: 500;
-    color: #334155;
-    cursor: pointer;
-    transition: all 0.15s ease;
+.select2-results__option {
+    padding: 8px 12px !important;
+    display: flex !important;
+    align-items: center !important;
 }
-
-.custom-multiselect option:hover {
-    background-color: #f1f5f9;
+.select2-results__option .select2-checkbox {
+    margin-right: 10px !important;
+    width: 16px !important;
+    height: 16px !important;
+    accent-color: #1e4d7b !important;
+    cursor: pointer !important;
+    pointer-events: none;
 }
-
-.custom-multiselect option:checked {
-    background: #1e4d7b linear-gradient(0deg, #1e4d7b 0%, #1e4d7b 100%) !important;
+.select2-container--default .select2-results__option--highlighted[aria-selected="true"] {
+    background-color: #1e4d7b !important;
     color: #ffffff !important;
-    font-weight: 600;
-    border-radius: 6px;
 }
-
-/* Custom Scrollbar for Roles Box */
-.custom-multiselect::-webkit-scrollbar {
-    width: 6px;
-}
-.custom-multiselect::-webkit-scrollbar-track {
-    background: #f1f5f9;
-    border-radius: 4px;
-}
-.custom-multiselect::-webkit-scrollbar-thumb {
-    background: #cbd5e1;
-    border-radius: 4px;
-}
-.custom-multiselect::-webkit-scrollbar-thumb:hover {
-    background: #94a3b8;
+.select2-container--default .select2-results__option--highlighted[aria-selected="false"] {
+    background-color: #f1f5f9 !important;
+    color: #0f172a !important;
 }
 
 
@@ -241,8 +225,7 @@
                         </label>
                     </div>
                     <div class="relative">
-                        <select id="user_role_id" name="role_ids[]" multiple required size="4"
-                                class="custom-multiselect w-full px-2 py-1.5 bg-slate-50 border border-slate-300 rounded-lg text-sm text-slate-700 focus:bg-white focus:ring-2 focus:ring-[#1e4d7b] focus:border-[#1e4d7b] outline-none h-32 transition duration-150 shadow-inner overflow-y-auto">
+                        <select id="user_role_id" name="role_ids[]" multiple required class="custom-multiselect w-full px-2 py-1.5 bg-slate-50 border border-slate-300 rounded-lg text-sm text-slate-700">
                             <?php if(!empty($roles)): ?>
                                 <?php foreach($roles as $role): ?>
                                     <option value="<?= $role['id'] ?>"><?= esc($role['name']) ?> (<?= esc($role['code']) ?>)</option>
@@ -393,6 +376,37 @@ $(document).ready(function() {
 
     initDataTable();
 
+    function initRoleSelect2() {
+        const $role = $('#user_role_id');
+
+        if (!$role.length || typeof $.fn.select2 === 'undefined') return;
+
+        if ($role.hasClass('select2-hidden-accessible')) {
+            $role.select2('destroy');
+        }
+
+        function formatOption(state) {
+            if (!state.id) return state.text;
+            
+            var isSelected = $(state.element).prop('selected');
+            var $element = $(
+                '<span><input type="checkbox" class="select2-checkbox" ' + (isSelected ? 'checked="checked"' : '') + ' /> ' + state.text + '</span>'
+            );
+            return $element;
+        }
+
+        $role.select2({
+            width: '100%',
+            closeOnSelect: false,
+            dropdownParent: $('#userModal'),
+            placeholder: 'Select Roles',
+            allowClear: true,
+            templateResult: formatOption
+        });
+    }
+
+    initRoleSelect2();
+
     function openUserModal() { $('#userModal').removeClass('hidden'); }
     function closeUserModal() { $('#userModal').addClass('hidden'); }
 
@@ -433,7 +447,7 @@ $(document).ready(function() {
 
         $('#user_id').val('');
         $('#user_designation').val('');
-        $('#user_role_id').val([]);
+        $('#user_role_id').val(null).trigger('change');
         $('#user_isactive').prop('checked', true);
         $('#userIsActiveContainer').hide();
         $('#user_org_type').val('').trigger('change');
@@ -577,7 +591,7 @@ $(document).ready(function() {
                         } else if (user.role_id) {
                             rolesToSelect = [user.role_id.toString()];
                         }
-                        $('#user_role_id').val(rolesToSelect);
+                        $('#user_role_id').val(rolesToSelect).trigger('change');
 
                         if (user.organization_id) {
                             $('#user_organization_id').val(user.organization_id.toString());

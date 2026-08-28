@@ -8,6 +8,7 @@
   <link href="<?= base_url('assets/vendor/fontawesome-free/css/all.min.css') ?>" rel="stylesheet">
   <!-- Google Font: Inter -->
 <link rel="stylesheet" href="<?= base_url('assets/css/fonts.css') ?>">
+  <link rel="stylesheet" href="<?= base_url('assets/css/select2.min.css') ?>">
   <script src="https://cdn.tailwindcss.com"></script>
   <meta name="csrf-token" content="gov-csrf-2026">
   <style>
@@ -1568,5 +1569,6 @@
           </div>
       </div>
     </div>
+    <script src="<?= base_url('assets/js/select2.min.js') ?>"></script>
 </body>
 </html>
