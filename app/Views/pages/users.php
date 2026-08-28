@@ -33,6 +33,47 @@
     color: #ffffff !important;
     border-color: #1e4d7b !important;
 }
+
+/* Custom Stylish Multi-Select Box */
+.custom-multiselect option {
+    padding: 1px 12px;
+    margin-bottom: 3px;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 500;
+    color: #334155;
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+
+.custom-multiselect option:hover {
+    background-color: #f1f5f9;
+}
+
+.custom-multiselect option:checked {
+    background: #1e4d7b linear-gradient(0deg, #1e4d7b 0%, #1e4d7b 100%) !important;
+    color: #ffffff !important;
+    font-weight: 600;
+    border-radius: 6px;
+}
+
+/* Custom Scrollbar for Roles Box */
+.custom-multiselect::-webkit-scrollbar {
+    width: 6px;
+}
+.custom-multiselect::-webkit-scrollbar-track {
+    background: #f1f5f9;
+    border-radius: 4px;
+}
+.custom-multiselect::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 4px;
+}
+.custom-multiselect::-webkit-scrollbar-thumb:hover {
+    background: #94a3b8;
+}
+
+
 </style>
 
 <div class="space-y-6">
@@ -201,17 +242,21 @@
                 </div>
 
                 <div>
-                    <label class="block text-xs font-bold text-slate-600 uppercase tracking-wider mb-1.5">
-                        Role <span class="text-red-500">*</span>
-                    </label>
-                    <select name="role_id" id="user_role_id" class="w-full px-3.5 py-2.5 text-sm bg-slate-50 border border-slate-300 rounded-lg focus:ring-2 focus:ring-[#1e4d7b] focus:border-[#1e4d7b] focus:bg-white outline-none transition" required>
-                        <option value="">Select Role</option>
-                        <?php if(!empty($roles)): ?>
-                            <?php foreach($roles as $role): ?>
-                                <option value="<?= $role['id'] ?>"><?= esc($role['name']) ?> (<?= esc($role['code']) ?>)</option>
-                            <?php endforeach; ?>
-                        <?php endif; ?>
-                    </select>
+                    <div class="flex items-center justify-between mb-1.5">
+                        <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider">
+                            Roles <span class="text-red-500">*</span>
+                        </label>
+                    </div>
+                    <div class="relative">
+                        <select id="user_role_id" name="role_ids[]" multiple required size="4"
+                                class="custom-multiselect w-full px-2 py-1.5 bg-slate-50 border border-slate-300 rounded-lg text-sm text-slate-700 focus:bg-white focus:ring-2 focus:ring-[#1e4d7b] focus:border-[#1e4d7b] outline-none h-32 transition duration-150 shadow-inner overflow-y-auto">
+                            <?php if(!empty($roles)): ?>
+                                <?php foreach($roles as $role): ?>
+                                    <option value="<?= $role['id'] ?>"><?= esc($role['name']) ?> (<?= esc($role['code']) ?>)</option>
+                                <?php endforeach; ?>
+                            <?php endif; ?>
+                        </select>
+                    </div>
                 </div>
 
                 <div>
@@ -395,10 +440,11 @@ $(document).ready(function() {
 
         $('#user_id').val('');
         $('#user_designation_id').val('');
-        $('#user_role_id').val('');
+        $('#user_role_id').val([]);
         $('#user_isactive').prop('checked', true);
         $('#userIsActiveContainer').hide();
         $('#user_org_type').val('').trigger('change');
+        $('#user_organization_id').val('').trigger('change');
         $('#userModalTitle').html('<i class="fa-solid fa-user-plus text-[#e58500]"></i> Add User');
         openUserModal();
     });
@@ -514,61 +560,72 @@ $(document).ready(function() {
     }
 
     function attachUserEventListeners() {
-        $('.edit-user-btn').off('click').on('click', function() {
-            let id = $(this).data('id');
-            $.ajax({
-                url: "<?= base_url('dashboard/get-user/') ?>" + id,
-                type: "GET",
-                dataType: "json",
-                success: function(res) {
-                    if(res.csrfHash) updateCSRF(res.csrfHash);
-                    if(res.success) {
-                        let user = res.data;
-                        $('#user_id').val(user.id);
-                        $('#user_name').val(user.name);
-                        $('#user_email').val(user.email);
-                        $('#user_mobile_no').val(user.mobile_no);
-                        
-                        let desigVal = user.designation_id !== undefined && user.designation_id !== null ? user.designation_id : user.designation;
-                        if (desigVal !== null && desigVal !== undefined) {
-                            $('#user_designation_id').val(desigVal.toString()).trigger('change');
-                        } else {
-                            $('#user_designation_id').val('').trigger('change');
-                        }
-
-                        let roleVal = user.role_id !== undefined && user.role_id !== null ? user.role_id : user.role;
-                        if (roleVal !== null && roleVal !== undefined) {
-                            $('#user_role_id').val(roleVal.toString()).trigger('change');
-                        } else {
-                            $('#user_role_id').val('').trigger('change');
-                        }
-
-                        if (user.organization_id) {
-                            $('#user_organization_id').val(user.organization_id.toString()).trigger('change');
-                        } else {
-                            $('#user_organization_id').val('').trigger('change');
-                        }
-
-                        if (user.org_type) {
-                            $('#user_org_type').val(user.org_type.toString()).trigger('change');
-                        } else {
-                            $('#user_org_type').val('').trigger('change');
-                        }
-
-                        $('#user_ugc_id').val(user.ugc_id || '');
-                        $('#user_isactive').prop('checked', user.isactive == 1 || user.isactive == '1');
-                        $('#userIsActiveContainer').show();
-                        $('#userModalTitle').html('<i class="fa-solid fa-user-pen text-[#e58500]"></i> Edit User');
-                        openUserModal();
+    $('.edit-user-btn').off('click').on('click', function() {
+        let id = $(this).data('id');
+        $.ajax({
+            url: "<?= base_url('dashboard/get-user/') ?>" + id,
+            type: "GET",
+            dataType: "json",
+            success: function(res) {
+                if(res.csrfHash) updateCSRF(res.csrfHash);
+                if(res.success) {
+                    let user = res.data;
+                    $('#user_id').val(user.id);
+                    $('#user_name').val(user.name);
+                    $('#user_email').val(user.email);
+                    $('#user_mobile_no').val(user.mobile_no);
+                    
+                    let desigVal = user.designation_id ?? user.designation;
+                    if (desigVal !== null && desigVal !== undefined) {
+                        $('#user_designation_id').val(desigVal.toString());
                     } else {
-                        if(typeof showToast === 'function') showToast('error', res.message || 'Unable to fetch record.');
+                        $('#user_designation_id').val('');
                     }
-                },
-                error: function() {
-                    if(typeof showToast === 'function') showToast('error', 'Error fetching user data.');
+                    let rolesToSelect = [];
+                    if (Array.isArray(user.role_ids)) {
+                        rolesToSelect = user.role_ids.map(String);
+                    } else if (typeof user.role_ids === 'string') {
+                        rolesToSelect = user.role_ids.split(',').map(s => s.trim());
+                    } else if (user.role_id) {
+                        rolesToSelect = [user.role_id.toString()];
+                    }
+                    $('#user_role_id').val(rolesToSelect);
+
+                    if (user.organization_id) {
+                        $('#user_organization_id').val(user.organization_id.toString());
+                    } else {
+                        $('#user_organization_id').val('');
+                    }
+
+                    if (user.org_type) {
+                        $('#user_org_type').val(user.org_type.toString());
+                        let isUgcRequired = $('#user_org_type').find(':selected').data('ugc-required');
+                        if (parseInt(isUgcRequired) === 1) {
+                            $('#user_ugc_container').show();
+                            $('#user_ugc_id').prop('required', true).val(user.ugc_id || '');
+                        } else {
+                            $('#user_ugc_container').hide();
+                            $('#user_ugc_id').prop('required', false).val('');
+                        }
+                    } else {
+                        $('#user_org_type').val('');
+                        $('#user_ugc_container').hide();
+                        $('#user_ugc_id').prop('required', false).val('');
+                    }
+
+                    $('#user_isactive').prop('checked', user.isactive == 1 || user.isactive == '1');
+                    $('#userIsActiveContainer').show();
+                    $('#userModalTitle').html('<i class="fa-solid fa-user-pen text-[#e58500]"></i> Edit User');
+                    openUserModal();
+                } else {
+                    if(typeof showToast === 'function') showToast('error', res.message || 'Unable to fetch record.');
                 }
-            });
+            },
+            error: function() {
+                if(typeof showToast === 'function') showToast('error', 'Error fetching user data.');
+            }
         });
+    });
 
         $('.delete-user-btn').off('click').on('click', function() {
             if(!confirm('Are you sure you want to deactivate this user?')) return;

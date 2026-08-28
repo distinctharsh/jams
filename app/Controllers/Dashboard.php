@@ -736,6 +736,12 @@ class Dashboard extends BaseController
         }
 
         $id = $this->request->getPost('id');
+        $roleIds  = $this->request->getPost('role_ids');
+
+        if (empty($roleIds)) {
+            return $this->response->setJSON(['success' => false, 'message' => 'Please select at least one role.']);
+        }
+
         $saveData = [
             'name'            => $this->request->getPost('name'),
             'email'           => $this->request->getPost('email'),
@@ -753,25 +759,42 @@ class Dashboard extends BaseController
             $file->move(FCPATH . 'uploads/authorization', $newName);
             $saveData['authorization_letter'] = $newName;
         }
+        $db = \Config\Database::connect();
+        $db->transStart();
 
         try {
             if (!empty($id)) {
                 $this->userModel->update($id, $saveData);
-                $msg = 'User updated successfully.';
+                $userId = $id;
+                $db->table('user_role_mapping')->where('user_id', $userId)->delete();
             } else {
-                $this->userModel->insert($saveData);
-                $msg = 'User created successfully.';
+                $userId = $this->userModel->insert($saveData, true);
+            }
+
+            $roleBatch = [];
+            foreach ($roleIds as $rId) {
+                $roleBatch[] = [
+                    'user_id'  => $userId,
+                    'role_id'  => $rId,
+                    'isactive' => 1
+                ];
+            }
+            $db->table('user_role_mapping')->insertBatch($roleBatch);
+            $db->transComplete();
+            if ($db->transStatus() === false) {
+                return $this->response->setJSON(['success' => false, 'message' => 'Failed to save roles.']);
             }
 
             return $this->response->setJSON([
                 'success'  => true,
-                'message'  => $msg,
+                'message'  => !empty($id) ? 'User updated successfully.' : 'User created successfully.',
                 'csrfHash' => csrf_hash()
             ]);
         } catch (\Exception $e) {
+            $db->transRollback();
             return $this->response->setJSON([
                 'success'  => false,
-                'message'  => 'Error saving data: ' . $e->getMessage(),
+                'message'  => 'Error: ' . $e->getMessage(),
                 'csrfHash' => csrf_hash()
             ]);
         }
