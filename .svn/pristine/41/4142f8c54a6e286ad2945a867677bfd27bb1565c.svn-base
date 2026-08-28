@@ -1,0 +1,251 @@
+ALTER TABLE `jams_db`.`user` 
+ADD COLUMN `password_reset_req` INT NOT NULL DEFAULT 0 AFTER `ugc_id`;
+CREATE DEFINER=`root`@`localhost` PROCEDURE `approve_registration`(
+    IN p_reg_id BIGINT,
+    IN p_approved_by INT,
+    IN p_action INT,
+    IN p_remarks VARCHAR(1000),
+    IN pwd VARCHAR(500)
+)
+BEGIN
+
+    DECLARE v_reg_no VARCHAR(50) DEFAULT NULL;
+    DECLARE v_name VARCHAR(1000) DEFAULT NULL;
+    DECLARE v_email VARCHAR(50) DEFAULT NULL;
+    DECLARE v_phone VARCHAR(15) DEFAULT NULL;
+    DECLARE v_org INT DEFAULT 1;
+    DECLARE v_org_type INT DEFAULT 1;
+    DECLARE v_ugc_id VARCHAR(100) DEFAULT NULL;
+    DECLARE v_authorization_letter VARCHAR(500) DEFAULT NULL;
+    DECLARE v_designation INT DEFAULT NULL;
+    DECLARE v_status INT DEFAULT NULL;
+    DECLARE v_user_id BIGINT DEFAULT NULL;
+
+    DECLARE v_error_code INT DEFAULT NULL;
+    DECLARE v_error_message TEXT DEFAULT NULL;
+
+
+    /* =========================================================
+       ERROR HANDLER
+       ========================================================= */
+    DECLARE EXIT HANDLER FOR SQLEXCEPTION
+    BEGIN
+
+        GET DIAGNOSTICS CONDITION 1
+            v_error_code = MYSQL_ERRNO,
+            v_error_message = MESSAGE_TEXT;
+
+        ROLLBACK;
+
+        SELECT
+            0 AS success,
+            'Registration could not be approved' AS message,
+            NULL AS id,
+            v_reg_no AS reg_no,
+            v_error_code AS error_code,
+            v_error_message AS error_message;
+
+    END;
+
+
+    /* =========================================================
+       START TRANSACTION
+       ========================================================= */
+    START TRANSACTION;
+
+
+    /* =========================================================
+       GET REGISTRATION DETAILS
+       ========================================================= */
+    SELECT
+        reg_no,
+        name,
+        email,
+        mobile_no,
+        organization_id,
+        org_type,
+        ugc_id,
+        authorization_letter,
+        designation
+    INTO
+        v_reg_no,
+        v_name,
+        v_email,
+        v_phone,
+        v_org,
+        v_org_type,
+        v_ugc_id,
+        v_authorization_letter,
+        v_designation
+    FROM registration
+    WHERE id = p_reg_id
+    FOR UPDATE;
+
+
+    /* =========================================================
+       CHECK REGISTRATION EXISTS
+       ========================================================= */
+    IF v_reg_no IS NULL THEN
+
+        ROLLBACK;
+
+        SELECT
+            0 AS success,
+            'Registration not found' AS message,
+            NULL AS id,
+            NULL AS reg_no,
+            404 AS error_code,
+            'No registration exists for the supplied ID' AS error_message;
+
+
+    ELSE
+
+        /* =====================================================
+           GET LATEST REGISTRATION HISTORY STATUS
+           ===================================================== */
+        SET v_status = NULL;
+
+        SELECT
+            status
+        INTO
+            v_status
+        FROM registration_history
+        WHERE reg_id = p_reg_id
+        ORDER BY id DESC
+        LIMIT 1
+        FOR UPDATE;
+
+
+        /* =====================================================
+           CHECK WHETHER REGISTRATION CAN BE PROCESSED
+
+           Assuming:
+             1 = Pending
+             2 = Some intermediate status
+             3 = Some intermediate status
+             4 = Approved
+             5 = Rejected
+           ===================================================== */
+        IF v_status IS NULL OR v_status NOT IN (1, 2, 3) THEN
+
+            ROLLBACK;
+
+            SELECT
+                0 AS success,
+                'Registration already processed' AS message,
+                NULL AS id,
+                NULL AS reg_no,
+                409 AS error_code,
+                'Already approved or rejected' AS error_message;
+
+
+        ELSE
+
+            /* =================================================
+               ACTION 5 = REJECT
+
+               For rejection:
+               Do NOT create a user.
+               Only insert registration history.
+               ================================================= */
+            IF p_action <> 5 THEN
+
+                /* =============================================
+                   CREATE USER
+                   ============================================= */
+                INSERT INTO `user`
+                (
+                    name,
+                    email,
+                    mobile_no,
+                    organization_id,
+                    org_type,
+                    ugc_id,
+                    authorization_letter,
+                    designation,`hash`,password_reset_req
+                )
+                VALUES
+                (
+                    v_name,
+                    v_email,
+                    v_phone,
+                    v_org,
+                    v_org_type,
+                    v_ugc_id,
+                    v_authorization_letter,
+                    v_designation,pwd,1
+                );
+
+
+                /* =============================================
+                   GET NEW USER ID
+                   ============================================= */
+                SET v_user_id = LAST_INSERT_ID();
+
+
+                /* =============================================
+                   ASSIGN DEFAULT ROLE
+                   ============================================= */
+                REPLACE INTO user_role_mapping
+                (
+                    user_id,
+                    role_id,
+                    isactive
+                )
+                VALUES
+                (
+                    v_user_id,
+                    3,
+                    1
+                );
+
+            END IF;
+
+
+            /* =================================================
+               ALWAYS INSERT REGISTRATION HISTORY
+               ================================================= */
+            INSERT INTO registration_history
+            (
+                reg_id,
+                status,
+                performed_by,
+                remarks
+            )
+            VALUES
+            (
+                p_reg_id,
+                p_action,
+                p_approved_by,
+                p_remarks
+            );
+
+
+            /* =================================================
+               COMMIT
+               ================================================= */
+            COMMIT;
+
+
+            /* =================================================
+               SUCCESS RESPONSE
+               ================================================= */
+            SELECT
+                1 AS success,
+
+                CASE
+                    WHEN p_action = 5
+                        THEN 'Registration Rejected successfully'
+                    ELSE 'Registration approved successfully'
+                END AS message,
+
+                v_user_id AS id,
+                v_reg_no AS reg_no,
+                NULL AS error_code,
+                NULL AS error_message;
+
+        END IF;
+
+    END IF;
+
+END

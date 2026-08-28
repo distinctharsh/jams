@@ -357,33 +357,15 @@
         </div>
       </a>
       <!-- Navigation -->
-        <nav id="navmenu" class="navmenu">
+      <nav id="navmenu" class="navmenu">
         <ul>
-            <li>
-                <a href="<?= base_url() ?>"
-                   class="<?= trim(uri_string(), '/') === '' ? 'active' : '' ?>">
-                    Home
-                </a>
-            </li>
-            <li>
-                <a href="<?= base_url() ?>#hero">
-                    About Us
-                </a>
-            </li>
-            <li>
-                <a href="<?= base_url() ?>#faqs">
-                    FAQ
-                </a>
-            </li>
-            <li>
-                <a href="<?= base_url('contact') ?>"
-                   class="<?= uri_string() == 'contact' ? 'active' : '' ?>">
-                    Contact
-                </a>
-            </li>
+          <li><a href="<?= base_url() ?>" class="active">Home</a></li>
+          <li><a href="#">About Us</a></li>
+          <li><a href="#">Services</a></li>
+          <li><a href="#">Contact</a></li>
         </ul>
         <i class="mobile-nav-toggle d-xl-none bi bi-list"></i>
-    </nav>
+      </nav>
     <div class="d-none d-lg-flex align-items-center ms-4 gap-3">
     <!-- Digital India -->
     <a href="https://www.digitalindia.gov.in/"
