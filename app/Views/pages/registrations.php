@@ -13,6 +13,9 @@
 
             <!-- Status Filter Buttons -->
             <div class="flex items-center gap-2 bg-slate-100 p-1 rounded-xl border border-slate-200 shrink-0">
+                <button type="button" data-filter="All" class="status-filter-btn px-4 py-1.5 text-xs font-semibold rounded-lg text-slate-600 hover:text-slate-800 hover:bg-slate-200 transition">
+                    <i class="fas fa-list me-1"></i> All
+                </button>
                 <button type="button" data-filter="Pending" class="status-filter-btn px-4 py-1.5 text-xs font-semibold rounded-lg bg-amber-500 text-white shadow-sm transition">
                     <i class="fas fa-clock me-1"></i> Pending
                 </button>
@@ -244,13 +247,15 @@ $(document).ready(function() {
     $('.status-filter-btn').on('click', function() {
         let activeFilter = $(this).data('filter');
         $('.status-filter-btn')
-            .removeClass('bg-amber-500 bg-green-600 bg-red-600 text-white shadow-sm')
+            .removeClass('bg-[#1e4d7b] bg-amber-500 bg-green-600 bg-red-600 text-white shadow-sm')
             .addClass('text-slate-600 hover:text-slate-800 hover:bg-slate-200');
 
         $('.status-filter-btn[data-filter="Approved"] i').addClass('text-green-600').removeClass('text-white');
         $('.status-filter-btn[data-filter="Rejected"] i').addClass('text-red-600').removeClass('text-white');
 
-        if (activeFilter === 'Pending') {
+        if (activeFilter === 'All') {
+            $(this).addClass('bg-[#1e4d7b] text-white shadow-sm').removeClass('text-slate-600 hover:bg-slate-200');
+        } else if (activeFilter === 'Pending') {
             $(this).addClass('bg-amber-500 text-white shadow-sm').removeClass('text-slate-600 hover:bg-slate-200');
         } else if (activeFilter === 'Approved') {
             $(this).addClass('bg-green-600 text-white shadow-sm').removeClass('text-slate-600 hover:bg-slate-200');
@@ -261,7 +266,11 @@ $(document).ready(function() {
         }
 
         if (registrationDataTable) {
-            registrationDataTable.column(5).search(activeFilter).draw();
+            if (activeFilter === 'All') {
+                registrationDataTable.column(5).search('').draw();
+            } else {
+                registrationDataTable.column(5).search(activeFilter).draw();
+            }
         }
     });
 
