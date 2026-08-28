@@ -1408,7 +1408,7 @@
   }
   
   // SPA Navigation - Show pages without refresh
-  function showPage(pageId) {
+  function showPage(pageId, pushToHistory = true) {
     document.querySelectorAll('.page-content').forEach(page => {
       page.classList.remove('active');
     });
@@ -1416,25 +1416,57 @@
     const selectedPage = document.getElementById(pageId);
     if (selectedPage) {
       selectedPage.classList.add('active');
+    } else {
+      document.getElementById('dashboard')?.classList.add('active');
+      pageId = 'dashboard';
     }
     
     document.querySelectorAll('.gov-sidebar .nav-item').forEach(item => {
       item.classList.remove('active');
-    });
-    
-    document.querySelectorAll('.gov-sidebar .nav-item').forEach(item => {
       const onclickAttr = item.getAttribute('onclick');
-      if (onclickAttr) {
-        if (onclickAttr.includes(`'${pageId}'`) || onclickAttr.includes(`"${pageId}"`)) {
-          item.classList.add('active');
-        }
+      if (onclickAttr && (onclickAttr.includes(`'${pageId}'`) || onclickAttr.includes(`"${pageId}"`))) {
+        item.classList.add('active');
       }
     });
-    
+
+    if (pushToHistory) {
+      const newUrl = pageId === 'dashboard' 
+        ? '<?= base_url('dashboard') ?>' 
+        : '<?= base_url('dashboard') ?>/' + pageId;
+        
+      history.pushState({ pageId: pageId }, '', newUrl);
+    }
+
     if (window.event) {
       window.event.preventDefault();
     }
   }
+
+  window.addEventListener('popstate', function(event) {
+    if (event.state && event.state.pageId) {
+      showPage(event.state.pageId, false);
+    } else {
+      const path = window.location.pathname.split('/').pop();
+      showPage(path && path !== 'dashboard' ? path : 'dashboard', false);
+    }
+  });
+
+  document.addEventListener('DOMContentLoaded', function() {
+    const currentPath = window.location.pathname.split('/').pop();
+    if (currentPath && currentPath !== 'dashboard' && document.getElementById(currentPath)) {
+      showPage(currentPath, false);
+    } else {
+      history.replaceState({ pageId: 'dashboard' }, '', '<?= base_url('dashboard') ?>');
+    }
+
+    setTimeout(function() {
+      const requestCount = document.querySelectorAll('#requests table tbody tr').length;
+      const requestBadge = document.getElementById('request-count');
+      if (requestBadge) {
+        requestBadge.textContent = requestCount;
+      }
+    }, 100);
+  });
   
   document.addEventListener('DOMContentLoaded', function() {
     setTimeout(function() {
