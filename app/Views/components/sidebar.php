@@ -135,22 +135,33 @@
             </button>
         </div>
         <nav>
-        <a href="<?= base_url('new-request') ?>" class="nav-item booking-btn">
-            <i class="fas fa-calendar-check"></i>
-            <span>New Request</span>
-        </a>
-        <a href="<?= base_url('dashboard/requests') ?>" class="nav-item"><i class="fas fa-clipboard-list"></i> <span>Requests <span class="badge" id="request-count">0</span></span></a>
-        <a href="<?= base_url('dashboard/analytics') ?>" class="nav-item"><i class="fas fa-chart-simple"></i> <span>Reports</span></a>
-        <div class="text-[9px] font-bold text-slate-400 uppercase tracking-wider px-3 mt-6 mb-2 nav-label">System</div>
-        <a href="<?= base_url('dashboard/settings') ?>" class="nav-item"><i class="fas fa-sliders"></i> <span>Settings</span></a>
-        <a href="<?= base_url('dashboard/audit-log') ?>" class="nav-item"><i class="fas fa-shield-halved"></i> <span>Audit Log</span></a>
-        <div class="text-[9px] font-bold text-slate-400 uppercase tracking-wider px-3 mt-6 mb-2 nav-label">Admin</div>
-        <a href="<?= base_url('dashboard/registrations') ?>" class="nav-item"><i class="fas fa-id-card"></i> <span>Pending Registration</span></a>
-        <a href="<?= base_url('dashboard/users') ?>" class="nav-item"><i class="fas fa-users"></i> <span>Users</span></a>
-        <a href="<?= base_url('dashboard/organizations') ?>" class="nav-item"><i class="fa-solid fa-sitemap"></i> <span>Manage Organization</span></a>
-        <a href="<?= base_url('dashboard/organization-types') ?>" class="nav-item"><i class="fa-solid fa-layer-group"></i> <span>Organization Types</span></a>
-        <a href="<?= base_url('dashboard/vendors') ?>" class="nav-item"><i class="fas fa-handshake"></i> <span>Vendor</span></a>
-        <a href="<?= base_url('dashboard/models') ?>" class="nav-item"><i class="fas fa-microchip"></i> <span>Model</span></a>
+            <?php 
+            // Get role IDs from session
+                        $roleIds = session()->get('role_ids') ?? '';
+
+            // Convert "3, 4, 7" into [3, 4, 7]
+                        $userRoles = array_map('intval', array_filter(explode(',', $roleIds)));
+
+            // Helper function
+                        $hasRole = function (array $roles) use ($userRoles): bool {
+                            return !empty(array_intersect($roles, $userRoles));
+                        };
+
+            ?>
+
+        <?php if ($hasRole([1])): ?><a href="<?= base_url('new-request') ?>" class="nav-item booking-btn"><i class="fas fa-calendar-check"></i><span>New Request</span></a><?php endif; ?>
+        <?php if ($hasRole([1,2,3,4,5,6,7,9])): ?><a href="<?= base_url('dashboard/requests') ?>" class="nav-item"><i class="fas fa-clipboard-list"></i> <span>Requests <span class="badge" id="request-count">0</span></span></a><?php endif; ?>
+        <?php if ($hasRole([1,2,3,4,5,6,7,8,9])): ?><a href="<?= base_url('dashboard/analytics') ?>" class="nav-item"><i class="fas fa-chart-simple"></i> <span>Reports</span></a><?php endif; ?>
+        <?php if ($hasRole([9])): ?><div class="text-[9px] font-bold text-slate-400 uppercase tracking-wider px-3 mt-6 mb-2 nav-label">System</div><?php endif; ?>
+        <?php if ($hasRole([9])): ?><a href="<?= base_url('dashboard/settings') ?>" class="nav-item"><i class="fas fa-sliders"></i> <span>Settings</span></a><?php endif; ?>
+        <?php if ($hasRole([9])): ?><a href="<?= base_url('dashboard/audit-log') ?>" class="nav-item"><i class="fas fa-shield-halved"></i> <span>Audit Log</span></a><?php endif; ?>
+        <?php if ($hasRole([4,9])): ?><div class="text-[9px] font-bold text-slate-400 uppercase tracking-wider px-3 mt-6 mb-2 nav-label">Admin</div><?php endif; ?>
+        <?php if ($hasRole([4,9])): ?><a href="<?= base_url('dashboard/registrations') ?>" class="nav-item"><i class="fas fa-id-card"></i> <span>Pending Registration</span></a><?php endif; ?>
+        <?php if ($hasRole([4,9])): ?><a href="<?= base_url('dashboard/users') ?>" class="nav-item"><i class="fas fa-users"></i> <span>Users</span></a><?php endif; ?>
+        <?php if ($hasRole([4,9])): ?><a href="<?= base_url('dashboard/organizations') ?>" class="nav-item"><i class="fa-solid fa-sitemap"></i> <span>Manage Organization</span></a><?php endif; ?>
+        <?php if ($hasRole([4,9])): ?><a href="<?= base_url('dashboard/organization-types') ?>" class="nav-item"><i class="fa-solid fa-layer-group"></i> <span>Organization Types</span></a><?php endif; ?>
+        <?php if ($hasRole([4,9])): ?><a href="<?= base_url('dashboard/vendors') ?>" class="nav-item"><i class="fas fa-handshake"></i> <span>Vendor</span></a><?php endif; ?>
+        <?php if ($hasRole([4,9])): ?><a href="<?= base_url('dashboard/models') ?>" class="nav-item"><i class="fas fa-microchip"></i> <span>Model</span></a><?php endif; ?>
         </nav>
     </div>
     </aside>

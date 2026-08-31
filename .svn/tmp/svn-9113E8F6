@@ -1,0 +1,2219 @@
+<?php echo view('header/header'); ?>
+<style>
+/* =========================================================
+   JAMMERS APPROVAL MANAGEMENT SYSTEM
+   APPLICANT + ORGANIZATION + AUTHORIZATION LETTER
+   ========================================================= */
+
+:root {
+    --gov-blue: #174a78;
+    --gov-blue-dark: #123b60;
+    --gov-blue-light: #eef5fb;
+    --gov-white: #fff;
+    --gov-orange: #e58500;
+    --gov-green: #138808;
+    --gov-red: #c62828;
+    --text: #1e293b;
+    --text-soft: #475569;
+    --muted: #64748b;
+    --border: #dbe4ec;
+    --border-light: #e8eef4;
+    --page-bg: #f4f7fa;
+    --white: #ffffff;
+    --shadow: 0 16px 40px rgba(15, 23, 42, 0.09);
+}
+
+/* =========================================================
+   RESET
+   ========================================================= */
+
+* {
+    box-sizing: border-box;
+}
+
+/* =========================================================
+   BODY
+   ========================================================= */
+
+body {
+    margin: 0;
+    color: var(--text);
+    background: var(--page-bg);
+    font-family: "Segoe UI", Roboto, Arial, sans-serif;
+}
+
+/* =========================================================
+   HEADER
+   ========================================================= */
+
+header,
+.navbar,
+.site-header,
+.main-header,
+.fixed-top {
+    z-index: 9999 !important;
+}
+
+/* =========================================================
+   MAIN PAGE
+   ========================================================= */
+
+main.signup-page-main {
+    position: relative !important;
+    display: block !important;
+    width: 100%;
+    min-height: 100vh;
+    margin: 0 !important;
+    padding-top: 185px !important;
+    padding-bottom: 45px !important;
+    background:
+        radial-gradient(circle at 5% 10%, rgba(23, 74, 120, 0.055), transparent 28%),
+        radial-gradient(circle at 95% 90%, rgba(19, 136, 8, 0.035), transparent 25%),
+        var(--page-bg);
+}
+
+/* =========================================================
+   PAGE WRAPPER
+   ========================================================= */
+
+.authorization-page-wrapper {
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    max-width: 86%;
+    margin: 0 auto;
+}
+
+/* =========================================================
+   MAIN TWO-COLUMN LAYOUT
+   ========================================================= */
+
+.authorization-layout {
+    display: grid;
+    grid-template-columns: minmax(0, 61%) minmax(0, 39%);
+    align-items: start;
+    gap: 18px;
+    width: 100%;
+}
+
+.authorization-layout.single-column {
+    display: grid;
+    grid-template-columns: 80%;
+    justify-content: center; 
+    align-items: center;
+}
+
+/* =========================================================
+   LEFT CONTAINER
+   ========================================================= */
+
+.gov-left-container {
+    position: relative;
+    min-width: 0;
+    padding: 32px 28px;
+    background: #fff;
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    box-shadow: var(--shadow);
+    overflow: hidden;
+}
+
+/* =========================================================
+   LEFT DECORATION
+   ========================================================= */
+
+.gov-left-container::before {
+    content: "";
+    position: absolute;
+    width: 210px;
+    height: 210px;
+    top: -125px;
+    right: -120px;
+    border: 25px solid rgba(23, 74, 120, 0.035);
+    border-radius: 50%;
+    pointer-events: none;
+}
+
+.gov-left-container::after {
+    content: "";
+    position: absolute;
+    width: 170px;
+    height: 170px;
+    left: -120px;
+    bottom: -105px;
+    border: 22px solid rgba(19, 136, 8, 0.035);
+    border-radius: 50%;
+    pointer-events: none;
+}
+
+/* =========================================================
+   GOVERNMENT TITLE
+   ========================================================= */
+
+.left-title {
+    position: relative;
+    z-index: 5;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin: 0 0 16px;
+    padding: 10px 20px;
+    color: var(--gov-white);
+    background: var(--gov-blue);
+}
+
+.title-logo {
+    width: 58px !important;
+    height: 58px !important;
+    flex: 0 0 58px !important;
+    display: block;
+    object-fit: contain;
+    padding: 6px;
+    background: #fff;
+    border: 1px solid #dbe4ec;
+    border-radius: 6px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+}
+
+.title-content {
+    min-width: 0;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.title-text {
+    display: block;
+    color: var(--gov-white);
+    font-size: 18px;
+    line-height: 1.2;
+    font-weight: 800;
+    letter-spacing: 0.5px;
+}
+
+.left-subtitle {
+    margin-top: 5px;
+    color: var(--gov-white);
+    font-size: 12px;
+    line-height: 1.5;
+}
+
+/* =========================================================
+   HEADER DIVIDER
+   ========================================================= */
+
+.header-divider {
+    width: 100%;
+    max-width: 1031px;
+    height: 3px;
+    margin-top: 8px;
+    margin-bottom: 22px;
+    background: linear-gradient(90deg, #174a78 0%, #ff9933 50%, #138808 100%);
+    border-radius: 5px;
+    opacity: 0.9;
+}
+
+/* =========================================================
+   APPLICANT + ORGANIZATION SAME ROW
+   ========================================================= */
+
+.information-row {
+    position: relative;
+    z-index: 5;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+    width: 100%;
+    margin-bottom: 18px;
+}
+
+.information-column {
+    min-width: 0;
+}
+
+/* =========================================================
+   SECTION TITLE
+   ========================================================= */
+
+.left-section-title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 0 0 9px;
+    color: #334155;
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.left-section-title i {
+    width: 22px;
+    height: 22px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 6px;
+    background: #eef5fb;
+    color: var(--gov-blue);
+    font-size: 10px;
+}
+
+/* =========================================================
+   INFORMATION CARD
+   ========================================================= */
+
+.left-info {
+    position: relative;
+    z-index: 5;
+    margin-bottom: 0;
+    padding: 10px 12px;
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+}
+
+.left-info-row {
+    padding: 7px 0;
+    border-bottom: 1px solid #e8eef4;
+}
+
+.left-info-row:first-child {
+    padding-top: 2px;
+}
+
+.left-info-row:last-child {
+    padding-bottom: 2px;
+    border-bottom: 0;
+}
+
+.left-info-label {
+    display: block;
+    margin-bottom: 3px;
+    color: #94a3b8;
+    font-size: 8px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.55px;
+}
+
+.left-info-value {
+    color: #1e293b;
+    font-size: 11px;
+    line-height: 1.4;
+    font-weight: 600;
+    word-break: break-word;
+    overflow-wrap: anywhere;
+}
+
+/* =========================================================
+   AUTHORIZATION CONTAINER
+   ========================================================= */
+
+.authorization-container {
+    position: relative;
+    z-index: 5;
+    width: 100%;
+    padding: 22px;
+    background: #fff;
+    border: 1px solid #e2e8f0;
+    border-radius: 13px;
+    box-shadow: 0 4px 14px rgba(15, 42, 70, 0.045);
+}
+
+/* =========================================================
+   AUTHORIZATION HEADER
+   ========================================================= */
+
+.right-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 18px;
+    margin-bottom: 20px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid var(--border-light);
+}
+
+.right-header-content {
+    min-width: 0;
+    flex: 1;
+}
+
+.right-title {
+    margin: 0;
+    color: var(--gov-blue);
+    font-size: 21px;
+    line-height: 1.25;
+    font-weight: 800;
+}
+
+.right-description {
+    margin: 6px 0 0;
+    color: var(--muted);
+    font-size: 12px;
+    line-height: 1.5;
+}
+
+.document-icon {
+    width: 46px;
+    height: 46px;
+    flex: 0 0 46px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid #dbe7f1;
+    border-radius: 10px;
+    background: var(--gov-blue-light);
+    color: var(--gov-blue);
+    font-size: 17px;
+}
+
+/* =========================================================
+   ORGANIZATION STRIP
+   ========================================================= */
+
+.organization-strip {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 11px;
+    margin-bottom: 21px;
+}
+
+.org-mini-box {
+    min-width: 0;
+    padding: 11px 13px;
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 9px;
+}
+
+.org-mini-label {
+    display: block;
+    margin-bottom: 4px;
+    color: #94a3b8;
+    font-size: 9px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.55px;
+}
+
+.org-mini-value {
+    color: var(--text);
+    font-size: 12px;
+    line-height: 1.4;
+    font-weight: 700;
+    word-break: break-word;
+    overflow-wrap: anywhere;
+}
+
+/* =========================================================
+   FORM SECTION TITLE
+   ========================================================= */
+
+.form-section-title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 0 0 11px;
+    color: #334155;
+    font-size: 13px;
+    font-weight: 700;
+}
+
+.form-section-title i {
+    color: var(--gov-blue);
+    font-size: 13px;
+}
+
+/* =========================================================
+   FORM LABEL
+   ========================================================= */
+
+.form-label {
+    display: block;
+    margin-bottom: 5px;
+    color: #334155;
+    font-size: 11px;
+    font-weight: 650;
+}
+
+/* =========================================================
+   FORM CONTROL
+   ========================================================= */
+
+.form-control {
+    width: 100%;
+    min-height: 42px;
+    padding: 9px 12px;
+    border: 1px solid #cfd9e3;
+    border-radius: 7px;
+    color: #1e293b;
+    background: #fff;
+    font-size: 12px;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+}
+
+.form-control:hover {
+    border-color: #b9c8d6;
+}
+
+.form-control:focus {
+    border-color: var(--gov-blue);
+    outline: none;
+    background: #fff;
+    box-shadow: 0 0 0 3px rgba(23, 74, 120, 0.09);
+}
+
+/* =========================================================
+   FILE UPLOAD
+   ========================================================= */
+
+.file-upload-wrapper .form-control::file-selector-button {
+    height: 40px;
+    margin: -9px 11px -9px -12px;
+    padding: 0 13px;
+    border: 0;
+    background: var(--gov-blue);
+    color: #fff;
+    font-size: 10px;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.file-help {
+    display: block;
+    margin-top: 5px;
+    color: #94a3b8;
+    font-size: 9.5px;
+    line-height: 1.45;
+}
+
+/* =========================================================
+   CAPTCHA
+   ========================================================= */
+
+.captcha-wrapper {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 155px 42px;
+    gap: 8px;
+    width: 100%;
+}
+
+.captcha-display {
+    position: relative;
+    height: 42px;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid #cbd7e2;
+    border-radius: 7px;
+    background:
+        radial-gradient(#aebdca 0.7px, transparent 0.7px),
+        linear-gradient(135deg, #f5f8fb, #fff);
+    background-size: 7px 7px, 100% 100%;
+}
+
+.captcha-display::before,
+.captcha-display::after {
+    content: "";
+    position: absolute;
+    left: -10%;
+    width: 120%;
+    height: 1px;
+    background: #64748b;
+    opacity: 0.25;
+}
+
+.captcha-display::before {
+    transform: rotate(7deg);
+}
+
+.captcha-display::after {
+    transform: rotate(-8deg);
+}
+
+.captcha-text {
+    position: relative;
+    z-index: 2;
+    color: var(--gov-blue);
+    font-family: "Courier New", monospace;
+    font-size: 18px;
+    font-weight: 900;
+    letter-spacing: 3px;
+    user-select: none;
+}
+
+.captcha-refresh {
+    width: 42px;
+    height: 42px;
+    padding: 0;
+    border: 1px solid #cbd7e2;
+    border-radius: 7px;
+    background: #fff;
+    color: var(--gov-blue);
+    cursor: pointer;
+}
+
+.captcha-refresh:hover {
+    color: #fff;
+    background: var(--gov-blue);
+    border-color: var(--gov-blue);
+}
+
+#captcha {
+    width: 100%;
+    height: 42px;
+    font-size: 12px;
+    font-weight: 650;
+    letter-spacing: 0.7px;
+    text-transform: uppercase;
+}
+
+#captcha::placeholder {
+    color: #9aa8b6;
+    font-weight: 400;
+    letter-spacing: 0;
+    text-transform: none;
+}
+
+/* =========================================================
+   SECURITY NOTICE
+   ========================================================= */
+
+.security-notice {
+    display: flex;
+    align-items: flex-start;
+    gap: 9px;
+    margin-top: 13px;
+    padding: 10px 12px;
+    background: #f4f8fc;
+    border: 1px solid #d9e5ef;
+    border-radius: 7px;
+}
+
+.security-notice i {
+    flex: 0 0 auto;
+    margin-top: 2px;
+    color: var(--gov-blue);
+    font-size: 13px;
+}
+
+.security-notice span {
+    color: #64748b;
+    font-size: 9.5px;
+    line-height: 1.5;
+}
+
+/* =========================================================
+   SUBMIT BUTTON
+   ========================================================= */
+
+.gov-submit {
+    width: 100%;
+    min-height: 44px;
+    margin-top: 14px;
+    padding: 9px 16px;
+    border: 0;
+    border-radius: 7px;
+    background: linear-gradient(135deg, var(--gov-blue), #246496);
+    color: #fff;
+    font-size: 12px;
+    font-weight: 700;
+    cursor: pointer;
+    box-shadow: 0 5px 14px rgba(23, 74, 120, 0.18);
+}
+
+.gov-submit:hover {
+    background: linear-gradient(135deg, var(--gov-blue-dark), var(--gov-blue));
+    transform: translateY(-1px);
+}
+
+.gov-submit:disabled {
+    opacity: 0.65;
+    cursor: not-allowed;
+    transform: none;
+}
+
+/* =========================================================
+   SUBMITTED DOCUMENT CARD
+   ========================================================= */
+
+.submitted-document-card {
+    position: relative;
+    display: flex;
+    align-items: center;
+    width: 100%;
+    min-height: 105px;
+    margin-top: 18px;
+    padding: 20px 24px;
+    background: linear-gradient(135deg, #fff 0%, #f8fbfd 100%);
+    border: 1px solid #e2e8f0;
+    border-radius: 15px;
+    box-shadow: 0 5px 18px rgba(15, 42, 70, 0.06);
+}
+
+.submitted-document-card::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 4px;
+    background: #1e4d7b;
+}
+
+.document-card-icon {
+    width: 64px;
+    min-width: 64px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.document-icon-bg {
+    width: 52px;
+    height: 52px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 14px;
+    background: #eef5fb;
+    color: #1e4d7b;
+    font-size: 22px;
+}
+
+.document-card-content {
+    flex: 1;
+    min-width: 0;
+    padding: 0 20px;
+}
+
+.document-card-label {
+    margin-bottom: 3px;
+    color: #8a97a6;
+    font-size: 9px;
+    font-weight: 800;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+}
+
+.document-card-title {
+    color: #183b5d;
+    font-size: 17px;
+    font-weight: 700;
+}
+
+.document-card-description {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 5px;
+    color: #718096;
+    font-size: 11px;
+}
+
+.document-card-description i {
+    color: #198754;
+}
+
+.document-card-status {
+    display: flex;
+    align-items: flex-end;
+    flex-direction: column;
+    gap: 7px;
+    min-width: 115px;
+}
+
+.document-verified-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 11px;
+    border-radius: 20px;
+    background: #e8f7ef;
+    color: #157347;
+    font-size: 10px;
+    font-weight: 700;
+}
+
+.document-secure {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    color: #9aa6b2;
+    font-size: 9px;
+}
+
+/* =========================================================
+   SECURITY BOX
+   ========================================================= */
+
+.verification-box {
+    position: relative;
+    z-index: 5;
+    display: flex;
+    align-items: center;
+    gap: 11px;
+    margin-top: 18px;
+    padding: 11px 12px;
+    background: #f4faf5;
+    border: 1px solid #d7eadb;
+    border-radius: 9px;
+}
+
+.verification-icon {
+    width: 34px;
+    height: 34px;
+    flex: 0 0 34px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background: #e8f7ef;
+    color: #138808;
+}
+
+.verification-text strong {
+    display: block;
+    color: #1e293b;
+    font-size: 12px;
+}
+
+.verification-text span {
+    display: block;
+    margin-top: 2px;
+    color: #64748b;
+    font-size: 10px;
+}
+
+/* =========================================================
+   RIGHT CONTAINER
+   ========================================================= */
+
+.gov-right-container {
+    position: relative;
+    min-width: 0;
+    padding: 17px;
+    background: #f8fafc;
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    box-shadow: var(--shadow);
+}
+
+/* =========================================================
+   SUBMISSION PROGRESS
+   ========================================================= */
+
+.submission-progress-container {
+    width: 94%;
+    margin: 0 auto;
+    background: #fff;
+    border: 1px solid #e2e8f0;
+    border-radius: 14px;
+    box-shadow: 0 5px 18px rgba(15, 42, 70, 0.06);
+    overflow: hidden;
+}
+
+.submission-progress-card {
+    width: 100%;
+    padding: 22px 24px 24px;
+    background: #fff;
+}
+
+/* =========================================================
+   PROGRESS HEADER
+   ========================================================= */
+
+.submission-progress-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 15px;
+    padding: 14px 18px;
+    margin: 0 -24px 20px;
+    background: #174a78;
+    color: #fff;
+    border-radius: 0;
+    border-bottom: 3px solid #123b60;
+}
+
+.submission-progress-header h3 {
+    margin: 0;
+    color: #fff;
+    font-size: 17px;
+    font-weight: 600;
+}
+
+.submission-progress-title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 0;
+    color: #1e4d7b;
+    font-size: 16px;
+    font-weight: 800;
+}
+
+.submission-progress-percent {
+    color: #fff;
+    font-size: 13px;
+    font-weight: 800;
+}
+
+/* =========================================================
+   COMPLETENESS
+   ========================================================= */
+
+.progress-completeness {
+    margin-bottom: 24px;
+}
+
+.progress-completeness-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 7px;
+    color: #475569;
+    font-size: 11px;
+    font-weight: 600;
+}
+
+.progress-completeness-percent {
+    color: #e58500;
+    font-weight: 800;
+}
+
+.submission-progress-track {
+    width: 100%;
+    height: 8px;
+    overflow: hidden;
+    background: #e2e8f0;
+    border-radius: 20px;
+}
+
+.submission-progress-fill {
+    height: 100%;
+    border-radius: 20px;
+    background: #e58500;
+    transition: width 0.5s ease;
+}
+
+/* =========================================================
+   PROGRESS STEPS
+   ========================================================= */
+
+.submission-progress-steps {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 21px;
+}
+
+.submission-progress-steps::before {
+    content: "";
+    position: absolute;
+    left: 15px;
+    top: 4px;
+    bottom: 4px;
+    width: 2px;
+    background: #e2e8f0;
+}
+
+.progress-step {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+}
+
+.progress-step-number {
+    width: 32px;
+    height: 32px;
+    min-width: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background: #f1f5f9;
+    border: 2px solid #cbd5e1;
+    color: #64748b;
+    font-size: 11px;
+    font-weight: 800;
+}
+
+.progress-step.active .progress-step-number {
+    background: #1e4d7b;
+    border-color: #1e4d7b;
+    color: #fff;
+    box-shadow: 0 0 0 4px #eef5fb;
+}
+
+.progress-step.completed .progress-step-number {
+    background: #198754;
+    border-color: #198754;
+    color: #fff;
+    box-shadow: 0 0 0 4px #e8f7ef;
+}
+
+.progress-step.rejected .progress-step-number {
+    background: #dc3545;
+    border-color: #dc3545;
+    color: #fff;
+    box-shadow: 0 0 0 4px #fdebed;
+}
+
+/* =========================================================
+   STEP CONTENT
+   ========================================================= */
+
+.progress-step-content {
+    min-width: 0;
+    padding-top: 1px;
+}
+
+.progress-step-title {
+    margin: 0;
+    color: #64748b;
+    font-size: 13px;
+    font-weight: 700;
+}
+
+.progress-step.active .progress-step-title {
+    color: #1e4d7b;
+}
+
+.progress-step.completed .progress-step-title {
+    color: #157347;
+}
+
+.progress-step.rejected .progress-step-title {
+    color: #b02a37;
+}
+
+.progress-step-description {
+    margin: 3px 0 0;
+    color: #94a3b8;
+    font-size: 10.5px;
+    line-height: 1.5;
+}
+
+/* =========================================================
+   STATUS MESSAGE
+   ========================================================= */
+
+.progress-status-message {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    margin-top: 20px;
+    padding: 10px 12px;
+    border-radius: 8px;
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    color: #64748b;
+    font-size: 10px;
+    line-height: 1.5;
+}
+
+.progress-status-message.approved {
+    background: #f0faf4;
+    border-color: #ccebd9;
+    color: #157347;
+}
+
+.progress-status-message.rejected {
+    background: #fff4f5;
+    border-color: #f3cbd0;
+    color: #b02a37;
+}
+
+/* =========================================================
+   MESSAGE
+   ========================================================= */
+
+#message {
+    margin-top: 12px;
+    font-size: 11px;
+}
+
+/* =========================================================
+   TOAST
+   ========================================================= */
+
+#toastContainer {
+    position: fixed !important;
+    top: 20px !important;
+    right: 20px !important;
+    width: 350px;
+    max-width: calc(100% - 30px);
+    z-index: 99999 !important;
+}
+
+/* =========================================================
+   TABLET
+   ========================================================= */
+
+@media (max-width: 900px) {
+    main.signup-page-main {
+        padding-top: 145px !important;
+    }
+
+    .authorization-layout {
+        grid-template-columns: 42% 58%;
+        gap: 14px;
+    }
+
+    .gov-left-container {
+        padding: 27px 22px;
+    }
+
+    .gov-right-container {
+        padding: 14px;
+    }
+
+    .information-row {
+        gap: 10px;
+    }
+
+    .title-logo {
+        width: 56px !important;
+        height: 56px !important;
+        flex-basis: 56px !important;
+    }
+
+    .title-text {
+        font-size: 17px;
+    }
+
+    .left-subtitle {
+        font-size: 10px;
+    }
+
+    .submission-progress-container {
+        width: 96%;
+    }
+
+    .captcha-wrapper {
+        grid-template-columns: minmax(0, 1fr) 130px 40px;
+    }
+}
+
+/* =========================================================
+   MOBILE
+   ========================================================= */
+
+@media (max-width: 767px) {
+    main.signup-page-main {
+        padding-top: 120px !important;
+        padding-bottom: 25px !important;
+    }
+
+    .authorization-page-wrapper {
+        padding-left: 10px;
+        padding-right: 10px;
+    }
+
+    .authorization-layout {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+    }
+
+    .gov-left-container {
+        width: 100%;
+        padding: 23px 18px 20px;
+        border-radius: 11px;
+    }
+
+    .gov-right-container {
+        width: 100%;
+        padding: 10px;
+        border-radius: 11px;
+    }
+
+    .information-row {
+        grid-template-columns: 1fr;
+        gap: 14px;
+        margin-bottom: 15px;
+    }
+
+    .information-column .left-info {
+        height: auto;
+    }
+
+    .title-logo {
+        width: 52px !important;
+        height: 52px !important;
+        flex-basis: 52px !important;
+    }
+
+    .title-text {
+        font-size: 17px;
+    }
+
+    .left-subtitle {
+        font-size: 9.5px;
+    }
+
+    .authorization-container {
+        padding: 18px 17px;
+    }
+
+    .right-title {
+        font-size: 17px;
+    }
+
+    .right-description {
+        font-size: 10px;
+    }
+
+    .document-icon {
+        width: 38px;
+        height: 38px;
+        flex-basis: 38px;
+        font-size: 14px;
+    }
+
+    .organization-strip {
+        grid-template-columns: 1fr;
+        gap: 8px;
+    }
+
+    .captcha-wrapper {
+        grid-template-columns: minmax(0, 1fr) 130px 40px;
+    }
+
+    #captcha {
+        grid-column: auto;
+    }
+
+    .submission-progress-container {
+        width: 100%;
+    }
+
+    .submission-progress-card {
+        padding: 18px 16px 20px;
+    }
+
+    .submission-progress-header {
+        margin-left: -16px;
+        margin-right: -16px;
+    }
+
+    .submission-progress-title {
+        font-size: 14px;
+    }
+
+    .progress-step-title {
+        font-size: 12px;
+    }
+}
+
+/* =========================================================
+   SMALL MOBILE
+   ========================================================= */
+
+@media (max-width: 480px) {
+    main.signup-page-main {
+        padding-top: 105px !important;
+    }
+
+    .authorization-page-wrapper {
+        padding-left: 8px;
+        padding-right: 8px;
+    }
+
+    .gov-left-container {
+        padding: 20px 14px 17px;
+    }
+
+    .gov-right-container {
+        padding: 8px;
+    }
+
+    .title-logo {
+        width: 48px !important;
+        height: 48px !important;
+        flex-basis: 48px !important;
+    }
+
+    .title-text {
+        font-size: 15px;
+    }
+
+    .left-subtitle {
+        font-size: 8.8px;
+    }
+
+    .authorization-container {
+        padding: 17px 13px;
+    }
+
+    .right-title {
+        font-size: 15px;
+    }
+
+    .right-description {
+        font-size: 9px;
+    }
+
+    .captcha-text {
+        font-size: 16px;
+        letter-spacing: 2.5px;
+    }
+
+    .submission-progress-card {
+        padding: 16px 13px 18px;
+    }
+
+    .submission-progress-header {
+        margin-left: -13px;
+        margin-right: -13px;
+    }
+
+    .progress-step-description {
+        font-size: 9.5px;
+    }
+}
+
+/* =========================================================
+   VERY SMALL MOBILE
+   ========================================================= */
+
+@media (max-width: 360px) {
+    main.signup-page-main {
+        padding-top: 95px !important;
+    }
+
+    .title-logo {
+        width: 44px !important;
+        height: 44px !important;
+        flex-basis: 44px !important;
+    }
+
+    .title-text {
+        font-size: 14px;
+    }
+
+    .gov-right-container {
+        padding: 6px;
+    }
+
+    .authorization-container {
+        padding-left: 11px;
+        padding-right: 11px;
+    }
+
+    .captcha-wrapper {
+        gap: 5px;
+    }
+
+    .captcha-refresh {
+        width: 37px;
+    }
+
+    .submission-progress-card {
+        padding-left: 11px;
+        padding-right: 11px;
+    }
+
+    .submission-progress-header {
+        margin-left: -11px;
+        margin-right: -11px;
+    }
+}
+
+/* =========================================================
+   TEXT SIZE INCREASE
+   Same Website Font - Only Size Increased
+   ========================================================= */
+
+body {
+    font-family: "Segoe UI", Roboto, Arial, sans-serif;
+}
+
+/* Government Header */
+.title-text {
+    font-size: 20px;
+}
+
+.left-subtitle {
+    font-size: 13px;
+}
+
+/* Section Titles */
+.left-section-title {
+    font-size: 14px;
+}
+
+.left-section-title i {
+    font-size: 11px;
+}
+
+/* Applicant / Organization Information */
+.left-info-label {
+    font-size: 10px;
+}
+
+.left-info-value {
+    font-size: 14px;
+}
+
+/* Right Authorization Header */
+.right-title {
+    font-size: 23px;
+}
+
+.right-description {
+    font-size: 13px;
+}
+
+/* Organization Details */
+.org-mini-label {
+    font-size: 10px;
+}
+
+.org-mini-value {
+    font-size: 13px;
+}
+
+/* Form Section */
+.form-section-title {
+    font-size: 14px;
+}
+
+.form-label {
+    font-size: 12px;
+}
+
+.form-control {
+    font-size: 13px;
+}
+
+/* File Upload Help */
+.file-help {
+    font-size: 10.5px;
+}
+
+/* CAPTCHA */
+.captcha-text {
+    font-size: 20px;
+}
+
+#captcha {
+    font-size: 13px;
+}
+
+/* Security Notice */
+.security-notice span {
+    font-size: 10.5px;
+}
+
+/* Submit Button */
+.gov-submit {
+    font-size: 13px;
+}
+
+/* Submitted Document */
+.document-card-label {
+    font-size: 10px;
+}
+
+.document-card-title {
+    font-size: 18px;
+}
+
+.document-card-description {
+    font-size: 12px;
+}
+
+.document-verified-badge {
+    font-size: 11px;
+}
+
+.document-secure {
+    font-size: 10px;
+}
+
+/* Verification */
+.verification-text strong {
+    font-size: 13px;
+}
+
+.verification-text span {
+    font-size: 11px;
+}
+
+/* Submission Progress */
+.submission-progress-header h3 {
+    font-size: 18px;
+}
+
+.submission-progress-title {
+    font-size: 17px;
+}
+
+.submission-progress-percent {
+    font-size: 14px;
+}
+
+.progress-completeness-header {
+    font-size: 12px;
+}
+
+.progress-step-title {
+    font-size: 14px;
+}
+
+.progress-step-description {
+    font-size: 11.5px;
+}
+
+.progress-status-message {
+    font-size: 11px;
+}
+
+#message {
+    font-size: 12px;
+}
+
+.progress-step-description {
+    font-size: 12px !important;
+    font-weight: 600 !important;
+    color: #000 !important;
+    line-height: 1.6;
+}
+
+.progress-status-message {
+    font-size: 12px !important;
+    font-weight: 600 !important;
+    color: #000 !important;
+    line-height: 1.5;
+}
+</style>
+<?php
+
+/*
+|--------------------------------------------------------------------------
+| REGISTRATION
+|--------------------------------------------------------------------------
+*/
+$registration = $registration ?? [];
+
+$authorizationStatus = (int)($authorizationStatus ?? 1);
+
+/*$authorizationFile = $registration['authorization_letter'] ?? null;
+$hasSubmitted = !empty($authorizationFile);
+if ($authorizationStatus === 4) {
+    $progressPercentage = 100;
+} elseif ($authorizationStatus === 3) {
+    $progressPercentage = 60;
+} else {
+    $progressPercentage = 30;
+}*/
+
+
+$authorizationFile = $registration['authorization_letter'] ?? null;
+$hasSubmitted = !empty($authorizationFile);
+/*
+|----------------------------------------------------------------------
+| PROGRESS
+|----------------------------------------------------------------------
+*/
+if ($authorizationStatus === 4) {
+    // Approved
+    $progressPercentage = 100;
+} elseif ($authorizationStatus === 5) {
+    // Rejected - final decision reached
+    $progressPercentage = 100;
+} elseif ($authorizationStatus === 3) {
+    // Under Verification
+    $progressPercentage = 60;
+} else {
+    // Registration Request Submitted
+    $progressPercentage = 30;
+}
+
+?>
+
+<main class="main signup-page-main">
+
+    <!-- =========================================================
+         TOAST
+         ========================================================= -->
+    <div id="toastContainer" class="position-fixed"></div>
+
+    <!-- =========================================================
+         PAGE WRAPPER
+         ========================================================= -->
+    <div class="authorization-page-wrapper">
+
+        <!-- =====================================================
+             LAYOUT
+             ===================================================== -->
+        <div class="authorization-layout <?= $hasSubmitted ? '' : 'single-column' ?>">
+
+            <!-- =================================================
+                 LEFT CONTAINER
+                 ================================================= -->
+            <div class="gov-left-container">
+
+                <!-- =================================================
+                     GOVERNMENT TITLE
+                     ================================================= -->
+                <div class="left-title">
+                    <img src="<?= base_url('assets/image/Emblem_of_India.svg.webp') ?>" alt="Government of India" class="title-logo">
+                    <div class="title-content">
+                        <span class="title-text">JAMMERS APPROVAL MANAGEMENT SYSTEM</span>
+                        <div class="left-subtitle">Authorization &amp; Verification Portal<br>Government of India</div>
+                    </div>
+                </div>
+
+                <!-- =================================================
+                     DIVIDER
+                     ================================================= -->
+                <div class="header-divider"></div>
+
+                <!-- =================================================
+                     APPLICANT + ORGANIZATION
+                     ================================================= -->
+                <div class="information-row">
+
+                    <!-- =============================================
+                         APPLICANT
+                         ============================================= -->
+                    <div class="information-column">
+                        <div class="left-section-title">
+                            <i class="fas fa-user"></i>
+                            <span>Applicant Information</span>
+                        </div>
+                        <div class="left-info">
+                            <div class="left-info-row">
+                                <span class="left-info-label">Registration No.</span>
+                                <div class="left-info-value"><?= esc($registration['reg_no'] ?? '-') ?></div>
+                            </div>
+                            <div class="left-info-row">
+                                <span class="left-info-label">Full Name</span>
+                                <div class="left-info-value"><?= esc($registration['name'] ?? '-') ?></div>
+                            </div>
+                            <div class="left-info-row">
+                                <span class="left-info-label">Official Email</span>
+                                <div class="left-info-value"><?= esc($registration['email'] ?? '-') ?></div>
+                            </div>
+                            <div class="left-info-row">
+                                <span class="left-info-label">Mobile Number</span>
+                                <div class="left-info-value"><?= esc($registration['mobile_no'] ?? '-') ?></div>
+                            </div>
+                            <div class="left-info-row">
+                                <span class="left-info-label">Designation</span>
+                                <div class="left-info-value"><?= esc($registration['designation'] ?? '-') ?></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- =============================================
+                         ORGANIZATION
+                         ============================================= -->
+                    <div class="information-column">
+                        <div class="left-section-title">
+                            <i class="fas fa-building"></i>
+                            <span>Organization</span>
+                        </div>
+                        <div class="left-info">
+                            <div class="left-info-row">
+                                <span class="left-info-label">Organization ID</span>
+                                <div class="left-info-value"><?= esc(getMasterValue(
+                                'mas_organization',
+                                $registration['organization_id'] ?? '',
+                                'org_name'
+                                ) ?: '-') ?></div>
+                            </div>
+                            <div class="left-info-row">
+                                <span class="left-info-label">Examination Body Type</span>
+                                <div class="left-info-value"><?= esc(getMasterValue(
+                                'mas_organization_type',
+                                $registration['org_type'] ?? '',
+                                'name'
+                                ) ?: '-') ?></div>
+                            </div>
+                            <div class="left-info-row">
+                                <span class="left-info-label">UGC ID</span>
+                                <div class="left-info-value"><?= esc(!empty($registration['ugc_id']) ? $registration['ugc_id'] : '-') ?></div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- =================================================
+                     AUTHORIZATION LETTER
+                     ================================================= -->
+                <div class="authorization-container">
+
+                    <!-- =============================================
+                         HEADER
+                         ============================================= -->
+                    <div class="right-header">
+                        <div class="right-header-content">
+                            <h2 class="right-title">AUTHORIZATION LETTER</h2>
+                            <p class="right-description">Submit your duly signed document for official verification and approval.</p>
+                        </div>
+                        <div class="document-icon">
+                            <i class="fas fa-file-signature"></i>
+                        </div>
+                    </div>
+
+                    <?php if (!$hasSubmitted): ?>
+                    <form id="authorizationForm" method="post" enctype="multipart/form-data">
+                        <input type="hidden" name="token" id="authorization_token" value="<?= esc($token ?? '') ?>">
+                        <input type="hidden" name="<?= csrf_token() ?>" id="csrf_token" value="<?= csrf_hash() ?>">
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <div class="form-section-title">
+                                    <i class="fas fa-cloud-upload-alt"></i>
+                                    <span>Document Upload (Authorization Letter)</span>
+                                </div>
+                                <div class="mb-3">
+                                    <div class="file-upload-wrapper">
+                                        <input type="file"
+                                               name="authorization_letter"
+                                               id="authorization_letter"
+                                               class="form-control"
+                                               accept=".pdf,.jpg,.jpeg,.png"
+                                               required>
+                                    </div>
+                                    <span class="file-help">
+                                        PDF, JPG, JPEG, PNG &nbsp; | &nbsp; Maximum size: 5 MB
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-section-title mt-3 mt-md-0">
+                                    <i class="fas fa-user-shield"></i>
+                                    <span>Security Verification</span>
+                                </div>
+                                <div class="mb-2">
+                                    <div class="captcha-wrapper">
+                                        <input type="text"
+                                               name="captcha"
+                                               id="captcha"
+                                               class="form-control"
+                                               placeholder="Enter CAPTCHA"
+                                               autocomplete="off"
+                                               maxlength="6"
+                                               required>
+                                        <div class="captcha-display" title="Security CAPTCHA">
+                                            <span class="captcha-text fw-bold" id="signupCaptchaText">
+                                                <?= esc($captcha_text ?? 'ABCDEF') ?>
+                                            </span>
+                                        </div>
+                                        <button type="button"
+                                                class="captcha-refresh"
+                                                id="signupRefreshCaptcha"
+                                                title="Refresh CAPTCHA">
+                                            <i class="fas fa-sync-alt"></i>
+                                        </button>
+                                    </div>
+                                    <span class="file-help">
+                                        <i class="fas fa-info-circle me-1"></i>
+                                        Enter the characters shown in the CAPTCHA.
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                        <button type="submit" class="gov-submit" id="uploadBtn">
+                            <i class="fas fa-paper-plane me-2"></i>
+                            Submit Authorization Letter
+                        </button>
+                    </form>
+
+                    <?php else: ?>
+
+                        <!-- =========================================
+                             SUBMITTED DOCUMENT
+                             ========================================= -->
+                        <div class="submitted-document-card">
+                            <div class="document-card-icon">
+                                <div class="document-icon-bg">
+                                    <i class="fas fa-file-alt"></i>
+                                </div>
+                            </div>
+                            <div class="document-card-content">
+                                <div class="document-card-label">SUBMITTED DOCUMENT</div>
+                                <div class="document-card-title">Authorization Letter</div>
+                                <div class="document-card-description">
+                                    <i class="fas fa-check-circle"></i>
+                                    Authorization Letter has been successfully submitted.
+                                </div>
+                            </div>
+                            <div class="document-card-status">
+                                <span class="document-verified-badge">
+                                    <i class="fas fa-check"></i>
+                                    Submitted
+                                </span>
+                                <span class="document-secure">
+                                    <i class="fas fa-shield-alt"></i>
+                                    Secure
+                                </span>
+                            </div>
+                        </div>
+
+                    <?php endif; ?>
+
+                </div>
+
+            </div>
+
+            <!-- =================================================
+                 RIGHT PROGRESS
+                 ================================================= -->
+                <?php if ($hasSubmitted): ?>
+                <div class="submission-progress-container">
+                    <div class="submission-progress-card">
+                        <div class="submission-progress-header">
+                            <h3 class="submission-progress-title">
+                                <i class="fas fa-tasks"></i>
+                                Submission Progress
+                            </h3>
+                            <span class="submission-progress-percent">
+                                <?= $progressPercentage ?>%
+                            </span>
+                        </div>
+                        <div class="progress-completeness">
+                            <div class="progress-completeness-header">
+                                <span>
+                                    Form completeness
+                                </span>
+                                <span class="progress-completeness-percent">
+                                    <?= $progressPercentage ?>%
+                                </span>
+                            </div>
+                            <div class="submission-progress-track">
+                                <div
+                                    class="submission-progress-fill"
+                                    style="width: <?= $progressPercentage ?>%;"
+                                ></div>
+                            </div>
+                        </div>
+                        <div class="submission-progress-steps">
+                            <div class="progress-step completed">
+                                <div class="progress-step-number">
+                                    <i class="fas fa-check"></i>
+                                </div>
+                                <div class="progress-step-content">
+                                    <h4 class="progress-step-title">
+                                        Registration Request Submitted
+                                    </h4>
+                                    <p class="progress-step-description">
+                                        Your registration request and Authorization
+                                        Letter have been successfully submitted.
+                                    </p>
+                                </div>
+                            </div>
+                            <div class="
+                                progress-step
+                                <?= $authorizationStatus === 3 ? 'active' : '' ?>
+                                <?= $authorizationStatus === 4 ? 'completed' : '' ?>
+                                <?= $authorizationStatus === 5 ? 'rejected' : '' ?>
+                            ">
+                                <div class="progress-step-number">
+                                    <?php if ($authorizationStatus === 4): ?>
+                                        <i class="fas fa-check"></i>
+                                    <?php elseif ($authorizationStatus === 5): ?>
+                                        <i class="fas fa-times"></i>
+                                    <?php elseif ($authorizationStatus === 3): ?>
+                                        <i class="fas fa-search"></i>
+                                    <?php else: ?>
+                                        2
+                                    <?php endif; ?>
+                                </div>
+                                <div class="progress-step-content">
+                                    <h4 class="progress-step-title">
+                                        Under Verification
+                                    </h4>
+                                    <p class="progress-step-description">
+                                        <?php if ($authorizationStatus === 4): ?>
+                                            Your submitted documents have been
+                                            successfully verified.
+                                        <?php elseif ($authorizationStatus === 5): ?>
+                                            Your submitted documents did not pass
+                                            the verification process.
+                                        <?php elseif ($authorizationStatus === 3): ?>
+                                            Your submitted documents are currently under verification
+                                            by the concerned authority. The verification process is
+                                            expected to be completed within 5 working days.
+                                        <?php else: ?>
+                                            Your submitted documents are awaiting
+                                            verification.
+                                        <?php endif; ?>
+                                    </p>
+                                </div>
+                            </div>
+                            <!-- =================================================
+                                 STEP 3
+                                 FINAL DECISION
+                                 ================================================= -->
+                            <div class="
+                                progress-step
+                                <?= $authorizationStatus === 4 ? 'completed' : '' ?>
+                                <?= $authorizationStatus === 5 ? 'rejected' : '' ?>
+                            ">
+                                <div class="progress-step-number">
+                                    <?php if ($authorizationStatus === 4): ?>
+                                        <i class="fas fa-check"></i>
+                                    <?php elseif ($authorizationStatus === 5): ?>
+                                        <i class="fas fa-times"></i>
+                                    <?php else: ?>
+                                        3
+                                    <?php endif; ?>
+                                </div>
+                                <div class="progress-step-content">
+                                    <h4 class="progress-step-title">
+                                        <?php if ($authorizationStatus === 4): ?>
+                                            Approved
+                                        <?php elseif ($authorizationStatus === 5): ?>
+                                            Rejected
+                                        <?php endif; ?>
+                                    </h4>
+
+                                    <p class="progress-step-description">
+                                        <?php if ($authorizationStatus === 4): ?>
+                                            Your registration has been successfully approved.
+                                            Your username and password have been sent to your registered email ID.
+                                        <?php elseif ($authorizationStatus === 5): ?>
+                                            Your registration request has been rejected.
+                                        <?php else: ?>
+                                           The final approved will be updated upon completion of the verification process by the concerned authority.
+                                        <?php endif; ?>
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                        <?php if ($authorizationStatus === 4): ?>
+                            <div class="progress-status-message approved">
+                                <i class="fas fa-check-circle"></i>
+                                <span>
+                                    Your Registration Request has been verified
+                                    and approved by the concerned authority.
+                                </span>
+                            </div>
+                        <?php elseif ($authorizationStatus === 5): ?>
+                            <div class="progress-status-message rejected">
+                                <i class="fas fa-times-circle"></i>
+                                <span>
+                                    Your Registration Request has been rejected.
+                                    Please contact the concerned authority for
+                                    further information.
+                                </span>
+                            </div>
+                        <?php elseif ($authorizationStatus === 3): ?>
+                            <div class="progress-status-message">
+                                <i class="fas fa-search"></i>
+                                <span>
+                                    Your Registration Request has been submitted
+                                    successfully and is currently under verification
+                                    by the concerned authority.
+                                </span>
+                            </div>
+                        <?php else: ?>
+                            <div class="progress-status-message">
+                                <i class="fas fa-info-circle"></i>
+                                <span>
+                                    Your Registration Request has been submitted
+                                    successfully and is awaiting verification.
+                                </span>
+                            </div>
+                        <?php endif; ?>
+                    </div>
+                </div>
+            <?php endif; ?>
+            <!-- AJAX MESSAGE -->
+            <div id="message" class="mt-3"></div>
+        </div>
+    </div>
+</main>
+<?= view('footer/footer') ?>
+<script>
+/* =========================================================
+   CSRF
+========================================================= */
+
+function getCSRFHash() {
+    return $('#csrf_token').val() || '';
+}
+
+function updateCSRF(hash) {
+    if (hash) {
+        $('#csrf_token').val(hash);
+    }
+}
+
+/* =========================================================
+   REFRESH CAPTCHA
+========================================================= */
+
+function refreshAuthorizationCaptcha(autoFocus = false) {
+    const button = $('#signupRefreshCaptcha');
+
+    if (button.length) {
+        button.prop('disabled', true);
+        button.find('i').addClass('fa-spin');
+    }
+
+    $.ajax({
+        url: "<?= base_url('refresh-captcha') ?>",
+        type: "POST",
+        dataType: "json",
+        data: {
+            csrf_token: getCSRFHash()
+        },
+        headers: {
+            "X-Requested-With": "XMLHttpRequest",
+            "X-CSRF-TOKEN": getCSRFHash()
+        },
+        success: function(response) {
+            console.log('CAPTCHA REFRESH:', response);
+
+            if (response.csrfHash) {
+                updateCSRF(response.csrfHash);
+            }
+
+            if (response.success) {
+                $('#signupCaptchaText').text(response.captcha);
+                $('#captcha').val('');
+
+                if (autoFocus) {
+                    $('#captcha').focus();
+                }
+            } else {
+                console.log('CAPTCHA REFRESH FAILED:', response.message);
+            }
+        },
+        error: function(xhr) {
+            console.log('CAPTCHA REFRESH ERROR:', xhr.responseText);
+        },
+        complete: function() {
+            if (button.length) {
+                button.prop('disabled', false);
+                button.find('i').removeClass('fa-spin');
+            }
+        }
+    });
+}
+
+/* =========================================================
+   REFRESH BUTTON
+========================================================= */
+
+$(document).on('click', '#signupRefreshCaptcha', function(e) {
+    e.preventDefault();
+    refreshAuthorizationCaptcha(true);
+});
+
+/* =========================================================
+   DOCUMENT READY
+========================================================= */
+
+$(document).ready(function() {
+
+    /*
+     * -----------------------------------------------------
+     * REFRESH CAPTCHA ON PAGE LOAD
+     * -----------------------------------------------------
+     */
+    refreshAuthorizationCaptcha(false);
+
+    /*
+     * =====================================================
+     * AUTHORIZATION FORM
+     * =====================================================
+     */
+    $('#authorizationForm').on('submit', function(e) {
+        e.preventDefault();
+
+        const form = this;
+
+        /*
+         * -------------------------------------------------
+         * FILE
+         * -------------------------------------------------
+         */
+        const fileInput = $('#authorization_letter')[0];
+        const file = fileInput && fileInput.files ? fileInput.files[0] : null;
+
+        if (!file) {
+            showToast('warning', 'Please select Authorization Letter.');
+            return;
+        }
+
+        /*
+         * -------------------------------------------------
+         * FILE SIZE
+         * -------------------------------------------------
+         */
+        if (file.size > 5 * 1024 * 1024) {
+            showToast('danger', 'Maximum file size is 5 MB.');
+            return;
+        }
+
+        /*
+         * -------------------------------------------------
+         * CAPTCHA
+         * -------------------------------------------------
+         */
+        const captcha = $.trim($('#captcha').val());
+
+        if (!captcha) {
+            showToast('warning', 'Please enter CAPTCHA code.');
+            $('#captcha').focus();
+            return;
+        }
+
+        /*
+         * -------------------------------------------------
+         * TOKEN
+         * -------------------------------------------------
+         */
+        const authorizationToken = $.trim($('#authorization_token').val());
+
+        if (!authorizationToken) {
+            showToast('danger', 'Authorization token is missing. Please reload the page.');
+            return;
+        }
+
+        /*
+         * -------------------------------------------------
+         * FORM DATA
+         * -------------------------------------------------
+         */
+        const formData = new FormData(form);
+        formData.set('token', authorizationToken);
+        formData.set('captcha', captcha);
+        formData.set('<?= csrf_token() ?>', getCSRFHash());
+
+        /*
+         * -------------------------------------------------
+         * DEBUG
+         * -------------------------------------------------
+         */
+        console.log('POST TOKEN:', formData.get('token'));
+        console.log('POST CAPTCHA:', formData.get('captcha'));
+        console.log('POST CSRF:', formData.get('<?= csrf_token() ?>'));
+
+        /*
+         * -------------------------------------------------
+         * DISABLE BUTTON
+         * -------------------------------------------------
+         */
+        $('#uploadBtn')
+            .prop('disabled', true)
+            .html('<i class="fas fa-spinner fa-spin me-2"></i>Uploading...');
+
+        /*
+         * =================================================
+         * AJAX
+         * =================================================
+         */
+        $.ajax({
+            url: "<?= base_url('auth/upload-authorization') ?>",
+            type: "POST",
+            data: formData,
+            processData: false,
+            contentType: false,
+            dataType: "json",
+            headers: {
+                "X-Requested-With": "XMLHttpRequest",
+                "X-CSRF-TOKEN": getCSRFHash()
+            },
+
+            /*
+             * =============================================
+             * SUCCESS
+             * =============================================
+             */
+            success: function(response) {
+                console.log('UPLOAD RESPONSE:', response);
+
+                /*
+                 * UPDATE CSRF
+                 */
+                if (response.csrfHash) {
+                    updateCSRF(response.csrfHash);
+                }
+
+                /*
+                 * SUCCESS
+                 */
+                if (response.success) {
+                    showToast('success', response.message || 'Authorization Letter submitted successfully.');
+
+                    setTimeout(function() {
+                        if (response.redirect) {
+                            window.location.href = response.redirect;
+                        } else {
+                            window.location.reload();
+                        }
+                    }, 1500);
+
+                    return;
+                }
+
+                /*
+                 * FAILED
+                 */
+                showToast('error', response.message || 'Something went wrong.');
+                $('#captcha').val('');
+                refreshAuthorizationCaptcha(true);
+
+                /*
+                 * ENABLE
+                 */
+                $('#uploadBtn')
+                    .prop('disabled', false)
+                    .html('<i class="fas fa-paper-plane me-2"></i>Submit Authorization Letter');
+            },
+
+            /*
+             * =============================================
+             * AJAX ERROR
+             * =============================================
+             */
+            error: function(xhr) {
+                console.log('UPLOAD ERROR:', xhr.status);
+                console.log(xhr.responseText);
+
+                let message = 'Server error. Please try again.';
+
+                try {
+                    const response = JSON.parse(xhr.responseText);
+
+                    if (response.csrfHash) {
+                        updateCSRF(response.csrfHash);
+                    }
+
+                    if (response.message) {
+                        message = response.message;
+                    }
+                } catch (error) {
+                    console.log('Invalid JSON response');
+                }
+
+                showToast('error', message);
+                $('#captcha').val('');
+                refreshAuthorizationCaptcha(false);
+
+                /*
+                 * ENABLE
+                 */
+                $('#uploadBtn')
+                    .prop('disabled', false)
+                    .html('<i class="fas fa-paper-plane me-2"></i>Submit Authorization Letter');
+            }
+        });
+
+    });
+
+});
+</script>

@@ -1,0 +1,2 @@
+--- app/Controllers/Dashboard.php
++++ app/Controllers/Dashboard.php

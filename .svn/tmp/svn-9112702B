@@ -1,0 +1,2 @@
+--- app/Views/dashboard.php
++++ app/Views/dashboard.php
