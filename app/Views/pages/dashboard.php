@@ -1,3 +1,6 @@
+<?php
+ob_start();
+?>
 <!-- Flash Messages -->
 <?php if (session()->getFlashdata('success')): ?>
 <div class="booking-alert !bg-green-50 !border-green-500">
@@ -418,3 +421,7 @@
 
     </div>
 </div>
+<?php
+$page_content = ob_get_clean();
+include dirname(__DIR__) . '/dashboard.php';
+?>

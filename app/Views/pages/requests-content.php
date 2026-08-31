@@ -1,5 +1,8 @@
+<?php
+ob_start();
+?>
 <!-- Requests Page Content -->
-<div class="gov-card p-6">
+<div class="gov-card p-6" id="requests-list">
     <div class="flex items-center justify-between mb-6">
         <div class="flex items-center gap-3">
             <i class="fas fa-clipboard-list text-[#e58500] text-2xl"></i>
@@ -87,6 +90,9 @@
     <?php endif; ?>
 </div>
 
+<!-- View Request Detail Container -->
+<div id="view-request-content" class="hidden"></div>
+
 <script>
 function viewRequest(requestId) {
     fetch('<?= base_url('dashboard/get-request/') ?>' + requestId)
@@ -104,6 +110,19 @@ function viewRequest(requestId) {
             console.error('Error:', error);
             alert('Error loading request details');
         });
+}
+
+function showPage(pageName) {
+    const requestsList = document.getElementById('requests-list');
+    const viewRequestContent = document.getElementById('view-request-content');
+
+    if (pageName === 'view-request') {
+        requestsList.classList.add('hidden');
+        viewRequestContent.classList.remove('hidden');
+    } else {
+        requestsList.classList.remove('hidden');
+        viewRequestContent.classList.add('hidden');
+    }
 }
 
 function switchTab(tabName) {
@@ -484,3 +503,7 @@ function generateRequestHTML(request) {
     `;
 }
 </script>
+<?php
+$page_content = ob_get_clean();
+include dirname(__DIR__) . '/dashboard.php';
+?>

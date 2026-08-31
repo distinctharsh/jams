@@ -35,21 +35,32 @@ class Dashboard extends BaseController
 
     public function index()
     {
-        // Check login
+        // Login check
         if (!session()->get('isLoggedIn')) {
             return redirect()->to(base_url('/'));
         }
-        $pendingCount = $this->regModel->where('isactive_authlink', 0)->countAllResults(); 
+        $pendingCount = $this->regModel->where('isactive_authlink', 0)->countAllResults();
         $totalCount = $this->regModel->countAll();
+
+        // Password reset check (1 = required, 0 = normal)
+        if ((int) session()->get('password_reset_req') === 1) {
+            $deadline = (int) session()->get('password_change_deadline');
+
+            // If 1 minute deadline passed
+            if ($deadline > 0 && time() >= $deadline) {
+                return redirect()->to(base_url('change-password'));
+            }
+        }
+
         $data = [
-            'user_id'            => session()->get('user_id'),
-            'username'           => session()->get('username'),
-            'full_name'          => session()->get('full_name'),
-            'email'              => session()->get('email'),
-            'pending_count'      => $pendingCount,
-            'total_count'        => $totalCount,
+            'user_id'       => session()->get('user_id'),
+            'username'      => session()->get('username'),
+            'full_name'     => session()->get('full_name'),
+            'email'         => session()->get('email'),
+            'pending_count' => $pendingCount,
+            'total_count'   => $totalCount,
         ];
-        return view('dashboard', $data);
+        return view('pages/dashboard', $data);
     }
     
     public function newRequest()
@@ -58,7 +69,15 @@ class Dashboard extends BaseController
         if (!session()->get('isLoggedIn')) {
             return redirect()->to(base_url('/'));
         }
-        return view('new-request');
+
+        $data = [
+            'user_id'      => session()->get('user_id'),
+            'username'     => session()->get('username'),
+            'full_name'    => session()->get('full_name'),
+            'email'        => session()->get('email'),
+        ];
+
+        return view('pages/new-request', $data);
     }
     
     public function submitRequest()
@@ -141,116 +160,6 @@ class Dashboard extends BaseController
         return $this->response->setJSON(['success' => true, 'request' => $request]);
     }
 
-    public function designations()
-    {
-        if (!session()->get('isLoggedIn')) {
-            return redirect()->to(base_url('/'));
-        }
-
-        $data = [
-            'designations' => $this->desModel->getAllDesignations()
-        ];
-
-        return view('pages/designation', $data);
-    }
-
-    public function getDesignations()
-    {
-        if (!session()->get('isLoggedIn')) {
-            return $this->response->setJSON(['success' => false, 'message' => 'Unauthorized']);
-        }
-
-        return $this->response->setJSON([
-            'success'      => true,
-            'designations' => $this->desModel->getAllDesignations(),
-            'csrfHash'     => csrf_hash()
-        ]);
-    }
-
-    public function saveDesignation()
-    {
-        if (!session()->get('isLoggedIn')) {
-            return $this->response->setJSON(['success' => false, 'message' => 'Unauthorized']);
-        }
-
-        $id = $this->request->getPost('id');
-        $saveData = [
-            'name'     => trim($this->request->getPost('name')),
-            'isactive' => $this->request->getPost('isactive') ? 1 : 0,
-        ];
-
-        try {
-            if (!empty($id)) {
-                $this->desModel->update($id, $saveData);
-                $msg = 'Designation updated successfully.';
-            } else {
-                $this->desModel->insert($saveData);
-                $msg = 'Designation created successfully.';
-            }
-
-            return $this->response->setJSON([
-                'success'  => true,
-                'message'  => $msg,
-                'csrfHash' => csrf_hash()
-            ]);
-        } catch (\Exception $e) {
-            return $this->response->setJSON([
-                'success'  => false,
-                'message'  => 'Error saving data: ' . $e->getMessage(),
-                'csrfHash' => csrf_hash()
-            ]);
-        }
-    }
-
-    public function getDesignation($id = null)
-    {
-        if (!session()->get('isLoggedIn')) {
-            return $this->response->setJSON(['success' => false, 'message' => 'Unauthorized']);
-        }
-
-        if (!$id) {
-            return $this->response->setJSON(['success' => false, 'message' => 'Invalid ID']);
-        }
-
-        $data = $this->desModel->getDesignationById($id);
-
-        if ($data) {
-            return $this->response->setJSON([
-                'success'  => true,
-                'data'     => $data,
-                'csrfHash' => csrf_hash()
-            ]);
-        }
-
-        return $this->response->setJSON([
-            'success'  => false,
-            'message'  => 'Record not found',
-            'csrfHash' => csrf_hash()
-        ]);
-    }
-
-    public function deleteDesignation($id)
-    {
-        if (!session()->get('isLoggedIn')) {
-            return $this->response->setJSON(['success' => false, 'message' => 'Unauthorized']);
-        }
-
-        try {
-            $this->desModel->update($id, ['isactive' => 0]);
-
-            return $this->response->setJSON([
-                'success'  => true,
-                'message'  => 'Designation deactivated successfully.',
-                'csrfHash' => csrf_hash()
-            ]);
-        } catch (\Exception $e) {
-            return $this->response->setJSON([
-                'success'  => false,
-                'message'  => 'Error deactivating record: ' . $e->getMessage(),
-                'csrfHash' => csrf_hash()
-            ]);
-        }
-    }
     
     public function organizations()
     {
@@ -259,7 +168,11 @@ class Dashboard extends BaseController
         }
 
         $data = [
-            'organizations' => $this->orgModel->getAllOrganizations()
+            'organizations' => $this->orgModel->getAllOrganizations(),
+            'user_id'       => session()->get('user_id'),
+            'username'      => session()->get('username'),
+            'full_name'     => session()->get('full_name'),
+            'email'         => session()->get('email'),
         ];
 
         return view('pages/organization', $data);
@@ -372,7 +285,11 @@ class Dashboard extends BaseController
         }
 
         $data = [
-            'orgTypes' => $this->orgTypeModel->getAllOrgTypes()
+            'orgTypes'     => $this->orgTypeModel->getAllOrgTypes(),
+            'user_id'      => session()->get('user_id'),
+            'username'     => session()->get('username'),
+            'full_name'    => session()->get('full_name'),
+            'email'        => session()->get('email'),
         ];
 
         return view('pages/organization-type', $data);
@@ -484,7 +401,11 @@ class Dashboard extends BaseController
         }
 
         $data = [
-            'vendors' => $this->vendorModel->getAllVendors()
+            'vendors'      => $this->vendorModel->getAllVendors(),
+            'user_id'      => session()->get('user_id'),
+            'username'     => session()->get('username'),
+            'full_name'    => session()->get('full_name'),
+            'email'        => session()->get('email'),
         ];
 
         return view('pages/vendor', $data);
@@ -596,8 +517,12 @@ class Dashboard extends BaseController
         }
 
         $data = [
-            'models'  => $this->modelModel->getAllModels(),
-            'vendors' => $this->vendorModel->getAllVendors()
+            'models'       => $this->modelModel->getAllModels(),
+            'vendors'      => $this->vendorModel->getAllVendors(),
+            'user_id'      => session()->get('user_id'),
+            'username'     => session()->get('username'),
+            'full_name'    => session()->get('full_name'),
+            'email'        => session()->get('email'),
         ];
 
         return view('pages/model', $data);
@@ -707,10 +632,19 @@ class Dashboard extends BaseController
             return redirect()->to(base_url('/'));
         }
 
+        $designationModel = new \App\Models\DesignationModel();
+        $roleModel        = new \App\Models\RoleModel();
+
         $data = [
             'users'         => $this->userModel->getAllUsers(),
             'organizations' => $this->orgModel->getAllOrganizations(),
-            'orgTypes'      => $this->orgTypeModel->getAllOrgTypes()
+            'orgTypes'      => $this->orgTypeModel->getAllOrgTypes(),
+            'designations'  => $designationModel->findAll(),
+            'roles'         => $roleModel->findAll(),
+            'user_id'       => session()->get('user_id'),
+            'username'      => session()->get('username'),
+            'full_name'     => session()->get('full_name'),
+            'email'         => session()->get('email'),
         ];
 
         return view('pages/users', $data);
@@ -856,11 +790,17 @@ class Dashboard extends BaseController
         $orgModel = new \App\Models\OrganizationModel();
         $orgTypeModel = new \App\Models\OrgTypeModel();
 
-        $data['registrations'] = $regModel->getRegistrationsWithDetails();
-        $data['organizations'] = $orgModel->findAll();
-        $data['orgTypes']      = $orgTypeModel->findAll();
+        $data = [
+            'registrations'  => $regModel->getRegistrationsWithDetails(),
+            'organizations'  => $orgModel->findAll(),
+            'orgTypes'       => $orgTypeModel->findAll(),
+            'user_id'        => session()->get('user_id'),
+            'username'       => session()->get('username'),
+            'full_name'      => session()->get('full_name'),
+            'email'          => session()->get('email'),
+        ];
 
-        return view('dashboard/registrations', $data);
+        return view('pages/registrations', $data);
     }
 
     public function approveRegistration()
@@ -893,6 +833,22 @@ class Dashboard extends BaseController
                 'csrfHash'    => csrf_hash()
             ]);
         }
+    }
+
+    public function changePassword()
+    {
+        if (!session()->get('isLoggedIn')) {
+            return redirect()->to(base_url('/'));
+        }
+
+        $data = [
+            'user_id'      => session()->get('user_id'),
+            'username'     => session()->get('username'),
+            'full_name'    => session()->get('full_name'),
+            'email'        => session()->get('email'),
+        ];
+
+        return view('pages/change-password', $data);
     }
 
     public function updatePassword()
@@ -938,5 +894,72 @@ class Dashboard extends BaseController
             'message'  => 'Password changed successfully!',
             'csrfHash' => csrf_hash()
         ]);
+    }
+
+    // Additional page methods for MVC pattern
+    public function requests()
+    {
+        if (!session()->get('isLoggedIn')) {
+            return redirect()->to(base_url('/'));
+        }
+
+        $requestModel = new \App\Models\RequestModel();
+        $data = [
+            'requests'     => $requestModel->getAllRequests(),
+            'user_id'      => session()->get('user_id'),
+            'username'     => session()->get('username'),
+            'full_name'    => session()->get('full_name'),
+            'email'        => session()->get('email'),
+        ];
+
+        return view('pages/requests-content', $data);
+    }
+
+    public function analytics()
+    {
+        if (!session()->get('isLoggedIn')) {
+            return redirect()->to(base_url('/'));
+        }
+
+        $data = [
+            'user_id'      => session()->get('user_id'),
+            'username'     => session()->get('username'),
+            'full_name'    => session()->get('full_name'),
+            'email'        => session()->get('email'),
+        ];
+
+        return view('pages/analytics', $data);
+    }
+
+    public function settings()
+    {
+        if (!session()->get('isLoggedIn')) {
+            return redirect()->to(base_url('/'));
+        }
+
+        $data = [
+            'user_id'      => session()->get('user_id'),
+            'username'     => session()->get('username'),
+            'full_name'    => session()->get('full_name'),
+            'email'        => session()->get('email'),
+        ];
+
+        return view('pages/settings', $data);
+    }
+
+    public function auditLog()
+    {
+        if (!session()->get('isLoggedIn')) {
+            return redirect()->to(base_url('/'));
+        }
+
+        $data = [
+            'user_id'      => session()->get('user_id'),
+            'username'     => session()->get('username'),
+            'full_name'    => session()->get('full_name'),
+            'email'        => session()->get('email'),
+        ];
+
+        return view('pages/audit-log', $data);
     }
 }

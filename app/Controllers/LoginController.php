@@ -90,35 +90,35 @@ class LoginController extends BaseController
             }
 
             $password = '';
+            $passwordResetReq = (int) ($user['password_reset_req'] ?? 0);
+            $loginTime = time();
+
             $this->session->regenerate(true);
 
             $this->session->set([
-                'user_id'         => $user['id'],
-                'name'            => $user['name'],
-                'email'           => $user['email'],
-                'mobile_no'       => $user['mobile_no'] ?? null,
-                'organization_id' => $user['organization_id'] ?? null,
-                'org_type'        => $user['org_type'] ?? null,
-                'designation'     => $user['designation'] ?? null,
-                'ugc_id'          => $user['ugc_id'] ?? null,
-                'isLoggedIn'      => true,
-                'login_time'      => time(),
-                'role_ids'        => $user['role_ids'] ?? null
+                'user_id'                     => $user['id'],
+                'name'                        => $user['name'],
+                'email'                       => $user['email'],
+                'mobile_no'                   => $user['mobile_no'] ?? null,
+                'organization_id'             => $user['organization_id'] ?? null,
+                'org_type'                    => $user['org_type'] ?? null,
+                'designation'                 => $user['designation'] ?? null,
+                'ugc_id'                      => $user['ugc_id'] ?? null,
+                'isLoggedIn'                  => true,
+                'login_time'                  => $loginTime,
+                'password_reset_req'          => $passwordResetReq,
+                'password_change_login_time'  => $passwordResetReq === 1 ? $loginTime : null,
+                'password_change_deadline'    => $passwordResetReq === 1 ? ($loginTime + 1) : null
             ]);
 
-            // Audit Trail
-            create_audit_trail(
-                $user['id'],
-                $user['email'],
-                'LOGIN',
-                'User logged in successfully'
-            );
+            create_audit_trail($user['id'], $user['email'], 'LOGIN', 'User logged in successfully');
 
             return $this->response->setJSON([
-                'success'   => true,
-                'message'   => 'Login successful.',
-                'redirect'  => base_url('dashboard'),
-                'csrfHash'  => csrf_hash()
+                'success'        => true,
+                'message'        => 'Login successful.',
+                'redirect'       => base_url('dashboard'),
+                'passwordChange' => $passwordResetReq === 1,
+                'csrfHash'       => csrf_hash()
             ]);
 
         } catch (\Throwable $e) {
@@ -126,9 +126,9 @@ class LoginController extends BaseController
             return $this->response
                 ->setStatusCode(500)
                 ->setJSON([
-                    'success'   => false,
-                    'message'   => 'An error occurred during login.',
-                    'csrfHash'  => csrf_hash()
+                    'success'  => false,
+                    'message'  => 'An error occurred during login.',
+                    'csrfHash' => csrf_hash()
                 ]);
         }
     }

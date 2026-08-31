@@ -1,3 +1,6 @@
+<?php
+ob_start();
+?>
 <!-- Analytics Page Content -->
 <div class="gov-card p-6">
     <div class="flex items-center gap-3 mb-6">
@@ -10,3 +13,7 @@
         <p class="text-slate-500">Analytics and reports will appear here</p>
     </div>
 </div>
+<?php
+$page_content = ob_get_clean();
+include dirname(__DIR__) . '/dashboard.php';
+?>

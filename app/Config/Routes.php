@@ -27,6 +27,15 @@ $routes->get(
     'contact',
     'LoginController::contact'
 );
+$routes->get(
+    'change-password',
+    'ChangePassword::index'
+);
+$routes->post(
+    'change-password/update',
+    'ChangePassword::update'
+);
+
 // Signup Auth Routes
 $routes->get('signup', 'Auth::signup');
 $routes->post('auth/register', 'Auth::register');
@@ -86,20 +95,17 @@ $routes->post('dashboard/save-user', 'Dashboard::saveUser');
 $routes->get('dashboard/get-user/(:num)', 'Dashboard::getUser/$1');
 $routes->post('dashboard/delete-user/(:num)', 'Dashboard::deleteUser/$1');
 
-// Designation Routes
-$routes->get('dashboard/designations', 'Dashboard::designations');
-$routes->get('dashboard/get-designations', 'Dashboard::getDesignations');
-$routes->get('dashboard/get-designation/(:num)', 'Dashboard::getDesignation/$1');
-$routes->post('dashboard/save-designation', 'Dashboard::saveDesignation');
-$routes->post('dashboard/delete-designation/(:num)', 'Dashboard::deleteDesignation/$1');
-
 // Registration Routes
 $routes->get('dashboard/registrations', 'Dashboard::registrations');
 $routes->post('dashboard/approve-registration', 'Dashboard::approveRegistration');
 
+// Additional Dashboard Routes
+$routes->get('dashboard/requests', 'Dashboard::requests');
+$routes->get('dashboard/analytics', 'Dashboard::analytics');
+$routes->get('dashboard/settings', 'Dashboard::settings');
+$routes->get('dashboard/audit-log', 'Dashboard::auditLog');
+
 $routes->get('uploads/authorization/(:segment)', 'PdfController::viewPdf/$1');
 
-$routes->get('(:any)', 'Dashboard::index');
-
-
+$routes->get('dashboard/change-password', 'Dashboard::changePassword');
 $routes->post('dashboard/update-password', 'Dashboard::updatePassword');

@@ -1,3 +1,6 @@
+<?php
+ob_start();
+?>
 <!-- Manage Organization Types Page -->
 <div class="space-y-6">
 
@@ -423,3 +426,7 @@ $(document).ready(function() {
     }
 });
 </script>
+<?php
+$page_content = ob_get_clean();
+include dirname(__DIR__) . '/dashboard.php';
+?>

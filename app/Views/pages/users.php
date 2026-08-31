@@ -1,15 +1,7 @@
+<?php
+ob_start();
+?>
 <!-- Manage Users Page -->
-<link rel="stylesheet" href="<?= base_url('assets/css/buttons.dataTables.min.css') ?>">
-<script src="<?= base_url('assets/js/jquery-3.7.0.min.js') ?>"></script>
-<script src="<?= base_url('assets/js/tost.js') ?>"></script>
-<script src="<?= base_url('assets/js/jquery.dataTables.min.js') ?>"></script>
-<script src="<?= base_url('assets/js/dataTables.buttons.min.js') ?>"></script>
-<script src="<?= base_url('assets/js/jszip.min.js') ?>"></script>
-<script src="<?= base_url('assets/js/pdfmake.min.js') ?>"></script>
-<script src="<?= base_url('assets/js/vfs_fonts.js') ?>"></script>
-<script src="<?= base_url('assets/js/buttons.html5.min.js') ?>"></script>
-<script src="<?= base_url('assets/js/buttons.print.min.js') ?>"></script>
-
 <style>
 /* Custom Buttons Styling */
 .dt-buttons {
@@ -56,9 +48,20 @@
     background-color: #f1f5f9 !important;
     color: #0f172a !important;
 }
-
-
 </style>
+
+<script src="<?= base_url('assets/js/jquery-3.7.0.min.js') ?>"></script>
+<script src="<?= base_url('assets/js/tost.js') ?>"></script>
+<link rel="stylesheet" href="<?= base_url('assets/css/select2.min.css') ?>">
+<link rel="stylesheet" href="<?= base_url('assets/css/buttons.dataTables.min.css') ?>">
+<script src="<?= base_url('assets/js/select2.min.js') ?>"></script>
+<script src="<?= base_url('assets/js/jquery.dataTables.min.js') ?>"></script>
+<script src="<?= base_url('assets/js/dataTables.buttons.min.js') ?>"></script>
+<script src="<?= base_url('assets/js/jszip.min.js') ?>"></script>
+<script src="<?= base_url('assets/js/pdfmake.min.js') ?>"></script>
+<script src="<?= base_url('assets/js/vfs_fonts.js') ?>"></script>
+<script src="<?= base_url('assets/js/buttons.html5.min.js') ?>"></script>
+<script src="<?= base_url('assets/js/buttons.print.min.js') ?>"></script>
 
 <div class="space-y-6">
     <div class="gov-card p-6">
@@ -662,3 +665,7 @@ $(document).ready(function() {
     }
 });
 </script>
+<?php
+$page_content = ob_get_clean();
+include dirname(__DIR__) . '/dashboard.php';
+?>

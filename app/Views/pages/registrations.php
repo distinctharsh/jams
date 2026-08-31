@@ -1,3 +1,6 @@
+<?php
+ob_start();
+?>
 <div class="space-y-6">
     <div class="gov-card p-6">
         <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
@@ -371,3 +374,7 @@ $(document).ready(function() {
     });
 });
 </script>
+<?php
+$page_content = ob_get_clean();
+include dirname(__DIR__) . '/dashboard.php';
+?>

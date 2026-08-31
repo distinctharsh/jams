@@ -1,3 +1,6 @@
+<?php
+ob_start();
+?>
 <div class="max-w-xl mx-auto">
     <div class="gov-card p-6">
         <div class="flex items-center gap-3 mb-6 pb-4 border-b border-slate-200">
@@ -72,7 +75,11 @@ function submitChangePassword(e) {
     .catch(() => {
         alertBox.classList.remove('hidden');
         alertBox.classList.add('bg-red-100', 'text-red-700');
-        alertBox.innerText = 'Something went wrong. Please try again.';
+        alertBox.innerText = 'An error occurred. Please try again.';
     });
 }
 </script>
+<?php
+$page_content = ob_get_clean();
+include dirname(__DIR__) . '/dashboard.php';
+?>

@@ -1,3 +1,6 @@
+<?php
+ob_start();
+?>
 <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
 
     <div class="lg:col-span-2 space-y-6">
@@ -342,4 +345,9 @@
         const [year, month, day] = picker.value.split('-');
         document.getElementById('examDateText').value = `${day}/${month}/${year}`;
     }
+});
 </script>
+<?php
+$page_content = ob_get_clean();
+include dirname(__DIR__) . '/dashboard.php';
+?>

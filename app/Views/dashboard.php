@@ -319,6 +319,8 @@
       overflow-y: auto;
       padding: 1.8rem 2rem 2rem;
       background: #f5f8fd;
+      min-height: 90vh;
+      margin-bottom: 10vh;
     }
 
     /* cards */
@@ -1200,13 +1202,7 @@
     transform: scale(.95);
 }
 
-/* Page content visibility */
-.page-content {
-    display: none;
-}
-.page-content.active {
-    display: block;
-}
+
 
 .timeline-comment{
     font-size:12px;
@@ -1374,8 +1370,23 @@
 </head>
 <body>
 <?php include 'components/header.php'; ?>
-<?php include 'components/sidebar.php'; ?>
+
+<!-- MAIN LAYOUT: sidebar + content -->
+<div class="flex overflow-hidden">
+  <?php include 'components/sidebar.php'; ?>
+
+  <!-- MAIN CONTENT -->
+  <div class="main-content">
+    <?php
+    if (isset($page_content) && !empty($page_content)) {
+        echo $page_content;
+    }
+    ?>
+  </div>
+</div>
+
 <?php include 'components/footer.php'; ?>
+
 <script>
   // Profile dropdown
   function toggleDropdown() {
@@ -1407,90 +1418,6 @@
       }
     }
   }
-  
-  // SPA Navigation - Show pages without refresh
-  function showPage(pageId, pushToHistory = true) {
-    document.querySelectorAll('.page-content').forEach(page => {
-      page.classList.remove('active');
-    });
-    
-    const selectedPage = document.getElementById(pageId);
-    if (selectedPage) {
-      selectedPage.classList.add('active');
-    } else {
-      document.getElementById('dashboard')?.classList.add('active');
-      pageId = 'dashboard';
-    }
-    
-    document.querySelectorAll('.gov-sidebar .nav-item').forEach(item => {
-      item.classList.remove('active');
-      const onclickAttr = item.getAttribute('onclick');
-      if (onclickAttr && (onclickAttr.includes(`'${pageId}'`) || onclickAttr.includes(`"${pageId}"`))) {
-        item.classList.add('active');
-      }
-    });
-
-    if (pushToHistory) {
-      const newUrl = pageId === 'dashboard' 
-        ? '<?= base_url('dashboard') ?>' 
-        :  pageId;
-        
-      history.pushState({ pageId: pageId }, '', newUrl);
-    }
-
-    if (window.event) {
-      window.event.preventDefault();
-    }
-  }
-
-  window.addEventListener('popstate', function(event) {
-    if (event.state && event.state.pageId) {
-      showPage(event.state.pageId, false);
-    } else {
-      const path = window.location.pathname.split('/').pop();
-      showPage(path && path !== 'dashboard' ? path : 'dashboard', false);
-    }
-  });
-
-  document.addEventListener('DOMContentLoaded', function() {
-    const currentPath = window.location.pathname.split('/').pop();
-    if (currentPath && currentPath !== 'dashboard' && document.getElementById(currentPath)) {
-      showPage(currentPath, false);
-    } else {
-      history.replaceState({ pageId: 'dashboard' }, '', '<?= base_url('dashboard') ?>');
-    }
-
-    setTimeout(function() {
-      const requestCount = document.querySelectorAll('#requests table tbody tr').length;
-      const requestBadge = document.getElementById('request-count');
-      if (requestBadge) {
-        requestBadge.textContent = requestCount;
-      }
-    }, 100);
-  });
-  
-  document.addEventListener('DOMContentLoaded', function() {
-    setTimeout(function() {
-      const requestCount = document.querySelectorAll('#requests table tbody tr').length;
-      const requestBadge = document.getElementById('request-count');
-      if (requestBadge) {
-        requestBadge.textContent = requestCount;
-      }
-    }, 100);
-  });
-  
-  // filter chips (toggle active)
-  document.querySelectorAll('.filter-chip').forEach(chip => {
-    chip.addEventListener('click', function() {
-      const parent = this.closest('.flex.gap-2');
-      if (parent) {
-        parent.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('orange-active'));
-        this.classList.add('orange-active');
-      }
-    });
-  });
-
-
 
 // Notification popup functions
   let notificationTimer = null;
@@ -1513,6 +1440,30 @@
       setTimeout(showNotification, 1000);
   });
 </script>
+
+<!-- Gitesh -->
+<script>
+(function() {
+    const passwordResetReq = <?= (int) session()->get('password_reset_req') ?>;
+    const loginTime = <?= (int) session()->get('password_change_login_time') ?>;
+    const deadline = <?= (int) session()->get('password_change_deadline') ?>;
+
+    if (passwordResetReq === 1 && deadline > 0) {
+        const currentTime = Math.floor(Date.now() / 1000);
+        const remainingSeconds = deadline - currentTime;
+
+        if (remainingSeconds <= 0) {
+            window.location.replace("<?= base_url('change-password') ?>");
+            return;
+        }
+
+        setTimeout(function() {
+            window.location.replace("<?= base_url('change-password') ?>");
+        }, remainingSeconds * 1000);
+    }
+})();
+</script>
+<!-- Gitesh -->
 
     <div id="complaintNotification" style="
         position: fixed;
