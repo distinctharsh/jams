@@ -475,7 +475,7 @@ $(document).ready(function() {
         }
 
         $.ajax({
-            url: "<?= base_url('dashboard/save-user') ?>",
+            url: "<?= base_url('save-user') ?>",
             type: "POST",
             data: formData,
             contentType: false,
@@ -506,7 +506,7 @@ $(document).ready(function() {
 
     function loadUsers() {
         $.ajax({
-            url: "<?= base_url('dashboard/get-users') ?>",
+            url: "<?= base_url('get-users') ?>",
             type: "GET",
             dataType: "json",
             success: function(res) {
@@ -574,7 +574,7 @@ $(document).ready(function() {
             e.preventDefault();
             let id = $(this).data('id');
             $.ajax({
-                url: "<?= base_url('dashboard/get-user/') ?>" + id,
+                url: "<?= base_url('get-user/') ?>" + id,
                 type: "GET",
                 dataType: "json",
                 success: function(res) {
@@ -644,7 +644,7 @@ $(document).ready(function() {
             dataParam[csrfInput.attr('name')] = csrfInput.val();
 
             $.ajax({
-                url: "<?= base_url('dashboard/delete-user/') ?>" + id,
+                url: "<?= base_url('delete-user/') ?>" + id,
                 type: "POST",
                 data: dataParam,
                 dataType: "json",

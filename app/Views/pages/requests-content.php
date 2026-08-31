@@ -95,7 +95,7 @@ ob_start();
 
 <script>
 function viewRequest(requestId) {
-    fetch('<?= base_url('dashboard/get-request/') ?>' + requestId)
+    fetch('<?= base_url('get-request/') ?>' + requestId)
         .then(response => response.json())
         .then(data => {
             if (data.success) {

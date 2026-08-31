@@ -330,7 +330,7 @@ $(document).ready(function() {
         }
 
         $.ajax({
-            url: "<?= base_url('dashboard/save-organization') ?>",
+            url: "<?= base_url('save-organization') ?>",
             type: "POST",
             data: formData,
             dataType: "json",
@@ -358,7 +358,7 @@ $(document).ready(function() {
     
     function loadOrganizations() {
         $.ajax({
-            url: "<?= base_url('dashboard/get-organizations') ?>",
+            url: "<?= base_url('get-organizations') ?>",
             type: "GET",
             dataType: "json",
             cache: false,
@@ -430,7 +430,7 @@ $(document).ready(function() {
         $('.edit-btn').off('click').on('click', function() {
             let id = $(this).data('id');
             $.ajax({
-                url: "<?= base_url('dashboard/get-organization/') ?>" + id,
+                url: "<?= base_url('get-organization/') ?>" + id,
                 type: "GET",
                 cache: false,
                 dataType: "json",
@@ -465,7 +465,7 @@ $(document).ready(function() {
             dataParam[csrfInput.attr('name')] = csrfInput.val();
 
             $.ajax({
-                url: "<?= base_url('dashboard/delete-organization/') ?>" + id,
+                url: "<?= base_url('delete-organization/') ?>" + id,
                 type: "POST",
                 data: dataParam,
                 dataType: "json",

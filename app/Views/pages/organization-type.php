@@ -284,7 +284,7 @@ $(document).ready(function() {
         }
 
         $.ajax({
-            url: "<?= base_url('dashboard/save-org-type') ?>",
+            url: "<?= base_url('save-org-type') ?>",
             type: "POST",
             data: formData,
             dataType: "json",
@@ -313,7 +313,7 @@ $(document).ready(function() {
 
     function loadOrgTypes() {
         $.ajax({
-            url: "<?= base_url('dashboard/get-org-types') ?>",
+            url: "<?= base_url('get-org-types') ?>",
             type: "GET",
             dataType: "json",
             success: function(res) {
@@ -372,7 +372,7 @@ $(document).ready(function() {
         $('.edit-type-btn').off('click').on('click', function() {
             let id = $(this).data('id');
             $.ajax({
-                url: "<?= base_url('dashboard/get-org-type/') ?>" + id,
+                url: "<?= base_url('get-org-type/') ?>" + id,
                 type: "GET",
                 dataType: "json",
                 success: function(res) {
@@ -405,7 +405,7 @@ $(document).ready(function() {
             dataParam[csrfInput.attr('name')] = csrfInput.val();
 
             $.ajax({
-                url: "<?= base_url('dashboard/delete-org-type/') ?>" + id,
+                url: "<?= base_url('delete-org-type/') ?>" + id,
                 type: "POST",
                 data: dataParam,
                 dataType: "json",

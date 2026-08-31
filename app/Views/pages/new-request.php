@@ -5,7 +5,7 @@ ob_start();
 
     <div class="lg:col-span-2 space-y-6">
         
-        <form action="<?= base_url('dashboard/submit-request') ?>" method="POST" class="space-y-6" enctype="multipart/form-data">
+        <form action="<?= base_url('submit-request') ?>" method="POST" class="space-y-6" enctype="multipart/form-data">
             <?= csrf_field() ?>
 
             <div class="gov-card p-6">

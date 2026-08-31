@@ -378,7 +378,7 @@ $(document).ready(function() {
         }
 
         $.ajax({
-            url: "<?= base_url('dashboard/save-model') ?>",
+            url: "<?= base_url('save-model') ?>",
             type: "POST",
             data: formData,
             dataType: "json",
@@ -407,7 +407,7 @@ $(document).ready(function() {
 
     function loadModels() {
         $.ajax({
-            url: "<?= base_url('dashboard/get-models') ?>",
+            url: "<?= base_url('get-models') ?>",
             type: "GET",
             dataType: "json",
             success: function(res) {
@@ -463,7 +463,7 @@ $(document).ready(function() {
         $('.edit-model-btn').off('click').on('click', function() {
             let id = $(this).data('id');
             $.ajax({
-                url: "<?= base_url('dashboard/get-model/') ?>" + id,
+                url: "<?= base_url('get-model/') ?>" + id,
                 type: "GET",
                 dataType: "json",
                 success: function(res) {
@@ -495,7 +495,7 @@ $(document).ready(function() {
             dataParam[csrfInput.attr('name')] = csrfInput.val();
 
             $.ajax({
-                url: "<?= base_url('dashboard/delete-model/') ?>" + id,
+                url: "<?= base_url('delete-model/') ?>" + id,
                 type: "POST",
                 data: dataParam,
                 dataType: "json",

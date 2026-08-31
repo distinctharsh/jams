@@ -256,7 +256,7 @@ $(document).ready(function() {
         }
 
         $.ajax({
-            url: "<?= base_url('dashboard/save-vendor') ?>",
+            url: "<?= base_url('save-vendor') ?>",
             type: "POST",
             data: formData,
             dataType: "json",
@@ -285,7 +285,7 @@ $(document).ready(function() {
 
     function loadVendors() {
         $.ajax({
-            url: "<?= base_url('dashboard/get-vendors') ?>",
+            url: "<?= base_url('get-vendors') ?>",
             type: "GET",
             dataType: "json",
             success: function(res) {
@@ -340,7 +340,7 @@ $(document).ready(function() {
         $('.edit-vendor-btn').off('click').on('click', function() {
             let id = $(this).data('id');
             $.ajax({
-                url: "<?= base_url('dashboard/get-vendor/') ?>" + id,
+                url: "<?= base_url('get-vendor/') ?>" + id,
                 type: "GET",
                 dataType: "json",
                 success: function(res) {
@@ -371,7 +371,7 @@ $(document).ready(function() {
             dataParam[csrfInput.attr('name')] = csrfInput.val();
 
             $.ajax({
-                url: "<?= base_url('dashboard/delete-vendor/') ?>" + id,
+                url: "<?= base_url('delete-vendor/') ?>" + id,
                 type: "POST",
                 data: dataParam,
                 dataType: "json",

@@ -835,66 +835,6 @@ class Dashboard extends BaseController
         }
     }
 
-    public function changePassword()
-    {
-        if (!session()->get('isLoggedIn')) {
-            return redirect()->to(base_url('/'));
-        }
-
-        $data = [
-            'user_id'      => session()->get('user_id'),
-            'username'     => session()->get('username'),
-            'full_name'    => session()->get('full_name'),
-            'email'        => session()->get('email'),
-        ];
-
-        return view('pages/change-password', $data);
-    }
-
-    public function updatePassword()
-    {
-        if (!session()->get('isLoggedIn')) {
-            return $this->response->setJSON(['success' => false, 'message' => 'Unauthorized access']);
-        }
-
-        $userId          = session()->get('user_id');
-        $currentPassword = $this->request->getPost('current_password');
-        $newPassword     = $this->request->getPost('new_password');
-        $confirmPassword = $this->request->getPost('confirm_password');
-
-        // Basic Validation
-        if (empty($currentPassword) || empty($newPassword) || empty($confirmPassword)) {
-            return $this->response->setJSON(['success' => false, 'message' => 'All fields are required.', 'csrfHash' => csrf_hash()]);
-        }
-
-        if ($newPassword !== $confirmPassword) {
-            return $this->response->setJSON(['success' => false, 'message' => 'New password and confirm password do not match.', 'csrfHash' => csrf_hash()]);
-        }
-
-        if (strlen($newPassword) < 8) {
-            return $this->response->setJSON(['success' => false, 'message' => 'Password must be at least 8 characters long.', 'csrfHash' => csrf_hash()]);
-        }
-
-        // Fetch user details
-        $user = $this->userModel->find($userId);
-        
-        // Validate current password (Assumes password hash field is 'hash' or 'password')
-        $userHash = $user['hash'] ?? $user['password'] ?? '';
-        
-        if (!password_verify($currentPassword, $userHash)) {
-            return $this->response->setJSON(['success' => false, 'message' => 'Incorrect current password.', 'csrfHash' => csrf_hash()]);
-        }
-
-        // Update new password hash
-        $newHash = password_hash($newPassword, PASSWORD_DEFAULT);
-        $this->userModel->update($userId, ['hash' => $newHash]);
-
-        return $this->response->setJSON([
-            'success'  => true,
-            'message'  => 'Password changed successfully!',
-            'csrfHash' => csrf_hash()
-        ]);
-    }
 
     // Additional page methods for MVC pattern
     public function requests()

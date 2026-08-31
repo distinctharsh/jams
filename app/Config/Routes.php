@@ -56,56 +56,53 @@ $routes->post('refresh-captcha', 'Auth::refreshCaptcha');
 
 $routes->get('dashboard', 'Dashboard::index');
 $routes->get('new-request', 'Dashboard::newRequest');
-$routes->post('dashboard/submit-request', 'Dashboard::submitRequest');
-$routes->get('dashboard/view-request/(:num)', 'Dashboard::viewRequest/$1');
-$routes->get('dashboard/get-request/(:num)', 'Dashboard::getRequest/$1');
+$routes->post('submit-request', 'Dashboard::submitRequest');
+$routes->get('view-request/(:num)', 'Dashboard::viewRequest/$1');
+$routes->get('get-request/(:num)', 'Dashboard::getRequest/$1');
 
 // Organizations Routes
-$routes->get('dashboard/organizations', 'Dashboard::organizations');
-$routes->get('dashboard/get-organizations', 'Dashboard::getOrganizations');
-$routes->post('dashboard/save-organization', 'Dashboard::saveOrganization');
-$routes->get('dashboard/get-organization/(:num)', 'Dashboard::getOrganization/$1');
-$routes->post('dashboard/delete-organization/(:num)', 'Dashboard::deleteOrganization/$1');
+$routes->get('organizations', 'Dashboard::organizations');
+$routes->get('get-organizations', 'Dashboard::getOrganizations');
+$routes->post('save-organization', 'Dashboard::saveOrganization');
+$routes->get('get-organization/(:num)', 'Dashboard::getOrganization/$1');
+$routes->post('delete-organization/(:num)', 'Dashboard::deleteOrganization/$1');
 
 // Organization Types Routes
-$routes->get('dashboard/organization-types', 'Dashboard::orgTypes');
-$routes->get('dashboard/get-org-types', 'Dashboard::getOrgTypes');
-$routes->post('dashboard/save-org-type', 'Dashboard::saveOrgType');
-$routes->get('dashboard/get-org-type/(:num)', 'Dashboard::getOrgType/$1');
-$routes->post('dashboard/delete-org-type/(:num)', 'Dashboard::deleteOrgType/$1');
+$routes->get('organization-types', 'Dashboard::orgTypes');
+$routes->get('get-org-types', 'Dashboard::getOrgTypes');
+$routes->post('save-org-type', 'Dashboard::saveOrgType');
+$routes->get('get-org-type/(:num)', 'Dashboard::getOrgType/$1');
+$routes->post('delete-org-type/(:num)', 'Dashboard::deleteOrgType/$1');
 
 // Vendor Routes
-$routes->get('dashboard/vendors', 'Dashboard::vendors');
-$routes->get('dashboard/get-vendors', 'Dashboard::getVendors');
-$routes->get('dashboard/get-vendor/(:num)', 'Dashboard::getVendor/$1');
-$routes->post('dashboard/save-vendor', 'Dashboard::saveVendor');
-$routes->post('dashboard/delete-vendor/(:num)', 'Dashboard::deleteVendor/$1');
+$routes->get('vendors', 'Dashboard::vendors');
+$routes->get('get-vendors', 'Dashboard::getVendors');
+$routes->get('get-vendor/(:num)', 'Dashboard::getVendor/$1');
+$routes->post('save-vendor', 'Dashboard::saveVendor');
+$routes->post('delete-vendor/(:num)', 'Dashboard::deleteVendor/$1');
 
 // Model Routes
-$routes->get('dashboard/models', 'Dashboard::models');
-$routes->get('dashboard/get-models', 'Dashboard::getModels');
-$routes->get('dashboard/get-model/(:num)', 'Dashboard::getModel/$1');
-$routes->post('dashboard/save-model', 'Dashboard::saveModel');
-$routes->post('dashboard/delete-model/(:num)', 'Dashboard::deleteModel/$1');
+$routes->get('models', 'Dashboard::models');
+$routes->get('get-models', 'Dashboard::getModels');
+$routes->get('get-model/(:num)', 'Dashboard::getModel/$1');
+$routes->post('save-model', 'Dashboard::saveModel');
+$routes->post('delete-model/(:num)', 'Dashboard::deleteModel/$1');
 
 // User Routes
-$routes->get('dashboard/users', 'Dashboard::users');
-$routes->get('dashboard/get-users', 'Dashboard::getUsers');
-$routes->post('dashboard/save-user', 'Dashboard::saveUser');
-$routes->get('dashboard/get-user/(:num)', 'Dashboard::getUser/$1');
-$routes->post('dashboard/delete-user/(:num)', 'Dashboard::deleteUser/$1');
+$routes->get('users', 'Dashboard::users');
+$routes->get('get-users', 'Dashboard::getUsers');
+$routes->post('save-user', 'Dashboard::saveUser');
+$routes->get('get-user/(:num)', 'Dashboard::getUser/$1');
+$routes->post('delete-user/(:num)', 'Dashboard::deleteUser/$1');
 
 // Registration Routes
-$routes->get('dashboard/registrations', 'Dashboard::registrations');
-$routes->post('dashboard/approve-registration', 'Dashboard::approveRegistration');
+$routes->get('registrations', 'Dashboard::registrations');
+$routes->post('approve-registration', 'Dashboard::approveRegistration');
 
 // Additional Dashboard Routes
-$routes->get('dashboard/requests', 'Dashboard::requests');
-$routes->get('dashboard/analytics', 'Dashboard::analytics');
-$routes->get('dashboard/settings', 'Dashboard::settings');
-$routes->get('dashboard/audit-log', 'Dashboard::auditLog');
+$routes->get('requests', 'Dashboard::requests');
+$routes->get('analytics', 'Dashboard::analytics');
+$routes->get('settings', 'Dashboard::settings');
+$routes->get('audit-log', 'Dashboard::auditLog');
 
 $routes->get('uploads/authorization/(:segment)', 'PdfController::viewPdf/$1');
-
-$routes->get('dashboard/change-password', 'Dashboard::changePassword');
-$routes->post('dashboard/update-password', 'Dashboard::updatePassword');

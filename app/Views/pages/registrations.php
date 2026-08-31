@@ -339,7 +339,7 @@ $(document).ready(function() {
         $('#submitActionBtn').prop('disabled', true).text(btnText);
 
         $.ajax({
-            url: "<?= base_url('dashboard/approve-registration') ?>",
+            url: "<?= base_url('approve-registration') ?>",
             type: "POST",
             data: $(this).serialize(),
             dataType: "json",
