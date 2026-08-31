@@ -117,7 +117,6 @@ class LoginController extends BaseController
                 'ugc_id'          => $user['ugc_id'] ?? null,
                 'isLoggedIn'      => true,
                 'login_time'      => time(),
-                'role_ids'        => $user['role_ids'] ?? null,
                 // Only password reset flag
                 'password_reset_req' => $passwordResetReq
             ]);
