@@ -291,6 +291,11 @@
         ?>
     </div>
 
+    <!-- Change Password Content Container -->
+    <div id="change-password" class="page-content">
+        <?php include APPPATH.'Views/pages/change-password.php'; ?>
+    </div>
+
   </div>
 </div>
 

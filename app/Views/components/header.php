@@ -97,7 +97,7 @@
                     <i class="fas fa-user-circle"></i>
                     <span>My Profile</span>
                 </a>
-                <a href="#">
+                <a href="change-password" onclick="showPage('change-password'); toggleDropdown();">
                     <i class="fas fa-key"></i>
                     <span>Change Password</span>
                 </a>

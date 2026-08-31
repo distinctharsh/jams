@@ -100,3 +100,6 @@ $routes->post('dashboard/approve-registration', 'Dashboard::approveRegistration'
 $routes->get('uploads/authorization/(:segment)', 'PdfController::viewPdf/$1');
 
 $routes->get('(:any)', 'Dashboard::index');
+
+
+$routes->post('dashboard/update-password', 'Dashboard::updatePassword');
