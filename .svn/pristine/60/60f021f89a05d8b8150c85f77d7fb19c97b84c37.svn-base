@@ -1,0 +1,108 @@
+<?php
+
+use CodeIgniter\Router\RouteCollection;
+
+/** @var RouteCollection $routes */
+$routes->get('/', 'Home::index');
+$routes->get('test-db', 'Test::index');
+
+// Login Routes
+$routes->post(
+    'login',
+    'LoginController::login'
+);
+$routes->post(
+    'login-crypto-config',
+    'LoginController::cryptoConfig'
+);
+$routes->get(
+    'logout',
+    'LoginController::logout'
+);
+$routes->post(
+    'refresh-captcha',
+    'LoginController::refreshCaptcha'
+);
+$routes->get(
+    'contact',
+    'LoginController::contact'
+);
+$routes->get(
+    'change-password',
+    'ChangePassword::index'
+);
+$routes->post(
+    'change-password/update',
+    'ChangePassword::update'
+);
+
+// Signup Auth Routes
+$routes->get('signup', 'Auth::signup');
+$routes->post('auth/register', 'Auth::register');
+$routes->get(
+    'auth/authorization',
+    'Auth::authorization'
+);
+$routes->post(
+    'auth/upload-authorization',
+    'Auth::uploadAuthorization'
+);
+$routes->get(
+    'auth/application-submitted',
+    'Auth::applicationSubmitted'
+);
+$routes->post('refresh-captcha', 'Auth::refreshCaptcha');
+
+
+$routes->get('dashboard', 'Dashboard::index');
+$routes->get('new-request', 'Dashboard::newRequest');
+$routes->post('submit-request', 'Dashboard::submitRequest');
+$routes->get('view-request/(:num)', 'Dashboard::viewRequest/$1');
+$routes->get('get-request/(:num)', 'Dashboard::getRequest/$1');
+
+// Organizations Routes
+$routes->get('organizations', 'Dashboard::organizations');
+$routes->get('get-organizations', 'Dashboard::getOrganizations');
+$routes->post('save-organization', 'Dashboard::saveOrganization');
+$routes->get('get-organization/(:num)', 'Dashboard::getOrganization/$1');
+$routes->post('delete-organization/(:num)', 'Dashboard::deleteOrganization/$1');
+
+// Organization Types Routes
+$routes->get('organization-types', 'Dashboard::orgTypes');
+$routes->get('get-org-types', 'Dashboard::getOrgTypes');
+$routes->post('save-org-type', 'Dashboard::saveOrgType');
+$routes->get('get-org-type/(:num)', 'Dashboard::getOrgType/$1');
+$routes->post('delete-org-type/(:num)', 'Dashboard::deleteOrgType/$1');
+
+// Vendor Routes
+$routes->get('vendors', 'Dashboard::vendors');
+$routes->get('get-vendors', 'Dashboard::getVendors');
+$routes->get('get-vendor/(:num)', 'Dashboard::getVendor/$1');
+$routes->post('save-vendor', 'Dashboard::saveVendor');
+$routes->post('delete-vendor/(:num)', 'Dashboard::deleteVendor/$1');
+
+// Model Routes
+$routes->get('models', 'Dashboard::models');
+$routes->get('get-models', 'Dashboard::getModels');
+$routes->get('get-model/(:num)', 'Dashboard::getModel/$1');
+$routes->post('save-model', 'Dashboard::saveModel');
+$routes->post('delete-model/(:num)', 'Dashboard::deleteModel/$1');
+
+// User Routes
+$routes->get('users', 'Dashboard::users');
+$routes->get('get-users', 'Dashboard::getUsers');
+$routes->post('save-user', 'Dashboard::saveUser');
+$routes->get('get-user/(:num)', 'Dashboard::getUser/$1');
+$routes->post('delete-user/(:num)', 'Dashboard::deleteUser/$1');
+
+// Registration Routes
+$routes->get('registrations', 'Dashboard::registrations');
+$routes->post('approve-registration', 'Dashboard::approveRegistration');
+
+// Additional Dashboard Routes
+$routes->get('requests', 'Dashboard::requests');
+$routes->get('analytics', 'Dashboard::analytics');
+$routes->get('settings', 'Dashboard::settings');
+$routes->get('audit-log', 'Dashboard::auditLog');
+
+$routes->get('uploads/authorization/(:segment)', 'PdfController::viewPdf/$1');

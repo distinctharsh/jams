@@ -1,0 +1,182 @@
+<!-- MAIN LAYOUT: sidebar + content -->
+<style>
+/* Sidebar Section Header */
+.sidebar-section-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 5px 10px 8px;
+    margin-bottom: 8px;
+}
+
+/* Main Label */
+.sidebar-section-title {
+    display: flex;
+    align-items: center;
+    gap: 3px;
+    font-size: 14px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: #1e4d7b;
+    white-space: nowrap;
+}
+
+.sidebar-section-title i {
+    font-size: 8px;
+    opacity: 0.75;
+}
+
+/* Toggle Button */
+.sidebar-toggle-btn {
+    width: 27px;
+    height: 27px;
+    min-width: 27px;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    background: #cc7700;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    box-shadow: 0 1px 2px rgba(15, 23, 42, 0.05);
+}
+
+.sidebar-toggle-btn i {
+    font-size: 10px;
+    transition: transform 0.25s ease;
+}
+
+.sidebar-toggle-btn:hover {
+    background: #f1f5f9;
+    border-color: #cbd5e1;
+    color: #1e4d7b;
+    transform: translateY(-1px);
+}
+
+.sidebar-toggle-btn:active {
+    transform: scale(0.94);
+}
+
+/* Collapsed Sidebar */
+.gov-sidebar.collapsed .sidebar-section-header {
+    justify-content: center;
+    padding-left: 0;
+    padding-right: 0;
+}
+
+.gov-sidebar.collapsed .sidebar-section-title {
+    display: none;
+}
+
+.gov-sidebar.collapsed .sidebar-toggle-btn i {
+    transform: rotate(180deg);
+}
+.sidebar-section-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 12px;
+}
+
+.sidebar-section-title {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 11px;
+    font-weight: 700;
+}
+
+.sidebar-section-title i {
+    font-size: 15px;   /* Dashboard icon bigger */
+}
+
+.sidebar-toggle-btn {
+    width: 32px;
+    height: 32px;
+    min-width: 32px;
+    border: none;
+    border-radius: 7px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 17px;   /* Toggle icon bigger */
+    transition: all 0.2s ease;
+}
+
+.sidebar-toggle-btn i {
+    font-size: 17px;
+}
+
+.sidebar-toggle-btn:hover {
+    transform: scale(1.05);
+}
+</style>
+<div class="flex overflow-hidden">
+  <!-- SIDEBAR -->
+    <aside class="gov-sidebar">
+    <div>
+        <div class="sidebar-section-header">
+            <a href="<?= base_url('dashboard') ?>" class="sidebar-section-title nav-label">
+                <i class="fas fa-layer-group me-1"></i>
+               Dashboard
+            </a>
+            <button
+                type="button"
+                class="sidebar-toggle-btn"
+                id="sidebarToggleBtn"
+                onclick="toggleSidebar()"
+                title="Toggle Sidebar"
+                aria-label="Toggle Sidebar">
+                <i class="fas fa-chevron-left" id="toggleIcon"></i>
+            </button>
+        </div>
+        <nav>
+            <?php 
+            // Get role IDs from session
+                        $roleIds = session()->get('role_ids') ?? '';
+
+            // Convert "3, 4, 7" into [3, 4, 7]
+                        $userRoles = array_map('intval', array_filter(explode(',', $roleIds)));
+
+            // Helper function
+                        $hasRole = function (array $roles) use ($userRoles): bool {
+                            return !empty(array_intersect($roles, $userRoles));
+                        };
+
+            ?>
+
+        <?php if ($hasRole([1])): ?><a href="<?= base_url('new-request') ?>" class="nav-item booking-btn"><i class="fas fa-calendar-check"></i><span>New Request</span></a><?php endif; ?>
+        <?php if ($hasRole([1,2,3,4,5,6,7,9])): ?><a href="<?= base_url('requests') ?>" class="nav-item"><i class="fas fa-clipboard-list"></i> <span>Requests <span class="badge" id="request-count">0</span></span></a><?php endif; ?>
+        <?php if ($hasRole([1,2,3,4,5,6,7,8,9])): ?><a href="<?= base_url('analytics') ?>" class="nav-item"><i class="fas fa-chart-simple"></i> <span>Reports</span></a><?php endif; ?>
+        <?php if ($hasRole([9])): ?><div class="text-[9px] font-bold text-slate-400 uppercase tracking-wider px-3 mt-6 mb-2 nav-label">System</div><?php endif; ?>
+        <?php if ($hasRole([9])): ?><a href="<?= base_url('settings') ?>" class="nav-item"><i class="fas fa-sliders"></i> <span>Settings</span></a><?php endif; ?>
+        <?php if ($hasRole([9])): ?><a href="<?= base_url('audit-log') ?>" class="nav-item"><i class="fas fa-shield-halved"></i> <span>Audit Log</span></a><?php endif; ?>
+        <?php if ($hasRole([4,9])): ?><div class="text-[9px] font-bold text-slate-400 uppercase tracking-wider px-3 mt-6 mb-2 nav-label">Admin</div><?php endif; ?>
+        <?php if ($hasRole([4,9])): ?><a href="<?= base_url('registrations') ?>" class="nav-item"><i class="fas fa-id-card"></i> <span>Pending Registration</span></a><?php endif; ?>
+        <?php if ($hasRole([4,9])): ?><a href="<?= base_url('users') ?>" class="nav-item"><i class="fas fa-users"></i> <span>Users</span></a><?php endif; ?>
+        <?php if ($hasRole([4,9])): ?><a href="<?= base_url('organizations') ?>" class="nav-item"><i class="fa-solid fa-sitemap"></i> <span>Manage Organization</span></a><?php endif; ?>
+        <?php if ($hasRole([4,9])): ?><a href="<?= base_url('organization-types') ?>" class="nav-item"><i class="fa-solid fa-layer-group"></i> <span>Organization Types</span></a><?php endif; ?>
+        <?php if ($hasRole([4,9])): ?><a href="<?= base_url('vendors') ?>" class="nav-item"><i class="fas fa-handshake"></i> <span>Vendor</span></a><?php endif; ?>
+        <?php if ($hasRole([4,9])): ?><a href="<?= base_url('models') ?>" class="nav-item"><i class="fas fa-microchip"></i> <span>Model</span></a><?php endif; ?>
+        </nav>
+    </div>
+    </aside>
+</div>
+
+<head>
+    <script src="<?= base_url('assets/js/jquery-3.7.0.min.js') ?>"></script>
+    <link rel="stylesheet" href="<?= base_url('assets/css/jquery.dataTables.min.css') ?>">
+
+    <script src="<?= base_url('assets/js/jquery.dataTables.min.js') ?>"></script>
+    <script src="<?= base_url('assets/js/dataTables.buttons.min.js') ?>"></script>
+    <script src="<?= base_url('assets/js/jszip.min.js') ?>"></script>
+    <script src="<?= base_url('assets/js/pdfmake.min.js') ?>"></script>
+    <script src="<?= base_url('assets/js/vfs_fonts.js') ?>"></script>
+    <script src="<?= base_url('assets/js/buttons.html5.min.js') ?>"></script>
+    <script src="<?= base_url('assets/js/buttons.print.min.js') ?>"></script>
+    <link rel="stylesheet" href="<?= base_url('assets/css/buttons.dataTables.min.css') ?>">
+</head>
