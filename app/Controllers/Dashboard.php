@@ -779,6 +779,38 @@ class Dashboard extends BaseController
         }
     }
 
+    public function resetUserPassword($id)
+    {
+        if (!session()->get('isLoggedIn')) {
+            return $this->response->setJSON(['success' => false, 'message' => 'Unauthorized']);
+        }
+
+        try {
+            $plainPassword = get_default_password(); 
+            $passwordHash  = get_default_password_hash();
+            $email = $this->request->getPost('email');
+
+            if ($email) {
+                $user = $this->userModel ->where('email', $email) ->first();
+                $this->userModel->update($user['id'], [ 'hash' => $passwordHash ]);
+            }else{
+                $this->userModel->update($id, ['hash' => $passwordHash]);
+            }
+
+            return $this->response->setJSON([
+                'success'  => true,
+                'message'  => 'User password reset successfully.',
+                'csrfHash' => csrf_hash()
+            ]);
+        } catch (\Exception $e) {
+            return $this->response->setJSON([
+                'success'  => false,
+                'message'  => 'Error reset password: ' . $e->getMessage(),
+                'csrfHash' => csrf_hash()
+            ]);
+        }
+    }
+
     public function registrations()
     {
         $regModel = new \App\Models\RegistrationModel();

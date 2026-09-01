@@ -120,6 +120,10 @@ ob_start();
                                                 <i class="fas fa-xmark"></i> Reject
                                             </button>
                                         </div>
+                                    <?php elseif($status == 4): ?>  
+                                            <button class="px-3 py-1.5 rounded-lg bg-amber-50 text-amber-700 hover:bg-amber-100 border border-amber-200 transition text-xs font-semibold reset-pwd-btn flex items-center gap-1.5 shadow-sm" data-id="<?= $reg['id'] ?>" data-email="<?= esc($reg['email']) ?>">
+                                                <i class="fas fa-key text-[#e58500]"></i> Reset Password
+                                            </button> 
                                     <?php else: ?>
                                         <span class="text-xs text-slate-400 font-medium">Processed</span>
                                     <?php endif; ?>
@@ -324,6 +328,51 @@ $(document).ready(function() {
             .text('Confirm Rejection');
 
         $('#actionModal').removeClass('hidden');
+    });
+
+    // Reset Password Handler
+    $(document).on('click', '.reset-pwd-btn', function(e) {
+        e.preventDefault();
+        if(!confirm('Are you sure you want to reset password ? ')) return;
+        
+        let id = $(this).data('id');
+        let email = $(this).data('email');
+        let csrfInput = $('#actionForm input[type="hidden"][name^="csrf"]').first();
+        
+        let dataParam = {
+            email: email
+        };
+        if (csrfInput.length) {
+            dataParam[csrfInput.attr('name')] = csrfInput.val();
+        }
+
+        $.ajax({
+            url: "<?= base_url('reset-user-password/') ?>" + id,
+            type: "POST",
+            data: dataParam,
+            dataType: "json",
+            success: function(res) {
+                if(res.csrfHash) updateCSRF(res.csrfHash);
+                if(res.success) {
+                    if(typeof showToast === 'function') {
+                        showToast('success', res.message || 'User password reset successfully!');
+                    }
+                } else {
+                    if(typeof showToast === 'function') {
+                        showToast('error', res.message || 'Unable to reset password.');
+                    } else {
+                        alert(res.message || 'Unable to reset password.');
+                    }
+                }
+            },
+            error: function() {
+                if(typeof showToast === 'function') {
+                    showToast('error', 'Error occurred while resetting password.');
+                } else {
+                    alert('Error occurred while resetting password.');
+                }
+            }
+        });
     });
 
     $('.closeCredModal').click(function() {

@@ -162,6 +162,9 @@ ob_start();
                                         <button class="w-8 h-8 rounded-lg bg-red-50 text-red-600 hover:bg-red-100 border border-red-100 transition delete-user-btn flex items-center justify-center" data-id="<?= $user['id'] ?>" title="Delete">
                                             <i class="fas fa-trash-can text-xs"></i>
                                         </button>
+                                        <button class="w-8 h-8 rounded-lg bg-amber-50 text-amber-600 hover:bg-amber-100 border border-amber-200 transition reset-user-btn flex items-center justify-center" data-id="<?= $user['id'] ?>" title="Reset Password">
+                                            <i class="fas fa-[#e58500] fa-key"></i>
+                                        </button>
                                     </div>
                                 </td>
                             </tr>
@@ -558,6 +561,7 @@ $(document).ready(function() {
                         '<div class="flex justify-start gap-2">' +
                             '<button class="w-8 h-8 rounded-lg bg-blue-50 text-[#1e4d7b] hover:bg-blue-100 border border-blue-100 transition edit-user-btn flex items-center justify-center" data-id="' + user.id + '" title="Edit"><i class="fas fa-pen-to-square text-xs"></i></button>' +
                             '<button class="w-8 h-8 rounded-lg bg-red-50 text-red-600 hover:bg-red-100 border border-red-100 transition delete-user-btn flex items-center justify-center" data-id="' + user.id + '" title="Delete"><i class="fas fa-trash-can text-xs"></i></button>' +
+                            '<button class="w-8 h-8 rounded-lg bg-amber-50 text-amber-600 hover:bg-amber-100 border border-amber-100 transition reset-user-btn flex items-center justify-center" data-id="' + user.id + '" title="Reset"><i class="fas fa-[#e58500] fa-key"></i></button>' +
                         '</div>' +
                     '</td>' +
                     '</tr>';
@@ -659,6 +663,35 @@ $(document).ready(function() {
                 },
                 error: function() {
                     if(typeof showToast === 'function') showToast('error', 'Error deleting user.');
+                }
+            });
+        });
+
+        $(document).on('click', '.reset-user-btn', function(e) {
+            e.preventDefault();
+            if(!confirm('Are you sure you want to reset the password ?')) return;
+            let id = $(this).data('id');
+
+            let csrfInput = $('#userForm input[type="hidden"]').first();
+            let dataParam = {};
+            dataParam[csrfInput.attr('name')] = csrfInput.val();
+
+            $.ajax({
+                url: "<?= base_url('reset-user-password/') ?>" + id,
+                type: "POST",
+                data: dataParam,
+                dataType: "json",
+                success: function(res) {
+                    if(res.csrfHash) updateCSRF(res.csrfHash);
+                    if(res.success) {
+                        loadUsers();
+                        if(typeof showToast === 'function') showToast('success', res.message || 'User password reset successfully!');
+                    } else {
+                        if(typeof showToast === 'function') showToast('error', res.message || 'Unable to reset password.');
+                    }
+                },
+                error: function() {
+                    if(typeof showToast === 'function') showToast('error', 'Error reset user password.');
                 }
             });
         });

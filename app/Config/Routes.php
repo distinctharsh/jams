@@ -94,6 +94,7 @@ $routes->get('get-users', 'Dashboard::getUsers');
 $routes->post('save-user', 'Dashboard::saveUser');
 $routes->get('get-user/(:num)', 'Dashboard::getUser/$1');
 $routes->post('delete-user/(:num)', 'Dashboard::deleteUser/$1');
+$routes->post('reset-user-password/(:num)', 'Dashboard::resetUserPassword/$1');
 
 // Registration Routes
 $routes->get('registrations', 'Dashboard::registrations');
