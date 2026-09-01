@@ -55,7 +55,7 @@
         gap: 7px;
 
         color: red;
-        font-size: 12px;
+        font-size: 14px;
         font-weight: 500;
 
         white-space: nowrap;
