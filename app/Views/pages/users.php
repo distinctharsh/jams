@@ -25,6 +25,7 @@ ob_start();
     color: #ffffff !important;
     border-color: #1e4d7b !important;
 }
+.dataTables_length, .dataTables_filter input{margin-bottom: 10px !important}
 
 /* Custom Stylish Multi-Select Box */
 .select2-results__option {

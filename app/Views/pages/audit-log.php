@@ -1,6 +1,31 @@
 <?php
 ob_start();
 ?>
+<style>
+    .dt-buttons {
+        display: inline-flex !important;
+        gap: 0.5rem !important;
+        margin-bottom: 0.5rem !important;
+    }
+    .dt-button {
+        background-color: #f8fafc !important;
+        border: 1px solid #cbd5e1 !important;
+        color: #1e4d7b !important;
+        font-size: 0.8125rem !important;
+        font-weight: 600 !important;
+        padding: 0.4rem 0.85rem !important;
+        border-radius: 0.5rem !important;
+        transition: all 0.2s ease !important;
+        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05) !important;
+    }
+    .dt-button:hover {
+        background-color: #1e4d7b !important;
+        color: #ffffff !important;
+        border-color: #1e4d7b !important;
+    }
+    .dataTables_length, .dataTables_filter input{margin-bottom: 10px !important}
+</style>
+
 <!-- Audit Log Page Content -->
 <div class="space-y-6">
     <div class="gov-card p-6">
@@ -96,10 +121,10 @@ $(document).ready(function() {
         "dom": '<"flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-3"<"flex items-center gap-4"Bl>f>rt<"flex flex-col sm:flex-row sm:items-center justify-between gap-4 mt-4"ip>',
         "buttons": [
             { extend: 'copy', text: '<i class="fas fa-copy me-1"></i> Copy', title: 'Audit Log Records', exportOptions: { columns: [0, 1, 2, 3, 4, 5, 6, 7] } },
-            { extend: 'csv', text: '<i class="fas fa-file-csv me-1"></i> CSV', filename: 'Audit_Log', exportOptions: { columns: [0, 1, 2, 3, 4, 5, 6, 7] } },
-            { extend: 'excel', text: '<i class="fas fa-file-excel me-1"></i> Excel', filename: 'Audit_Log', exportOptions: { columns: [0, 1, 2, 3, 4, 5, 6, 7] } },
-            { extend: 'pdf', text: '<i class="fas fa-file-pdf me-1"></i> PDF', filename: 'Audit_Log', exportOptions: { columns: [0, 1, 2, 3, 4, 5, 6, 7] } },
-            { extend: 'print', text: '<i class="fas fa-print me-1"></i> Print', exportOptions: { columns: [0, 1, 2, 3, 4, 5, 6, 7] } }
+            { extend: 'csv', text: '<i class="fas fa-file-csv me-1"></i> CSV', filename: 'Audit_Log', title: 'Audit Log Records', exportOptions: { columns: [0, 1, 2, 3, 4, 5, 6, 7] } },
+            { extend: 'excel', text: '<i class="fas fa-file-excel me-1"></i> Excel', filename: 'Audit_Log', title: 'Audit Log Records', exportOptions: { columns: [0, 1, 2, 3, 4, 5, 6, 7] } },
+            { extend: 'pdf', text: '<i class="fas fa-file-pdf me-1"></i> PDF', filename: 'Audit_Log', title: 'Audit Log Records', exportOptions: { columns: [0, 1, 2, 3, 4, 5, 6, 7] } },
+            { extend: 'print', text: '<i class="fas fa-print me-1"></i> Print', title: 'Audit Log Records', exportOptions: { columns: [0, 1, 2, 3, 4, 5, 6, 7] } }
         ],
         "language": {
             "search": "_INPUT_",

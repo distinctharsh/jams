@@ -1,6 +1,31 @@
 <?php
 ob_start();
 ?>
+<style>
+    .dt-buttons {
+        display: inline-flex !important;
+        gap: 0.5rem !important;
+        margin-bottom: 0.5rem !important;
+    }
+    .dt-button {
+        background-color: #f8fafc !important;
+        border: 1px solid #cbd5e1 !important;
+        color: #1e4d7b !important;
+        font-size: 0.8125rem !important;
+        font-weight: 600 !important;
+        padding: 0.4rem 0.85rem !important;
+        border-radius: 0.5rem !important;
+        transition: all 0.2s ease !important;
+        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05) !important;
+    }
+    .dt-button:hover {
+        background-color: #1e4d7b !important;
+        color: #ffffff !important;
+        border-color: #1e4d7b !important;
+    }
+    .dataTables_length, .dataTables_filter input{margin-bottom: 10px !important}
+</style>
+
 <div class="space-y-6">
     <div class="gov-card p-6">
         <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
@@ -223,14 +248,42 @@ $(document).ready(function() {
                 "order": [[0, "desc"]],
                 "dom": '<"flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-3"<"flex items-center gap-4"Bl>f>rt<"flex flex-col sm:flex-row sm:items-center justify-between gap-4 mt-4"ip>',
                 "buttons": [
-                    { extend: 'copy', title: 'Registrations', exportOptions: { columns: [0, 1, 2, 3, 4] } },
-                    { extend: 'csv', title: 'Registrations', filename: 'Registrations', exportOptions: { columns: [0, 1, 2, 3, 4] } },
-                    { extend: 'excel', title: 'Registrations', filename: 'Registrations', exportOptions: { columns: [0, 1, 2, 3, 4] } },
-                    { extend: 'pdf', title: 'Registrations', filename: 'Registrations', exportOptions: { columns: [0, 1, 2, 3, 4] } },
-                    { extend: 'print', title: 'Registrations', exportOptions: { columns: [0, 1, 2, 3, 4] } }
+                    {
+                        extend: 'copy',
+                        text: '<i class="fas fa-copy me-1"></i> Copy',
+                        title: 'Registrations',
+                        exportOptions: { columns: [0, 1, 2, 3, 4, 5] }
+                    },
+                    {
+                        extend: 'csv',
+                        text: '<i class="fas fa-file-csv me-1"></i> CSV',
+                        title: 'Registrations',
+                        filename: 'Registrations',
+                        exportOptions: { columns: [0, 1, 2, 3, 4, 5] }
+                    },
+                    {
+                        extend: 'excel',
+                        text: '<i class="fas fa-file-excel me-1"></i> Excel',
+                        title: 'Registrations',
+                        filename: 'Registrations',
+                        exportOptions: { columns: [0, 1, 2, 3, 4, 5] }
+                    },
+                    {
+                        extend: 'pdf',
+                        text: '<i class="fas fa-file-pdf me-1"></i> PDF',
+                        title: 'Registrations',
+                        filename: 'Registrations',
+                        exportOptions: { columns: [0, 1, 2, 3, 4, 5] }
+                    },
+                    {
+                        extend: 'print',
+                        text: '<i class="fas fa-print me-1"></i> Print',
+                        title: 'Registrations',
+                        exportOptions: { columns: [0, 1, 2, 3, 4, 5] }
+                    }
                 ],
                 "columnDefs": [
-                    { "orderable": false, "targets": [5, 6] }
+                    { "orderable": false, "targets": [4, 6] }
                 ],
                 "language": {
                     "search": "_INPUT_",

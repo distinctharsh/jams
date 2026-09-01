@@ -1,6 +1,31 @@
 <?php
 ob_start();
 ?>
+<style>
+    .dt-buttons {
+        display: inline-flex !important;
+        gap: 0.5rem !important;
+        margin-bottom: 0.5rem !important;
+    }
+    .dt-button {
+        background-color: #f8fafc !important;
+        border: 1px solid #cbd5e1 !important;
+        color: #1e4d7b !important;
+        font-size: 0.8125rem !important;
+        font-weight: 600 !important;
+        padding: 0.4rem 0.85rem !important;
+        border-radius: 0.5rem !important;
+        transition: all 0.2s ease !important;
+        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05) !important;
+    }
+    .dt-button:hover {
+        background-color: #1e4d7b !important;
+        color: #ffffff !important;
+        border-color: #1e4d7b !important;
+    }
+    .dataTables_length, .dataTables_filter input{margin-bottom: 10px !important}
+</style>
+
 <!-- Manage Models Page -->
 <div class="space-y-6">
 
@@ -59,7 +84,7 @@ ob_start();
                                         </span>
                                     <?php endif; ?>
                                 </td>
-                                <td class="px-5 py-4 text-right pr-6">
+                                <td class="px-5 py-4 text-left pr-6">
                                     <div class="flex justify-left gap-2">
                                         <button class="w-8 h-8 rounded-lg bg-blue-50 text-[#1e4d7b] hover:bg-blue-100 border border-blue-100 transition edit-model-btn flex items-center justify-center" data-id="<?= $model['id'] ?>" title="Edit">
                                             <i class="fas fa-pen-to-square text-xs"></i>
@@ -143,7 +168,6 @@ ob_start();
     </div>
 </div>
 
-
 <link rel="stylesheet" href="<?= base_url('assets/css/buttons.dataTables.min.css') ?>">
 <script src="<?= base_url('assets/js/jquery-3.7.0.min.js') ?>"></script>
 <script src="<?= base_url('assets/js/tost.js') ?>"></script>
@@ -154,108 +178,6 @@ ob_start();
 <script src="<?= base_url('assets/js/vfs_fonts.js') ?>"></script>
 <script src="<?= base_url('assets/js/buttons.html5.min.js') ?>"></script>
 <script src="<?= base_url('assets/js/buttons.print.min.js') ?>"></script>
-
-<style>
-/* Custom Styled DataTables Layout */
-.dataTables_wrapper { font-family: inherit; }
-
-.dataTables_wrapper .dataTables_length,
-.dataTables_wrapper .dataTables_filter {
-    margin-bottom: 1.25rem;
-    font-size: 0.875rem;
-    color: #475569;
-    font-weight: 500;
-}
-
-.dataTables_wrapper .dataTables_length { float: left; }
-.dataTables_wrapper .dataTables_filter { float: right; }
-
-.dataTables_wrapper .dataTables_length select {
-    padding: 6px 32px 6px 12px !important;
-    border-radius: 8px;
-    border: 1px solid #cbd5e1;
-    background-color: #f8fafc;
-    font-size: 0.875rem;
-    color: #334155;
-    outline: none;
-    transition: all 0.2s;
-    cursor: pointer;
-}
-.dataTables_wrapper .dataTables_length select:focus {
-    border-color: #1e4d7b;
-    background-color: #ffffff;
-    box-shadow: 0 0 0 3px rgba(30, 77, 123, 0.1);
-}
-
-.dataTables_wrapper .dataTables_filter input {
-    padding: 6px 14px !important;
-    border-radius: 8px;
-    border: 1px solid #cbd5e1;
-    background-color: #f8fafc;
-    margin-left: 8px;
-    outline: none;
-    font-size: 0.875rem;
-    transition: all 0.2s;
-    width: 220px;
-}
-.dataTables_wrapper .dataTables_filter input:focus {
-    border-color: #1e4d7b;
-    background-color: #ffffff;
-    box-shadow: 0 0 0 3px rgba(30, 77, 123, 0.1);
-}
-
-.dataTables_wrapper .dataTables_info {
-    padding-top: 1rem !important;
-    font-size: 0.85rem;
-    color: #64748b !important;
-    float: left;
-}
-
-.dataTables_wrapper .dataTables_paginate {
-    padding-top: 0.75rem !important;
-    float: right;
-}
-
-.dataTables_wrapper .dataTables_paginate .paginate_button {
-    border-radius: 6px !important;
-    border: 1px solid #e2e8f0 !important;
-    background: #ffffff !important;
-    color: #475569 !important;
-    font-size: 0.85rem !important;
-    font-weight: 600 !important;
-    padding: 5px 12px !important;
-    margin-left: 4px !important;
-    transition: all 0.15s ease-in-out;
-}
-
-.dataTables_wrapper .dataTables_paginate .paginate_button:hover {
-    background: #f1f5f9 !important;
-    color: #1e4d7b !important;
-    border-color: #cbd5e1 !important;
-}
-
-.dataTables_wrapper .dataTables_paginate .paginate_button.current,
-.dataTables_wrapper .dataTables_paginate .paginate_button.current:hover {
-    background: #1e4d7b !important;
-    color: #ffffff !important;
-    border-color: #1e4d7b !important;
-    box-shadow: 0 1px 2px rgba(0,0,0,0.05);
-}
-
-.dataTables_wrapper .dataTables_paginate .paginate_button.disabled,
-.dataTables_wrapper .dataTables_paginate .paginate_button.disabled:hover {
-    opacity: 0.5;
-    cursor: not-allowed;
-    background: #f8fafc !important;
-    border-color: #e2e8f0 !important;
-}
-
-.dataTables_wrapper::after {
-    content: "";
-    clear: both;
-    display: table;
-}
-</style>
 
 <script>
 $(document).ready(function() {
@@ -310,7 +232,7 @@ $(document).ready(function() {
                 ],
 
                 "columnDefs": [
-                    { "orderable": false, "targets": [3, 4] }
+                    { "orderable": false, "targets": [4] }
                 ],
                 "language": {
                     "search": "_INPUT_",
@@ -444,8 +366,8 @@ $(document).ready(function() {
                             '<span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg border-l-4 border-green-500 bg-green-50 text-green-700 font-semibold text-xs shadow-sm"><i class="fas fa-check-circle"></i> Active</span>' : 
                             '<span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg border-l-4 border-red-500 bg-red-50 text-red-700 font-semibold text-xs shadow-sm"><i class="fas fa-times-circle"></i> Inactive</span>') +
                     '</td>' +
-                    '<td class="px-5 py-4 text-right pr-6">' +
-                        '<div class="flex justify-center gap-2">' +
+                    '<td class="px-5 py-4 text-left pr-6">' +
+                        '<div class="flex justify-left gap-2">' +
                             '<button class="w-8 h-8 rounded-lg bg-blue-50 text-[#1e4d7b] hover:bg-blue-100 border border-blue-100 transition edit-model-btn flex items-center justify-center" data-id="' + model.id + '" title="Edit"><i class="fas fa-pen-to-square text-xs"></i></button>' +
                             '<button class="w-8 h-8 rounded-lg bg-red-50 text-red-600 hover:bg-red-100 border border-red-100 transition delete-model-btn flex items-center justify-center" data-id="' + model.id + '" title="Delete"><i class="fas fa-trash-can text-xs"></i></button>' +
                         '</div>' +

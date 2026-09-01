@@ -186,28 +186,28 @@ ob_start();
 <script src="<?= base_url('assets/js/buttons.print.min.js') ?>"></script>
 
 <style>
-/* Buttons Design Customization */
-.dt-buttons {
-    display: inline-flex !important;
-    gap: 0.5rem !important;
-    margin-bottom: 0.5rem !important;
-}
-.dt-button {
-    background-color: #f8fafc !important;
-    border: 1px solid #cbd5e1 !important;
-    color: #1e4d7b !important;
-    font-size: 0.8125rem !important;
-    font-weight: 600 !important;
-    padding: 0.4rem 0.85rem !important;
-    border-radius: 0.5rem !important;
-    transition: all 0.2s ease !important;
-    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05) !important;
-}
-.dt-button:hover {
-    background-color: #1e4d7b !important;
-    color: #ffffff !important;
-    border-color: #1e4d7b !important;
-}
+    .dt-buttons {
+        display: inline-flex !important;
+        gap: 0.5rem !important;
+        margin-bottom: 0.5rem !important;
+    }
+    .dt-button {
+        background-color: #f8fafc !important;
+        border: 1px solid #cbd5e1 !important;
+        color: #1e4d7b !important;
+        font-size: 0.8125rem !important;
+        font-weight: 600 !important;
+        padding: 0.4rem 0.85rem !important;
+        border-radius: 0.5rem !important;
+        transition: all 0.2s ease !important;
+        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05) !important;
+    }
+    .dt-button:hover {
+        background-color: #1e4d7b !important;
+        color: #ffffff !important;
+        border-color: #1e4d7b !important;
+    }
+    .dataTables_length, .dataTables_filter input{margin-bottom: 10px !important}
 </style>
 
 <script>

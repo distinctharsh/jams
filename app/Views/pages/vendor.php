@@ -1,6 +1,31 @@
 <?php
 ob_start();
 ?>
+<style>
+    .dt-buttons {
+        display: inline-flex !important;
+        gap: 0.5rem !important;
+        margin-bottom: 0.5rem !important;
+    }
+    .dt-button {
+        background-color: #f8fafc !important;
+        border: 1px solid #cbd5e1 !important;
+        color: #1e4d7b !important;
+        font-size: 0.8125rem !important;
+        font-weight: 600 !important;
+        padding: 0.4rem 0.85rem !important;
+        border-radius: 0.5rem !important;
+        transition: all 0.2s ease !important;
+        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05) !important;
+    }
+    .dt-button:hover {
+        background-color: #1e4d7b !important;
+        color: #ffffff !important;
+        border-color: #1e4d7b !important;
+    }
+    .dataTables_length, .dataTables_filter input{margin-bottom: 10px !important}
+</style>
+
 <!-- Manage Vendors Page -->
 <div class="space-y-6">
 
@@ -55,7 +80,7 @@ ob_start();
                                         </span>
                                     <?php endif; ?>
                                 </td>
-                                <td class="px-5 py-4 text-right pr-6">
+                                <td class="px-5 py-4 text-left pr-6">
                                     <div class="flex justify-left gap-2">
                                         <button class="w-8 h-8 rounded-lg bg-blue-50 text-[#1e4d7b] hover:bg-blue-100 border border-blue-100 transition edit-vendor-btn flex items-center justify-center" data-id="<?= $vendor['id'] ?>" title="Edit">
                                             <i class="fas fa-pen-to-square text-xs"></i>
@@ -321,8 +346,8 @@ $(document).ready(function() {
                             '<span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg border-l-4 border-green-500 bg-green-50 text-green-700 font-semibold text-xs shadow-sm"><i class="fas fa-check-circle"></i> Active</span>' : 
                             '<span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg border-l-4 border-red-500 bg-red-50 text-red-700 font-semibold text-xs shadow-sm"><i class="fas fa-times-circle"></i> Inactive</span>') +
                     '</td>' +
-                    '<td class="px-5 py-4 text-right pr-6">' +
-                        '<div class="flex justify-end gap-2">' +
+                    '<td class="px-5 py-4 text-left pr-6">' +
+                        '<div class="flex justify-left gap-2">' +
                             '<button class="w-8 h-8 rounded-lg bg-blue-50 text-[#1e4d7b] hover:bg-blue-100 border border-blue-100 transition edit-vendor-btn flex items-center justify-center" data-id="' + vendor.id + '" title="Edit"><i class="fas fa-pen-to-square text-xs"></i></button>' +
                             '<button class="w-8 h-8 rounded-lg bg-red-50 text-red-600 hover:bg-red-100 border border-red-100 transition delete-vendor-btn flex items-center justify-center" data-id="' + vendor.id + '" title="Delete"><i class="fas fa-trash-can text-xs"></i></button>' +
                         '</div>' +
