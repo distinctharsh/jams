@@ -1,0 +1,236 @@
+<style>
+    .gov-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+        background: #1e4d7b;
+        padding: 8px 20px;
+    }
+
+    .gov-marquee-strip {
+        flex: 1;
+        max-width: 750px;
+        height: 34px;
+        display: flex;
+        align-items: center;
+        background: #fff;
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        border-radius: 6px;
+        overflow: hidden;
+        margin: 0 10px;
+        box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.2);
+        position: relative;
+    }
+
+    .marquee-track {
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+        position: relative;
+        display: flex;
+        align-items: center;
+    }
+
+    .marquee-content {
+        position: absolute;
+        left: 0;
+        display: flex;
+        align-items: center;
+        width: max-content;
+        white-space: nowrap;
+        transform: translate(100%, -50%);
+        animation: marqueeRightToLeft 10s linear infinite;
+    }
+
+    .marquee-group {
+        display: flex;
+        align-items: center;
+        flex-shrink: 0;
+    }
+
+    .marquee-item {
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
+
+        color: red;
+        font-size: 14px;
+        font-weight: 500;
+
+        white-space: nowrap;
+    }
+
+
+    .marquee-item i {
+        color: #ffb74d;
+        font-size: 12px;
+    }
+
+    .gov-marquee-strip:hover .marquee-content {
+        animation-play-state: paused;
+    }
+
+    @keyframes marqueeRightToLeft {
+
+        0% {
+            transform: translateX(200%);
+        }
+
+        100% {
+            transform: translateX(-100%);
+        }
+
+    }
+
+    @media (max-width: 768px) {
+
+        .gov-header {
+            gap: 8px;
+            padding: 8px 10px;
+        }
+
+        .gov-marquee-strip {
+            margin: 0 5px;
+        }
+
+        .marquee-item {
+            font-size: 11px;
+        }
+
+    }
+</style>
+
+<!-- HEADER (deep blue #1e4d7b + orange #e58500) -->
+<header class="gov-header">
+  <div class="brand">
+    <!-- Emblem + Cabinet Secretariat branding — BIGGER & BOLDER -->
+    <div class="emblem-wrapper">
+      <img src="<?= base_url('assets/image/Emblem_of_India.svg.webp') ?>" alt="Government of India Emblem">
+      <div class="cabinet-text">
+        <span class="hindi">मंत्रिमंडल सचिवालय</span>
+        <span class="english">Cabinet Secretariat</span>
+        <span class="gov-india">Government of India</span>
+      </div>
+    </div>
+  </div>
+
+    <div class="gov-marquee-strip">
+        <div class="marquee-track">
+            <div class="marquee-content">
+                <div class="marquee-group">
+                    <span class="marquee-item">
+                        <i class="fas fa-info-circle"></i>
+                        Welcome to JAMS – Jammer Approval Management System
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+  <div class="header-actions">
+        <!-- <div class="icon-btn back-btn" onclick="history.back()">
+            <i class="fas fa-arrow-left"></i>
+        </div> -->
+
+    <?php 
+        $roleIds = session()->get('role_ids') ?? '';
+        $userRoles = array_map('intval', array_filter(explode(',', $roleIds)));
+        $hasRole = function (array $roles) use ($userRoles): bool {
+            return !empty(array_intersect($roles, $userRoles));
+        };
+    ?>
+
+    <?php if ($hasRole([1])): ?>
+    <a href="<?= base_url('new-request') ?>" class="btn-orange">
+        <i class="fas fa-plus"></i> New Request
+    </a>
+    <?php endif; ?>
+    <div class="relative" id="notificationDropdown">
+        <div class="icon-btn relative" id="bellIconBtn">
+            <i class="far fa-bell"></i>
+            <span class="dot"></span>
+        </div>
+
+        <div class="notification-popover" id="notificationMenu">
+            <div class="notif-header">
+            <div class="flex items-center justify-between">
+                <h4 class="font-bold text-slate-800 text-sm flex items-center gap-2">
+                <i class="fa-solid fa-bell text-[#e58500]"></i> Notifications
+                </h4>
+                <span class="bg-amber-100 text-[#e58500] text-[10px] font-bold px-2 py-0.5 rounded-full">3 New</span>
+            </div>
+            </div>
+
+            <div class="notif-body">
+            <a href="#" class="notif-item unread">
+                <div class="notif-icon bg-amber-50 text-[#e58500]">
+                <i class="fas fa-user-plus text-xs"></i>
+                </div>
+                <div class="notif-content">
+                <p class="notif-title">New User Registration</p>
+                <p class="notif-sub">A new user account request is pending for approval.</p>
+                <span class="notif-time">2 mins ago</span>
+                </div>
+            </a>
+
+            <a href="#" class="notif-item unread">
+                <div class="notif-icon bg-blue-50 text-[#1e4d7b]">
+                <i class="fas fa-file-signature text-xs"></i>
+                </div>
+                <div class="notif-content">
+                <p class="notif-title">New Request Submitted</p>
+                <p class="notif-sub">Request #1024 updated by Cabinet Division.</p>
+                <span class="notif-time">1 hour ago</span>
+                </div>
+            </a>
+
+            <a href="#" class="notif-item">
+                <div class="notif-icon bg-emerald-50 text-emerald-600">
+                <i class="fas fa-check-circle text-xs"></i>
+                </div>
+                <div class="notif-content">
+                <p class="notif-title">Approval Completed</p>
+                <p class="notif-sub">User authorization document successfully verified.</p>
+                <span class="notif-time">Yesterday</span>
+                </div>
+            </a>
+            </div>
+
+            <div class="notif-footer">
+            <a href="#">Mark all as read</a>
+            <a href="#" class="text-[#1e4d7b]">View All</a>
+            </div>
+        </div>
+    </div>
+    <div class="relative" id="profileDropdown">
+        <button class="profile-trigger" onclick="toggleDropdown()">
+            <div class="profile-avatar">
+                <i class="fas fa-user"></i>
+            </div>
+            <div class="profile-details">
+                <span class="profile-name">
+                    <?= esc(session()->get('name', 'User')) ?>
+                </span>
+            </div>
+            <i class="fas fa-chevron-down dropdown-arrow"></i>
+        </button>
+        <div class="dropdown-menu-gov" id="dropdownMenu">
+            <div class="dropdown-user">
+                <h5>
+                    <?= esc(session()->get('name', 'User')) ?>
+                </h5>
+            </div>
+            <a href="<?= base_url('change-password'); ?>">
+                <i class="fas fa-key"></i>
+                <span>Change Password</span>
+            </a>
+            <div class="dropdown-divider"></div>
+            <a href="<?= base_url('logout') ?>" class="logout">
+                <i class="fas fa-right-from-bracket"></i>
+                <span>Logout</span>
+            </a>
+        </div>
+    </div>
+  </div>
+</header>

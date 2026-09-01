@@ -1,43 +1,6 @@
 <?php
 ob_start();
 ?>
-
-<style>
-.dataTables_length, div.dataTables_wrapper div.dataTables_length {
-    display: none !important;
-}
-
-.dt-buttons .dt-button {
-    background-color: #ffffff !important;
-    border: 1px solid #cbd5e1 !important;
-    color: #334155 !important;
-    font-size: 0.75rem !important;
-    font-weight: 600 !important;
-    padding: 0.4rem 0.8rem !important;
-    border-radius: 0.5rem !important;
-    box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05) !important;
-    transition: all 0.15s ease-in-out !important;
-}
-.dt-buttons .dt-button:hover {
-    background-color: #f8fafc !important;
-    border-color: #94a3b8 !important;
-    color: #1e4d7b !important;
-}
-
-.dataTables_filter input {
-    border: 1px solid #cbd5e1 !important;
-    border-radius: 0.5rem !important;
-    padding: 0.4rem 0.75rem !important;
-    font-size: 0.875rem !important;
-    outline: none !important;
-    transition: all 0.15s ease-in-out !important;
-}
-.dataTables_filter input:focus {
-    border-color: #1e4d7b !important;
-    box-shadow: 0 0 0 3px rgba(30, 77, 123, 0.15) !important;
-}
-</style>
-
 <!-- Audit Log Page Content -->
 <div class="space-y-6">
     <div class="gov-card p-6">
@@ -56,27 +19,6 @@ ob_start();
 
     <!-- Data Table Card -->
     <div class="gov-card p-5 overflow-hidden shadow-sm border border-slate-200 rounded-xl bg-white">
-        
-        <!-- Top Toolbar Control Bar -->
-        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-4">
-            <div class="flex flex-wrap items-center gap-3">
-                <div id="custom-buttons-container"></div>
-                <div class="flex items-center gap-2 bg-slate-50 border border-slate-200 rounded-lg px-3 py-1.5 shadow-sm hover:border-slate-300 transition-colors">
-                    <span class="text-xs font-medium text-slate-500">Show:</span>
-                    <select id="customPageLength" class="bg-transparent text-xs font-semibold text-slate-700 outline-none cursor-pointer pr-1">
-                        <option value="10" selected>10 entries</option>
-                        <option value="15">15 entries</option>
-                        <option value="25">25 entries</option>
-                        <option value="50">50 entries</option>
-                        <option value="100">100 entries</option>
-                        <option value="-1">All entries</option>
-                    </select>
-                </div>
-            </div>
-
-            <div id="custom-search-container"></div>
-        </div>
-
         <div class="overflow-x-auto">
             <table class="w-full text-sm gov-table rounded-lg overflow-hidden" id="auditLogTable">
                 <thead class="bg-[#1e4d7b] text-white">
@@ -145,49 +87,33 @@ ob_start();
 
 <script>
 $(document).ready(function() {
-    let auditLogDataTable = null;
-
-    if ($.fn && $.fn.DataTable) {
-        if ($.fn.DataTable.isDataTable('#auditLogTable')) {
-            $('#auditLogTable').DataTable().destroy();
-        }
-
-        auditLogDataTable = $('#auditLogTable').DataTable({
-            "pageLength": 10,
-            "responsive": true,
-            "autoWidth": false,
-            "order": [[0, "asc"]],
-            "dom": 'Bfrtip',
-            "buttons": [
-                { extend: 'copy', text: '<i class="fas fa-copy me-1"></i> Copy', title: 'Audit Log Records', exportOptions: { columns: [0, 1, 2, 3, 4, 5, 6, 7] } },
-                { extend: 'csv', text: '<i class="fas fa-file-csv me-1"></i> CSV', filename: 'Audit_Log', exportOptions: { columns: [0, 1, 2, 3, 4, 5, 6, 7] } },
-                { extend: 'excel', text: '<i class="fas fa-file-excel me-1"></i> Excel', filename: 'Audit_Log', exportOptions: { columns: [0, 1, 2, 3, 4, 5, 6, 7] } },
-                { extend: 'pdf', text: '<i class="fas fa-file-pdf me-1"></i> PDF', filename: 'Audit_Log', exportOptions: { columns: [0, 1, 2, 3, 4, 5, 6, 7] } },
-                { extend: 'print', text: '<i class="fas fa-print me-1"></i> Print', exportOptions: { columns: [0, 1, 2, 3, 4, 5, 6, 7] } }
-            ],
-            "language": {
-                "search": "_INPUT_",
-                "searchPlaceholder": "Search audit log...",
-                "info": "Showing _START_ to _END_ of _TOTAL_ entries",
-                "infoEmpty": "Showing 0 to 0 of 0 entries",
-                "infoFiltered": "(filtered from _MAX_ total entries)",
-                "paginate": {
-                    "previous": "<i class='fas fa-chevron-left text-xs'></i>",
-                    "next": "<i class='fas fa-chevron-right text-xs'></i>"
-                }
-            },
-            "initComplete": function() {
-                $('.dt-buttons').appendTo('#custom-buttons-container');
-                $('.dataTables_filter').appendTo('#custom-search-container');
+    $('#auditLogTable').DataTable({
+        "pageLength": 10,
+        "lengthMenu": [ [10, 15, 25, 50, 100, -1], [10, 15, 25, 50, 100, "All"] ],
+        "responsive": true,
+        "autoWidth": false,
+        "order": [[0, "asc"]],
+        "dom": '<"flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-3"<"flex items-center gap-4"Bl>f>rt<"flex flex-col sm:flex-row sm:items-center justify-between gap-4 mt-4"ip>',
+        "buttons": [
+            { extend: 'copy', text: '<i class="fas fa-copy me-1"></i> Copy', title: 'Audit Log Records', exportOptions: { columns: [0, 1, 2, 3, 4, 5, 6, 7] } },
+            { extend: 'csv', text: '<i class="fas fa-file-csv me-1"></i> CSV', filename: 'Audit_Log', exportOptions: { columns: [0, 1, 2, 3, 4, 5, 6, 7] } },
+            { extend: 'excel', text: '<i class="fas fa-file-excel me-1"></i> Excel', filename: 'Audit_Log', exportOptions: { columns: [0, 1, 2, 3, 4, 5, 6, 7] } },
+            { extend: 'pdf', text: '<i class="fas fa-file-pdf me-1"></i> PDF', filename: 'Audit_Log', exportOptions: { columns: [0, 1, 2, 3, 4, 5, 6, 7] } },
+            { extend: 'print', text: '<i class="fas fa-print me-1"></i> Print', exportOptions: { columns: [0, 1, 2, 3, 4, 5, 6, 7] } }
+        ],
+        "language": {
+            "search": "_INPUT_",
+            "searchPlaceholder": "Search audit log...",
+            "lengthMenu": "Show _MENU_ entries",
+            "info": "Showing _START_ to _END_ of _TOTAL_ entries",
+            "infoEmpty": "Showing 0 to 0 of 0 entries",
+            "infoFiltered": "(filtered from _MAX_ total entries)",
+            "paginate": {
+                "previous": "<i class='fas fa-chevron-left text-xs'></i>",
+                "next": "<i class='fas fa-chevron-right text-xs'></i>"
             }
-        });
-
-        // Event listener for Custom Page Length Dropdown
-        $('#customPageLength').on('change', function() {
-            let selectedVal = parseInt($(this).val());
-            auditLogDataTable.page.len(selectedVal).draw();
-        });
-    }
+        }
+    });
 });
 </script>
 
