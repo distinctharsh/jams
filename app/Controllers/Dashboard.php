@@ -688,7 +688,7 @@ class Dashboard extends BaseController
         }
 
         try {
-            $plainPassword = get_default_password(); 
+            // $plainPassword = get_default_password(); 
             $passwordHash  = get_default_password_hash();
             $email = $this->request->getPost('email');
 

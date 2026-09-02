@@ -42,3 +42,13 @@ CREATE TABLE audit_action (
 ALTER TABLE `user`
 ADD COLUMN `must_change_password` TINYINT NOT NULL DEFAULT 0 AFTER `hash`,
 ADD COLUMN `password_changed_at` DATETIME NULL AFTER `must_change_password`;
+
+
+==========02092026=======================================================
+
+ALTER TABLE `user`
+	CHANGE COLUMN `password_reset_req` `password_reset_req` INT NOT NULL DEFAULT '1' AFTER `ugc_id`;
+
+ALTER TABLE `user`
+ADD COLUMN `is_locked` TINYINT(1) NOT NULL DEFAULT 0 AFTER `isactive`,
+ADD COLUMN `mfa_required` TINYINT(1) NOT NULL DEFAULT 1 AFTER `is_locked`;
