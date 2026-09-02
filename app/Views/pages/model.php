@@ -89,7 +89,7 @@ ob_start();
                                         <button class="w-8 h-8 rounded-lg bg-blue-50 text-[#1e4d7b] hover:bg-blue-100 border border-blue-100 transition edit-model-btn flex items-center justify-center" data-id="<?= $model['id'] ?>" title="Edit">
                                             <i class="fas fa-pen-to-square text-xs"></i>
                                         </button>
-                                        <button class="w-8 h-8 rounded-lg bg-red-50 text-red-600 hover:bg-red-100 border border-red-100 transition delete-model-btn flex items-center justify-center" data-id="<?= $model['id'] ?>" title="Delete">
+                                        <button class="w-8 h-8 rounded-lg bg-red-50 text-red-600 hover:bg-red-100 border border-red-100 transition delete-model-btn flex items-center justify-center" data-id="<?= $model['id'] ?>" data-name="<?= esc($model['name']) ?>" title="Delete">
                                             <i class="fas fa-trash-can text-xs"></i>
                                         </button>
                                     </div>
@@ -169,6 +169,7 @@ ob_start();
 </div>
 
 <link rel="stylesheet" href="<?= base_url('assets/css/buttons.dataTables.min.css') ?>">
+<link rel="stylesheet" href="<?= base_url('assets/css/sweetalert2.min.css') ?>">
 <script src="<?= base_url('assets/js/jquery-3.7.0.min.js') ?>"></script>
 <script src="<?= base_url('assets/js/tost.js') ?>"></script>
 <script src="<?= base_url('assets/js/jquery.dataTables.min.js') ?>"></script>
@@ -178,6 +179,7 @@ ob_start();
 <script src="<?= base_url('assets/js/vfs_fonts.js') ?>"></script>
 <script src="<?= base_url('assets/js/buttons.html5.min.js') ?>"></script>
 <script src="<?= base_url('assets/js/buttons.print.min.js') ?>"></script>
+<script src="<?= base_url('assets/js/sweetalert2.all.min.js') ?>"></script>
 
 <script>
 $(document).ready(function() {
@@ -369,7 +371,7 @@ $(document).ready(function() {
                     '<td class="px-5 py-4 text-left pr-6">' +
                         '<div class="flex justify-left gap-2">' +
                             '<button class="w-8 h-8 rounded-lg bg-blue-50 text-[#1e4d7b] hover:bg-blue-100 border border-blue-100 transition edit-model-btn flex items-center justify-center" data-id="' + model.id + '" title="Edit"><i class="fas fa-pen-to-square text-xs"></i></button>' +
-                            '<button class="w-8 h-8 rounded-lg bg-red-50 text-red-600 hover:bg-red-100 border border-red-100 transition delete-model-btn flex items-center justify-center" data-id="' + model.id + '" title="Delete"><i class="fas fa-trash-can text-xs"></i></button>' +
+                            '<button class="w-8 h-8 rounded-lg bg-red-50 text-red-600 hover:bg-red-100 border border-red-100 transition delete-model-btn flex items-center justify-center" data-id="' + model.id + '" data-name="' + model.name + '" title="Delete"><i class="fas fa-trash-can text-xs"></i></button>' +
                         '</div>' +
                     '</td>' +
                     '</tr>';
@@ -409,29 +411,43 @@ $(document).ready(function() {
         });
 
         $('.delete-model-btn').off('click').on('click', function() {
-            if(!confirm('Are you sure you want to delete this model?')) return;
             let id = $(this).data('id');
+            let modelName = $(this).data('name') || 'this model';
 
-            let csrfInput = $('#modelForm input[type="hidden"]').first();
-            let dataParam = {};
-            dataParam[csrfInput.attr('name')] = csrfInput.val();
+            Swal.fire({
+                title: 'Delete Model?',
+                text: `Are you sure you want to delete "${modelName}"?`,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#dc2626',
+                cancelButtonColor: '#64748b',
+                confirmButtonText: 'Yes, Delete',
+                cancelButtonText: 'Cancel',
+                reverseButtons: true
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    let csrfInput = $('#modelForm input[type="hidden"]').first();
+                    let dataParam = {};
+                    dataParam[csrfInput.attr('name')] = csrfInput.val();
 
-            $.ajax({
-                url: "<?= base_url('delete-model/') ?>" + id,
-                type: "POST",
-                data: dataParam,
-                dataType: "json",
-                success: function(res) {
-                    if(res.csrfHash) updateCSRF(res.csrfHash);
-                    if(res.success) {
-                        loadModels();
-                        showToast('success', res.message || 'Model deleted successfully!');
-                    } else {
-                        showToast('error', res.message || 'Unable to delete record.');
-                    }
-                },
-                error: function() {
-                    showToast('error', 'Error deleting model.');
+                    $.ajax({
+                        url: "<?= base_url('delete-model/') ?>" + id,
+                        type: "POST",
+                        data: dataParam,
+                        dataType: "json",
+                        success: function(res) {
+                            if(res.csrfHash) updateCSRF(res.csrfHash);
+                            if(res.success) {
+                                loadModels();
+                                showToast('success', res.message || 'Model deleted successfully!');
+                            } else {
+                                showToast('error', res.message || 'Unable to delete record.');
+                            }
+                        },
+                        error: function() {
+                            showToast('error', 'Error deleting model.');
+                        }
+                    });
                 }
             });
         });
