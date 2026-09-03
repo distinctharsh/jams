@@ -166,6 +166,23 @@ ob_start();
                                         <button class="w-8 h-8 rounded-lg bg-amber-50 text-amber-600 hover:bg-amber-100 border border-amber-200 transition reset-user-btn flex items-center justify-center" data-id="<?= $user['id'] ?>" data-name="<?= esc($user['name']) ?>" title="Reset Password">
                                             <i class="fas fa-key text-xs"></i>
                                         </button>
+                                       <?php if ((int)($user['is_locked'] ?? 0) === 1): ?>
+                                            <button class="w-8 h-8 rounded-lg bg-amber-50 text-slate-600 hover:bg-slate-100 border border-slate-200 transition lock-user-btn flex items-center justify-center" 
+                                                    data-id="<?= $user['id'] ?>" 
+                                                    data-name="<?= esc($user['name']) ?>" 
+                                                    data-status="1" 
+                                                    title="Unlock User Account">
+                                                <i class="fas fa-lock text-xs"></i>
+                                            </button>
+                                        <?php else: ?>
+                                            <button class="w-8 h-8 rounded-lg bg-slate-100 text-slate-600 hover:bg-slate-200 border border-slate-200 transition lock-user-btn flex items-center justify-center" 
+                                                    data-id="<?= $user['id'] ?>" 
+                                                    data-name="<?= esc($user['name']) ?>" 
+                                                    data-status="0" 
+                                                    title="Lock User Account">
+                                                <i class="fas fa-lock-open text-xs"></i>
+                                            </button>
+                                        <?php endif; ?>
                                     </div>
                                 </td>
                             </tr>
@@ -538,11 +555,17 @@ $(document).ready(function() {
         } else {
             users.forEach(function(user, index) {
                 let isActive = (user.isactive == 1 || user.isactive == '1');
+                let isLocked = (user.is_locked == 1 || user.is_locked == '1');
+                
                 let authDoc = user.authorization_letter ? 
                     '<a href="<?= base_url('uploads/authorization/') ?>' + user.authorization_letter + '" target="_blank" class="inline-flex items-center gap-1 text-xs text-[#1e4d7b] hover:underline font-semibold"><i class="fas fa-file-pdf text-red-500"></i></a>' : 
                     '<span class="text-xs text-slate-400">None</span>';
                 let userName = user.name ? user.name : 'User';
                 let userEmail = user.email ? user.email : '';
+
+                let lockBtn = isLocked ?
+                    '<button class="w-8 h-8 rounded-lg bg-slate-50 text-slate-600 hover:bg-slate-100 border border-slate-200 transition lock-user-btn flex items-center justify-center" data-id="' + user.id + '" data-name="' + userName + '" data-status="1" title="Unlock User Account"><i class="fas fa-lock text-xs"></i></button>' :
+                    '<button class="w-8 h-8 rounded-lg bg-slate-100 text-slate-600 hover:bg-slate-200 border border-slate-200 transition lock-user-btn flex items-center justify-center" data-id="' + user.id + '" data-name="' + userName + '" data-status="0" title="Lock User Account"><i class="fas fa-lock-open text-xs"></i></button>';
 
                 let row = '<tr class="hover:bg-slate-50/80 transition-colors duration-150">' +
                     '<td class="px-5 py-4 text-left font-bold text-[#1e4d7b]">' + (index + 1) + '</td>' +
@@ -565,6 +588,7 @@ $(document).ready(function() {
                             '<button class="w-8 h-8 rounded-lg bg-blue-50 text-[#1e4d7b] hover:bg-blue-100 border border-blue-100 transition edit-user-btn flex items-center justify-center" data-id="' + user.id + '" title="Edit"><i class="fas fa-pen-to-square text-xs"></i></button>' +
                             '<button class="w-8 h-8 rounded-lg bg-red-50 text-red-600 hover:bg-red-100 border border-red-100 transition delete-user-btn flex items-center justify-center" data-id="' + user.id + '" data-name="' + userName + '" data-email="' + userEmail + '" title="Delete"><i class="fas fa-trash-can text-xs"></i></button>' +
                             '<button class="w-8 h-8 rounded-lg bg-amber-50 text-amber-600 hover:bg-amber-100 border border-amber-200 transition reset-user-btn flex items-center justify-center" data-id="' + user.id + '" data-name="' + userName + '" title="Reset Password"><i class="fas fa-key text-xs"></i></button>' +
+                            lockBtn +
                         '</div>' +
                     '</td>' +
                     '</tr>';
@@ -722,6 +746,53 @@ $(document).ready(function() {
                         },
                         error: function() {
                             if(typeof showToast === 'function') showToast('error', 'Error resetting user password.');
+                        }
+                    });
+                }
+            });
+        });
+
+        $(document).off('click', '.lock-user-btn').on('click', '.lock-user-btn', function(e) {
+            e.preventDefault();
+            let id = $(this).data('id');
+            let userName = $(this).data('name') || 'this user';
+            let currentStatus = parseInt($(this).data('status')) || 0;
+            let actionText = currentStatus === 1 ? 'unlock' : 'lock';
+            let confirmBtnText = currentStatus === 1 ? 'Yes, Unlock User' : 'Yes, Lock User';
+            let targetUrl = currentStatus === 1 ? "<?= base_url('unlock-user/') ?>" : "<?= base_url('lock-user/') ?>";
+
+            Swal.fire({
+                title: `${actionText.charAt(0).toUpperCase() + actionText.slice(1)} User Account?`,
+                text: `Are you sure you want to ${actionText} the account for "${userName}"?`,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: currentStatus === 1 ? '#e58500' : '#dc2626',
+                cancelButtonColor: '#64748b',
+                confirmButtonText: confirmBtnText,
+                cancelButtonText: 'Cancel',
+                reverseButtons: true
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    let csrfInput = $('#userForm input[type="hidden"]').first();
+                    let dataParam = {};
+                    dataParam[csrfInput.attr('name')] = csrfInput.val();
+
+                    $.ajax({
+                        url: targetUrl + id,
+                        type: "POST",
+                        data: dataParam,
+                        dataType: "json",
+                        success: function(res) {
+                            if(res.csrfHash) updateCSRF(res.csrfHash);
+                            if(res.success) {
+                                loadUsers();
+                                if(typeof showToast === 'function') showToast('success', res.message || `User account ${actionText}ed successfully!`);
+                            } else {
+                                if(typeof showToast === 'function') showToast('error', res.message || `Unable to ${actionText} user account.`);
+                            }
+                        },
+                        error: function() {
+                            if(typeof showToast === 'function') showToast('error', `Error ${actionText}ing user account.`);
                         }
                     });
                 }

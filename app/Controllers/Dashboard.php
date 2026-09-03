@@ -713,6 +713,49 @@ class Dashboard extends BaseController
         }
     }
 
+    public function lockUser($id = null)
+    {
+        if (!session()->get('isLoggedIn')) {
+            return $this->response->setJSON([
+                'success'  => false, 
+                'message'  => 'Unauthorized access.',
+                'csrfHash' => csrf_hash()
+            ]);
+        }
+
+        if (!$id) {
+            return $this->response->setJSON([
+                'success'  => false,
+                'message'  => 'Invalid user ID.',
+                'csrfHash' => csrf_hash()
+            ]);
+        }
+
+        try {
+            $updated = $this->userModel->update($id, ['is_locked' => 1]);
+
+            if ($updated) {
+                return $this->response->setJSON([
+                    'success'  => true,
+                    'message'  => 'User account locked successfully.',
+                    'csrfHash' => csrf_hash()
+                ]);
+            } else {
+                return $this->response->setJSON([
+                    'success'  => false,
+                    'message'  => 'Failed to lock user account.',
+                    'csrfHash' => csrf_hash()
+                ]);
+            }
+        } catch (\Exception $e) {
+            return $this->response->setJSON([
+                'success'  => false,
+                'message'  => 'Error: ' . $e->getMessage(),
+                'csrfHash' => csrf_hash()
+            ]);
+        }
+    }
+
     public function registrations()
     {
         $regModel = new \App\Models\RegistrationModel();

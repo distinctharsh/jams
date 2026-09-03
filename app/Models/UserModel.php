@@ -14,7 +14,7 @@ class UserModel extends Model
         'mobile_no',
         'organization_id', 
         'org_type', 'designation', 'authorization_letter',
-        'isactive', 'salt', 'hash', 'ugc_id'
+        'isactive', 'is_locked', 'mfa_required', 'salt', 'hash', 'ugc_id'
     ];
 
     public function getAllUsers()
