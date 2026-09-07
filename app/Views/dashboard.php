@@ -7,10 +7,9 @@
   <!-- Font Awesome 6 -->
   <link href="<?= base_url('assets/vendor/fontawesome-free/css/all.min.css') ?>" rel="stylesheet">
   <!-- Google Font: Inter -->
-<link rel="stylesheet" href="<?= base_url('assets/css/font.css') ?>">
+  <link rel="stylesheet" href="<?= base_url('assets/css/fonts.css') ?>">
   <link rel="stylesheet" href="<?= base_url('assets/css/select2.min.css') ?>">
-  <link rel="stylesheet" href="<?= base_url('assets/css/sweetalert2.min.css') ?>">
-  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="<?= base_url('assets/css/tailwind.css') ?>">
   <meta name="csrf-token" content="gov-csrf-2026">
   <style>
     /* 
@@ -1387,7 +1386,6 @@
 </div>
 
 <?php include 'components/footer.php'; ?>
-<script src="<?= base_url('assets/js/sweetalert2.all.min.js') ?>"></script>
 
 <script>
   // Profile dropdown

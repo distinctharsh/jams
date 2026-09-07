@@ -428,13 +428,13 @@ $(document).ready(function() {
             let typeName = $(this).data('name') || 'this record';
 
             Swal.fire({
-                title: 'Delete Organization Type?',
-                text: `Are you sure you want to delete "${typeName}"?`,
+                title: 'Deactivate Organization Type?',
+                text: `Are you sure you want to deactivate "${typeName}"?`,
                 icon: 'warning',
                 showCancelButton: true,
                 confirmButtonColor: '#dc2626',
                 cancelButtonColor: '#64748b',
-                confirmButtonText: 'Yes, Delete',
+                confirmButtonText: 'Yes, Deactivate',
                 cancelButtonText: 'Cancel',
                 reverseButtons: true
             }).then((result) => {
@@ -452,9 +452,9 @@ $(document).ready(function() {
                             if(res.csrfHash) updateCSRF(res.csrfHash);
                             if(res.success) {
                                 loadOrgTypes();
-                                showToast('success', res.message || 'Organization type deleted successfully!');
+                                showToast('success', res.message || 'Organization type deactivate successfully!');
                             } else {
-                                showToast('error', res.message || 'Unable to delete record.');
+                                showToast('error', res.message || 'Unable to deactivate record.');
                             }
                         },
                         error: function() {

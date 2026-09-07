@@ -427,6 +427,19 @@ $(document).ready(function() {
             allowClear: true,
             templateResult: formatOption
         });
+
+        $role.off('select2:select').on('select2:select', function(e) {
+            let data = e.params.data;
+            let $option = $(this).find('option[value="' + data.id + '"]');
+            let $li = $('.select2-results__option[id*="-' + data.id + '"]');
+            $li.find('.select2-checkbox').prop('checked', true);
+        });
+
+        $role.off('select2:unselect').on('select2:unselect', function(e) {
+            let data = e.params.data;
+            let $li = $('.select2-results__option[id*="-' + data.id + '"]');
+            $li.find('.select2-checkbox').prop('checked', false);
+        });
     }
 
     initRoleSelect2();
@@ -698,7 +711,7 @@ $(document).ready(function() {
                                 loadUsers();
                                 if(typeof showToast === 'function') showToast('success', res.message || 'User deactivated successfully!');
                             } else {
-                                if(typeof showToast === 'function') showToast('error', res.message || 'Unable to delete record.');
+                                if(typeof showToast === 'function') showToast('error', res.message || 'Unable to deactivate record.');
                             }
                         },
                         error: function() {

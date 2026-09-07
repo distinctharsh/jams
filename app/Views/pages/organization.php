@@ -462,13 +462,13 @@ $(document).ready(function() {
             let orgName = $(this).data('name') || 'this record';
 
             Swal.fire({
-                title: 'Delete Organization?',
-                text: `Are you sure you want to delete "${orgName}"?`,
+                title: 'Deactivate Organization?',
+                text: `Are you sure you want to deactivate "${orgName}"?`,
                 icon: 'warning',
                 showCancelButton: true,
                 confirmButtonColor: '#dc2626',
                 cancelButtonColor: '#64748b',
-                confirmButtonText: 'Yes, Delete',
+                confirmButtonText: 'Yes, Deactivate',
                 cancelButtonText: 'Cancel',
                 reverseButtons: true
             }).then((result) => {
@@ -486,13 +486,13 @@ $(document).ready(function() {
                             if(res.csrfHash) updateCSRF(res.csrfHash);
                             if(res.success) {
                                 loadOrganizations();
-                                showToast('success', res.message || 'Organization deleted successfully!');
+                                showToast('success', res.message || 'Organization deactivate successfully!');
                             } else {
-                                showToast('error', res.message || 'Unable to delete record.');
+                                showToast('error', res.message || 'Unable to deactivate record.');
                             }
                         },
                         error: function() {
-                            showToast('error', 'Error deleting organization.');
+                            showToast('error', 'Error deactivate organization.');
                         }
                     });
                 }

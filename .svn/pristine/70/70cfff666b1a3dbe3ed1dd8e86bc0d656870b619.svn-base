@@ -1,0 +1,2 @@
+ERROR - 2026-08-24 12:49:36 --> Password decryption error: Undefined constant App\Controllers\LoginController::LOGIN_CRYPTO_KEY
+ERROR - 2026-08-24 13:04:07 --> Password decryption error: Undefined constant App\Controllers\LoginController::LOGIN_CRYPTO_KEY

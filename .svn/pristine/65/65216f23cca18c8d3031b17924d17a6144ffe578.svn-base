@@ -1,0 +1,364 @@
+ALTER TABLE `jams_db`.`user` 
+ADD COLUMN `password_reset_req` INT NOT NULL DEFAULT 0 AFTER `ugc_id`;
+CREATE DEFINER=`root`@`localhost` PROCEDURE `approve_registration`(
+    IN p_reg_id BIGINT,
+    IN p_approved_by INT,
+    IN p_action INT,
+    IN p_remarks VARCHAR(1000),
+    IN pwd VARCHAR(500)
+)
+BEGIN
+
+    DECLARE v_reg_no VARCHAR(50) DEFAULT NULL;
+    DECLARE v_name VARCHAR(1000) DEFAULT NULL;
+    DECLARE v_email VARCHAR(50) DEFAULT NULL;
+    DECLARE v_phone VARCHAR(15) DEFAULT NULL;
+    DECLARE v_org INT DEFAULT 1;
+    DECLARE v_org_type INT DEFAULT 1;
+    DECLARE v_ugc_id VARCHAR(100) DEFAULT NULL;
+    DECLARE v_authorization_letter VARCHAR(500) DEFAULT NULL;
+    DECLARE v_designation INT DEFAULT NULL;
+    DECLARE v_status INT DEFAULT NULL;
+    DECLARE v_user_id BIGINT DEFAULT NULL;
+
+    DECLARE v_error_code INT DEFAULT NULL;
+    DECLARE v_error_message TEXT DEFAULT NULL;
+
+
+    /* =========================================================
+       ERROR HANDLER
+       ========================================================= */
+    DECLARE EXIT HANDLER FOR SQLEXCEPTION
+    BEGIN
+
+        GET DIAGNOSTICS CONDITION 1
+            v_error_code = MYSQL_ERRNO,
+            v_error_message = MESSAGE_TEXT;
+
+        ROLLBACK;
+
+        SELECT
+            0 AS success,
+            'Registration could not be approved' AS message,
+            NULL AS id,
+            v_reg_no AS reg_no,
+            v_error_code AS error_code,
+            v_error_message AS error_message;
+
+    END;
+
+
+    /* =========================================================
+       START TRANSACTION
+       ========================================================= */
+    START TRANSACTION;
+
+
+    /* =========================================================
+       GET REGISTRATION DETAILS
+       ========================================================= */
+    SELECT
+        reg_no,
+        name,
+        email,
+        mobile_no,
+        organization_id,
+        org_type,
+        ugc_id,
+        authorization_letter,
+        designation
+    INTO
+        v_reg_no,
+        v_name,
+        v_email,
+        v_phone,
+        v_org,
+        v_org_type,
+        v_ugc_id,
+        v_authorization_letter,
+        v_designation
+    FROM registration
+    WHERE id = p_reg_id
+    FOR UPDATE;
+
+
+    /* =========================================================
+       CHECK REGISTRATION EXISTS
+       ========================================================= */
+    IF v_reg_no IS NULL THEN
+
+        ROLLBACK;
+
+        SELECT
+            0 AS success,
+            'Registration not found' AS message,
+            NULL AS id,
+            NULL AS reg_no,
+            404 AS error_code,
+            'No registration exists for the supplied ID' AS error_message;
+
+
+    ELSE
+
+        /* =====================================================
+           GET LATEST REGISTRATION HISTORY STATUS
+           ===================================================== */
+        SET v_status = NULL;
+
+        SELECT
+            status
+        INTO
+            v_status
+        FROM registration_history
+        WHERE reg_id = p_reg_id
+        ORDER BY id DESC
+        LIMIT 1
+        FOR UPDATE;
+
+
+        /* =====================================================
+           CHECK WHETHER REGISTRATION CAN BE PROCESSED
+
+           Assuming:
+             1 = Pending
+             2 = Some intermediate status
+             3 = Some intermediate status
+             4 = Approved
+             5 = Rejected
+           ===================================================== */
+        IF v_status IS NULL OR v_status NOT IN (1, 2, 3) THEN
+
+            ROLLBACK;
+
+            SELECT
+                0 AS success,
+                'Registration already processed' AS message,
+                NULL AS id,
+                NULL AS reg_no,
+                409 AS error_code,
+                'Already approved or rejected' AS error_message;
+
+
+        ELSE
+
+            /* =================================================
+               ACTION 5 = REJECT
+
+               For rejection:
+               Do NOT create a user.
+               Only insert registration history.
+               ================================================= */
+            IF p_action <> 5 THEN
+
+                /* =============================================
+                   CREATE USER
+                   ============================================= */
+                INSERT INTO `user`
+                (
+                    name,
+                    email,
+                    mobile_no,
+                    organization_id,
+                    org_type,
+                    ugc_id,
+                    authorization_letter,
+                    designation,`hash`,password_reset_req
+                )
+                VALUES
+                (
+                    v_name,
+                    v_email,
+                    v_phone,
+                    v_org,
+                    v_org_type,
+                    v_ugc_id,
+                    v_authorization_letter,
+                    v_designation,pwd,1
+                );
+
+
+                /* =============================================
+                   GET NEW USER ID
+                   ============================================= */
+                SET v_user_id = LAST_INSERT_ID();
+
+
+                /* =============================================
+                   ASSIGN DEFAULT ROLE
+                   ============================================= */
+                REPLACE INTO user_role_mapping
+                (
+                    user_id,
+                    role_id,
+                    isactive
+                )
+                VALUES
+                (
+                    v_user_id,
+                    3,
+                    1
+                );
+
+            END IF;
+
+
+            /* =================================================
+               ALWAYS INSERT REGISTRATION HISTORY
+               ================================================= */
+            INSERT INTO registration_history
+            (
+                reg_id,
+                status,
+                performed_by,
+                remarks
+            )
+            VALUES
+            (
+                p_reg_id,
+                p_action,
+                p_approved_by,
+                p_remarks
+            );
+
+
+            /* =================================================
+               COMMIT
+               ================================================= */
+            COMMIT;
+
+
+            /* =================================================
+               SUCCESS RESPONSE
+               ================================================= */
+            SELECT
+                1 AS success,
+
+                CASE
+                    WHEN p_action = 5
+                        THEN 'Registration Rejected successfully'
+                    ELSE 'Registration approved successfully'
+                END AS message,
+
+                v_user_id AS id,
+                v_reg_no AS reg_no,
+                NULL AS error_code,
+                NULL AS error_message;
+
+        END IF;
+
+    END IF;
+
+END
+
+Table Change Request – New (02-09-2026-Request module) 
+
+CREATE TABLE application_vendor_mapping (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    app_id INT NOT NULL,
+    vendor_id INT NULL,
+    vendor_name VARCHAR(255) NULL,
+    technical_specifications TEXT NULL,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME NULL
+);
+
+
+
+ALTER TABLE application
+    ADD COLUMN contact_person VARCHAR(500) NULL,
+    ADD COLUMN email VARCHAR(255) NULL AFTER contact_person,
+    ADD COLUMN phone VARCHAR(20) NULL AFTER email,
+    ADD COLUMN organisation VARCHAR(255) NULL AFTER phone,
+    ADD COLUMN organisation_type VARCHAR(255) NULL AFTER organisation,
+
+    ALTER TABLE application_document_master
+ADD COLUMN document_path VARCHAR(500) NULL AFTER document_name;
+--------------------------------------------jammer application-request no generate 03-09-2026 ---------------
+CREATE TABLE organization_monthly_counter (
+    organization_id INT NOT NULL,
+    year_month_counter CHAR(6) NOT NULL,
+    last_count INT NOT NULL DEFAULT 0,
+    PRIMARY KEY (organization_id, year_month_counter)
+);
+
+DELIMITER $$
+
+CREATE PROCEDURE generate_application_no(
+    IN p_organization_id INT,
+    OUT p_application_no VARCHAR(100)
+)
+BEGIN
+    DECLARE v_short_name VARCHAR(50);
+    DECLARE v_year_month CHAR(6);
+    DECLARE v_count INT;
+
+    SET v_year_month = DATE_FORMAT(CURDATE(), '%Y%m');
+
+    /* Get organization short name */
+    SELECT org_name
+    INTO v_short_name
+    FROM mas_organization
+    WHERE id = p_organization_id
+    LIMIT 1;
+
+    /* Validate organization */
+    IF v_short_name IS NULL THEN
+        SIGNAL SQLSTATE '45000'
+            SET MESSAGE_TEXT = 'Invalid organization ID';
+    END IF;
+
+    /*
+       Increment monthly counter.
+       INSERT creates counter = 1 for a new month.
+       ON DUPLICATE KEY UPDATE safely increments it.
+    */
+    INSERT INTO organization_monthly_counter
+        (organization_id, year_month_counter, last_count)
+    VALUES
+        (p_organization_id, v_year_month, 1)
+    ON DUPLICATE KEY UPDATE
+        last_count = last_count + 1;
+
+    /* Get the newly assigned number */
+    SELECT last_count
+    INTO v_count
+    FROM organization_monthly_counter
+    WHERE organization_id = p_organization_id
+      AND year_month_counter = v_year_month;
+
+    /* Build application number */
+    SET p_application_no = CONCAT(
+        v_short_name,
+        '/',
+        v_year_month,
+        '/',
+        LPAD(v_count, 4, '0')
+    );
+
+END$$
+
+DELIMITER ;
+
+ALTER TABLE `user`
+	CHANGE COLUMN `password_reset_req` `password_reset_req` INT NOT NULL DEFAULT '1' AFTER `ugc_id`;
+
+ALTER TABLE `user`
+ADD COLUMN `is_locked` TINYINT(1) NOT NULL DEFAULT 0 AFTER `isactive`,
+ADD COLUMN `mfa_required` TINYINT(1) NOT NULL DEFAULT 1 AFTER `is_locked`;
+
+ALTER TABLE `application_date_mapping` 
+ADD COLUMN `exam_name` VARCHAR(255) NULL AFTER `app_id`;
+
+
+ALTER TABLE application_centre_mapping
+ADD COLUMN centre_coordinates VARCHAR(255) NULL AFTER centre_address;
+
+ALTER TABLE application_centre_mapping
+    MODIFY COLUMN district VARCHAR(255),
+    MODIFY COLUMN state VARCHAR(255);
+
+ALTER TABLE `jams_db`.`application_vendor_mapping` 
+CHANGE COLUMN `vendor_id` `model_vendor_id` INT NULL DEFAULT NULL ;
+
+ALTER TABLE `jams_db`.`application_vendor_mapping` 
+ADD COLUMN `jammer_id` INT NULL AFTER `vendor_id`;

@@ -1,0 +1,14 @@
+CRITICAL - 2026-09-01 09:04:37 --> ErrorException: Undefined variable $request
+[Method: GET, Route: request-view]
+in APPPATH\Views\pages\request-view.php on line 8.
+ 1 APPPATH\Views\pages\request-view.php(8): CodeIgniter\Debug\Exceptions->errorHandler(2, 'Undefined variable $request', 'C:\\xampp\\htdocs\\jams-nic\\app\\Views\\pages\\request-view.php', 8)
+ 2 SYSTEMPATH\View\View.php(240): include('C:\\xampp\\htdocs\\jams-nic\\app\\Views\\pages\\request-view.php')
+ 3 SYSTEMPATH\View\View.php(243): CodeIgniter\View\View->CodeIgniter\View\{closure}()
+ 4 SYSTEMPATH\Common.php(1268): CodeIgniter\View\View->render('pages/request-view', [], true)
+ 5 APPPATH\Controllers\RequestController.php(46): view('pages/request-view', [...])
+ 6 SYSTEMPATH\CodeIgniter.php(974): App\Controllers\RequestController->requestView()
+ 7 SYSTEMPATH\CodeIgniter.php(520): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\RequestController))
+ 8 SYSTEMPATH\CodeIgniter.php(363): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 9 SYSTEMPATH\Boot.php(417): CodeIgniter\CodeIgniter->run()
+10 SYSTEMPATH\Boot.php(68): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+11 FCPATH\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))

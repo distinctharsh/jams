@@ -9,7 +9,7 @@ use App\Models\VendorModel;
 use App\Models\ModelModel;
 use App\Models\DesignationModel;
 use App\Models\RegistrationModel;
-
+use App\Models\AuditTrailModel;
 class Dashboard extends BaseController
 {
     protected $userModel;
@@ -20,6 +20,7 @@ class Dashboard extends BaseController
     protected $modelModel;
     protected $desModel;
     protected $regModel;
+    protected $auditModel;
 
     public function __construct()
     {
@@ -31,6 +32,7 @@ class Dashboard extends BaseController
         $this->modelModel  = new ModelModel();
         $this->desModel     = new DesignationModel();
         $this->regModel     = new RegistrationModel();
+        $this->auditModel = new AuditTrailModel();
     }
 
     public function index()
@@ -511,7 +513,7 @@ class Dashboard extends BaseController
             $this->modelModel->updateModel($id, ['isactive' => 0]);
             return $this->response->setJSON([
                 'success'  => true,
-                'message'  => 'Record deleted successfully.',
+                'message'  => 'Record deactivate successfully.',
                 'csrfHash' => csrf_hash()
             ]);
         } catch (\Exception $e) {
@@ -713,52 +715,123 @@ class Dashboard extends BaseController
         }
     }
 
-    public function toggleLockUser($id = null)
-    {
-        if (!session()->get('isLoggedIn')) {
-            return $this->response->setJSON([
-                'success'  => false, 
-                'message'  => 'Unauthorized access.',
-                'csrfHash' => csrf_hash()
-            ]);
-        }
+public function toggleLockUser($id = null)
+{
+    if (!session()->get('isLoggedIn')) {
+        return $this->response->setJSON([
+            'success'  => false,
+            'message'  => 'Unauthorized access.',
+            'csrfHash' => csrf_hash()
+        ]);
+    }
 
-        if (!$id) {
+    if (!$id) {
+        return $this->response->setJSON([
+            'success'  => false,
+            'message'  => 'Invalid user ID.',
+            'csrfHash' => csrf_hash()
+        ]);
+    }
+
+    $status = $this->request->getPost('status');
+
+    // 1 = Lock, 0 = Unlock
+    $newStatus = ($status == '1' || $status === 1) ? 1 : 0;
+
+    try {
+
+        // Get user details
+        $user = $this->userModel->getUserById($id);
+
+        if (!$user) {
             return $this->response->setJSON([
                 'success'  => false,
-                'message'  => 'Invalid user ID.',
+                'message'  => 'User not found.',
                 'csrfHash' => csrf_hash()
             ]);
         }
 
-        $status = $this->request->getPost('status'); 
-        $newStatus = ($status == '1' || $status === 1) ? 1 : 0;
-        $actionText = ($newStatus === 1) ? 'locked' : 'unlocked';
+        $email = $user['email'];
+        
+        $adminUserId = (int) session()->get('user_id');
+        $adminIp     = $this->request->getIPAddress();
 
-        try {
-            $updated = $this->userModel->update($id, ['is_locked' => $newStatus]);
+        /*
+         * LOCK USER
+         */
+        if ($newStatus === 1) {
 
-            if ($updated) {
-                return $this->response->setJSON([
-                    'success'  => true,
-                    'message'  => "User account {$actionText} successfully.",
-                    'csrfHash' => csrf_hash()
-                ]);
-            } else {
+            // Already locked
+            if ((int) $user['is_locked'] === 1) {
                 return $this->response->setJSON([
                     'success'  => false,
-                    'message'  => "Failed to {$actionText} user account.",
+                    'message'  => 'User account is already locked.',
                     'csrfHash' => csrf_hash()
                 ]);
             }
-        } catch (\Exception $e) {
+
+            $updated = $this->auditModel->lockAccount($email);
+            create_audit_action(null, $adminUserId,'LOCK_ACCOUNT','Account locked by administrator',  $email);
+
+            $actionText = 'locked';
+        }
+
+        /*
+         * UNLOCK USER
+         */
+        else {
+
+            // Already unlocked
+            if ((int) $user['is_locked'] === 0) {
+                return $this->response->setJSON([
+                    'success'  => false,
+                    'message'  => 'User account is already unlocked.',
+                    'csrfHash' => csrf_hash()
+                ]);
+            }
+
+            $updated = $this->auditModel->unlockAccount(
+                (int) $id,
+                $email,
+                $adminIp
+            );
+            create_audit_action(null, $adminUserId,'UNLOCK_ACCOUNT','Account unlocked by administrator',  $email);
+            $actionText = 'unlocked';
+        }
+
+        /*
+         * RESPONSE
+         */
+        if ($updated) {
+
             return $this->response->setJSON([
-                'success'  => false,
-                'message'  => 'Error: ' . $e->getMessage(),
+                'success'  => true,
+                'message'  => "User account {$actionText} successfully.",
+                'status'   => $newStatus,
                 'csrfHash' => csrf_hash()
             ]);
         }
+
+        return $this->response->setJSON([
+            'success'  => false,
+            'message'  => "Failed to {$actionText} user account.",
+            'csrfHash' => csrf_hash()
+        ]);
+
+    } catch (\Throwable $e) {
+
+        log_message(
+            'error',
+            'toggleLockUser error: ' . $e->getMessage()
+        );
+
+        return $this->response->setJSON([
+            'success'  => false,
+            'message'  => 'Unable to change account status.',
+            'csrfHash' => csrf_hash()
+        ]);
     }
+}
 
     public function registrations()
     {

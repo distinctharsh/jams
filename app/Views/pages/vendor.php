@@ -393,13 +393,13 @@ $(document).ready(function() {
             let vendorName = $(this).data('name') || 'this vendor';
 
             Swal.fire({
-                title: 'Delete Vendor?',
-                text: `Are you sure you want to delete "${vendorName}"?`,
+                title: 'Deactivate Vendor?',
+                text: `Are you sure you want to deactivate "${vendorName}"?`,
                 icon: 'warning',
                 showCancelButton: true,
                 confirmButtonColor: '#dc2626',
                 cancelButtonColor: '#64748b',
-                confirmButtonText: 'Yes, Delete',
+                confirmButtonText: 'Yes, Deactivate',
                 cancelButtonText: 'Cancel',
                 reverseButtons: true
             }).then((result) => {
@@ -417,9 +417,9 @@ $(document).ready(function() {
                             if(res.csrfHash) updateCSRF(res.csrfHash);
                             if(res.success) {
                                 loadVendors();
-                                showToast('success', res.message || 'Vendor deleted successfully!');
+                                showToast('success', res.message || 'Vendor deactivate successfully!');
                             } else {
-                                showToast('error', res.message || 'Unable to delete record.');
+                                showToast('error', res.message || 'Unable to deactivate record.');
                             }
                         },
                         error: function() {
