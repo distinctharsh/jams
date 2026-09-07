@@ -273,8 +273,6 @@ ALTER TABLE application
 
     ALTER TABLE application_document_master
 ADD COLUMN document_path VARCHAR(500) NULL AFTER document_name;
-
-
 --------------------------------------------jammer application-request no generate 03-09-2026 ---------------
 CREATE TABLE organization_monthly_counter (
     organization_id INT NOT NULL,
@@ -347,3 +345,20 @@ ALTER TABLE `user`
 ALTER TABLE `user`
 ADD COLUMN `is_locked` TINYINT(1) NOT NULL DEFAULT 0 AFTER `isactive`,
 ADD COLUMN `mfa_required` TINYINT(1) NOT NULL DEFAULT 1 AFTER `is_locked`;
+
+ALTER TABLE `application_date_mapping` 
+ADD COLUMN `exam_name` VARCHAR(255) NULL AFTER `app_id`;
+
+
+ALTER TABLE application_centre_mapping
+ADD COLUMN centre_coordinates VARCHAR(255) NULL AFTER centre_address;
+
+ALTER TABLE application_centre_mapping
+    MODIFY COLUMN district VARCHAR(255),
+    MODIFY COLUMN state VARCHAR(255);
+
+ALTER TABLE `jams_db`.`application_vendor_mapping` 
+CHANGE COLUMN `model_vendor_id` `vendor_id` INT NULL DEFAULT NULL ;
+
+ALTER TABLE `jams_db`.`application_vendor_mapping` 
+ADD COLUMN `jammer_id` INT NULL AFTER `vendor_id`;
