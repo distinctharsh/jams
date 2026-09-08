@@ -10,6 +10,7 @@ use App\Models\ModelModel;
 use App\Models\DesignationModel;
 use App\Models\RegistrationModel;
 use App\Models\AuditTrailModel;
+use CodeIgniter\Database\Config;
 class Dashboard extends BaseController
 {
     protected $userModel;
@@ -21,6 +22,7 @@ class Dashboard extends BaseController
     protected $desModel;
     protected $regModel;
     protected $auditModel;
+    protected $db;
 
     public function __construct()
     {
@@ -33,11 +35,11 @@ class Dashboard extends BaseController
         $this->desModel     = new DesignationModel();
         $this->regModel     = new RegistrationModel();
         $this->auditModel = new AuditTrailModel();
+        $this->db           = Config::connect();
     }
 
     public function index()
     {
-        
         if (!session()->get('isLoggedIn')) {
             return redirect()->to(base_url('/'));
         }
@@ -49,6 +51,21 @@ class Dashboard extends BaseController
             ->countAllResults();
 
         $totalCount = $this->regModel->countAll();
+        $rawExamEvents = $this->db->table('application_date_mapping as adm')
+            ->select('adm.id, adm.app_id, adm.exam_name, DATE(adm.exam_date) as event_date, adm.exam_date, app.app_no')
+            ->join('application as app', 'app.id = adm.app_id', 'left')
+            ->get()
+            ->getResultArray();
+
+        $examDatesMap = [];
+        foreach ($rawExamEvents as $event) {
+            $date = $event['event_date'];
+            if (!isset($examDatesMap[$date])) {
+                $examDatesMap[$date] = [];
+            }
+            $examDatesMap[$date][] = $event;
+        }
+
         $data = [
             'user_id'       => session()->get('user_id'),
             'username'      => session()->get('username'),
@@ -56,6 +73,7 @@ class Dashboard extends BaseController
             'email'         => session()->get('email'),
             'pending_count' => $pendingCount,
             'total_count'   => $totalCount,
+            'exam_dates_map'    => $examDatesMap,
         ];
         return view('pages/dashboard', $data);
     }
