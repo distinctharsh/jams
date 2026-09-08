@@ -8,79 +8,27 @@
         padding: 8px 20px;
     }
 
-    .gov-marquee-strip {
+    .gov-center-msg {
         flex: 1;
-        max-width: 750px;
-        height: 34px;
         display: flex;
+        justify-content: center;
         align-items: center;
-        background: #fff;
-        border: 1px solid rgba(255, 255, 255, 0.12);
-        border-radius: 6px;
-        overflow: hidden;
-        margin: 0 10px;
-        box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.2);
-        position: relative;
+        text-align: center;
+        padding: 0 10px;
     }
 
-    .marquee-track {
-        width: 100%;
-        height: 100%;
-        overflow: hidden;
-        position: relative;
-        display: flex;
-        align-items: center;
+    .gov-center-msg span {
+        color: #ffffff;
+        font-size: 15px;
+        font-weight: 600;
+        letter-spacing: 0.3px;
+        text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
     }
 
-    .marquee-content {
-        position: absolute;
-        left: 0;
-        display: flex;
-        align-items: center;
-        width: max-content;
-        white-space: nowrap;
-        transform: translate(100%, -50%);
-        animation: marqueeRightToLeft 10s linear infinite;
-    }
-
-    .marquee-group {
-        display: flex;
-        align-items: center;
-        flex-shrink: 0;
-    }
-
-    .marquee-item {
-        display: inline-flex;
-        align-items: center;
-        gap: 7px;
-
-        color: red;
-        font-size: 14px;
-        font-weight: 500;
-
-        white-space: nowrap;
-    }
-
-
-    .marquee-item i {
+    .gov-center-msg i {
         color: #ffb74d;
-        font-size: 12px;
-    }
-
-    .gov-marquee-strip:hover .marquee-content {
-        animation-play-state: paused;
-    }
-
-    @keyframes marqueeRightToLeft {
-
-        0% {
-            transform: translateX(200%);
-        }
-
-        100% {
-            transform: translateX(-100%);
-        }
-
+        margin-right: 8px;
+        font-size: 14px;
     }
 
     @media (max-width: 768px) {
@@ -90,11 +38,7 @@
             padding: 8px 10px;
         }
 
-        .gov-marquee-strip {
-            margin: 0 5px;
-        }
-
-        .marquee-item {
+        .gov-center-msg span {
             font-size: 11px;
         }
 
@@ -116,24 +60,14 @@
     </div>
   </div>
 
-    <div class="gov-marquee-strip">
-        <div class="marquee-track">
-            <div class="marquee-content">
-                <div class="marquee-group">
-                    <span class="marquee-item">
-                        <i class="fas fa-info-circle"></i>
-                        Welcome to JAMS – Jammer Approval Management System
-                    </span>
-                </div>
-            </div>
-        </div>
-    </div>
+  <div class="gov-center-msg">
+      <span>
+          <i class="fas fa-shield-halved"></i>
+          Welcome to JAMS – Jammer Approval Management System
+      </span>
+  </div>
 
   <div class="header-actions">
-        <!-- <div class="icon-btn back-btn" onclick="history.back()">
-            <i class="fas fa-arrow-left"></i>
-        </div> -->
-
     <?php 
         $roleIds = session()->get('role_ids') ?? '';
         $userRoles = array_map('intval', array_filter(explode(',', $roleIds)));
@@ -155,52 +89,52 @@
 
         <div class="notification-popover" id="notificationMenu">
             <div class="notif-header">
-            <div class="flex items-center justify-between">
-                <h4 class="font-bold text-slate-800 text-sm flex items-center gap-2">
-                <i class="fa-solid fa-bell text-[#e58500]"></i> Notifications
-                </h4>
-                <span class="bg-amber-100 text-[#e58500] text-[10px] font-bold px-2 py-0.5 rounded-full">3 New</span>
-            </div>
+                <div class="flex items-center justify-between">
+                    <h4 class="font-bold text-slate-800 text-sm flex items-center gap-2">
+                        <i class="fa-solid fa-bell text-[#e58500]"></i> Notifications
+                    </h4>
+                    <span class="bg-amber-100 text-[#e58500] text-[10px] font-bold px-2 py-0.5 rounded-full">3 New</span>
+                </div>
             </div>
 
             <div class="notif-body">
-            <a href="#" class="notif-item unread">
-                <div class="notif-icon bg-amber-50 text-[#e58500]">
-                <i class="fas fa-user-plus text-xs"></i>
-                </div>
-                <div class="notif-content">
-                <p class="notif-title">New User Registration</p>
-                <p class="notif-sub">A new user account request is pending for approval.</p>
-                <span class="notif-time">2 mins ago</span>
-                </div>
-            </a>
+                <a href="#" class="notif-item unread">
+                    <div class="notif-icon bg-amber-50 text-[#e58500]">
+                        <i class="fas fa-user-plus text-xs"></i>
+                    </div>
+                    <div class="notif-content">
+                        <p class="notif-title">New User Registration</p>
+                        <p class="notif-sub">A new user account request is pending for approval.</p>
+                        <span class="notif-time">2 mins ago</span>
+                    </div>
+                </a>
 
-            <a href="#" class="notif-item unread">
-                <div class="notif-icon bg-blue-50 text-[#1e4d7b]">
-                <i class="fas fa-file-signature text-xs"></i>
-                </div>
-                <div class="notif-content">
-                <p class="notif-title">New Request Submitted</p>
-                <p class="notif-sub">Request #1024 updated by Cabinet Division.</p>
-                <span class="notif-time">1 hour ago</span>
-                </div>
-            </a>
+                <a href="#" class="notif-item unread">
+                    <div class="notif-icon bg-blue-50 text-[#1e4d7b]">
+                        <i class="fas fa-file-signature text-xs"></i>
+                    </div>
+                    <div class="notif-content">
+                        <p class="notif-title">New Request Submitted</p>
+                        <p class="notif-sub">Request #1024 updated by Cabinet Division.</p>
+                        <span class="notif-time">1 hour ago</span>
+                    </div>
+                </a>
 
-            <a href="#" class="notif-item">
-                <div class="notif-icon bg-emerald-50 text-emerald-600">
-                <i class="fas fa-check-circle text-xs"></i>
-                </div>
-                <div class="notif-content">
-                <p class="notif-title">Approval Completed</p>
-                <p class="notif-sub">User authorization document successfully verified.</p>
-                <span class="notif-time">Yesterday</span>
-                </div>
-            </a>
+                <a href="#" class="notif-item">
+                    <div class="notif-icon bg-emerald-50 text-emerald-600">
+                        <i class="fas fa-check-circle text-xs"></i>
+                    </div>
+                    <div class="notif-content">
+                        <p class="notif-title">Approval Completed</p>
+                        <p class="notif-sub">User authorization document successfully verified.</p>
+                        <span class="notif-time">Yesterday</span>
+                    </div>
+                </a>
             </div>
 
             <div class="notif-footer">
-            <a href="#">Mark all as read</a>
-            <a href="#" class="text-[#1e4d7b]">View All</a>
+                <a href="#">Mark all as read</a>
+                <a href="#" class="text-[#1e4d7b]">View All</a>
             </div>
         </div>
     </div>
