@@ -32,14 +32,16 @@
     }
 
     @media (max-width: 768px) {
+
         .gov-header {
             gap: 8px;
             padding: 8px 10px;
         }
 
-        .gov-center-msg {
-            display: none;
+        .gov-center-msg span {
+            font-size: 11px;
         }
+
     }
 </style>
 
