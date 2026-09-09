@@ -80,10 +80,10 @@
     </a>
     <?php endif; ?>
     <div class="relative" id="notificationDropdown">
-        <div class="icon-btn relative" id="bellIconBtn">
+        <!-- <div class="icon-btn relative" id="bellIconBtn">
             <i class="far fa-bell"></i>
             <span class="dot"></span>
-        </div>
+        </div> -->
 
         <div class="notification-popover" id="notificationMenu">
             <div class="notif-header">
