@@ -1,0 +1,109 @@
+----------------------------------09092026---------------------------------------
+
+
+ALTER TABLE `jams_db`.`application_history` 
+ADD COLUMN `assigned_to` INT NULL AFTER `created_at`;
+
+
+
+/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
+/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
+/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
+/*!50503 SET NAMES utf8 */;
+/*!40103 SET @OLD_TIME_ZONE=@@TIME_ZONE */;
+/*!40103 SET TIME_ZONE='+00:00' */;
+/*!40014 SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0 */;
+/*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
+/*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
+/*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
+
+--
+-- Table structure for table `mas_settings`
+--
+
+DROP TABLE IF EXISTS `mas_settings`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `mas_settings` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `desc` varchar(500) NOT NULL,
+  `value` varchar(500) DEFAULT NULL,
+  `isactive` int NOT NULL DEFAULT '1',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `mas_settings`
+--
+
+LOCK TABLES `mas_settings` WRITE;
+/*!40000 ALTER TABLE `mas_settings` DISABLE KEYS */;
+INSERT INTO `mas_settings` VALUES (1,'Default Password','jams@2026',1),(2,'Default application Landing User','1',1);
+/*!40000 ALTER TABLE `mas_settings` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Temporary view structure for view `vw_application_latest_status`
+--
+
+DROP TABLE IF EXISTS `vw_application_latest_status`;
+/*!50001 DROP VIEW IF EXISTS `vw_application_latest_status`*/;
+SET @saved_cs_client     = @@character_set_client;
+/*!50503 SET character_set_client = utf8mb4 */;
+/*!50001 CREATE VIEW `vw_application_latest_status` AS SELECT 
+ 1 AS `application_id`,
+ 1 AS `id`,
+ 1 AS `app_no`,
+ 1 AS `user_id`,
+ 1 AS `adequate_arrangement_check`,
+ 1 AS `jammer_accounted`,
+ 1 AS `non_intereference`,
+ 1 AS `created_at`,
+ 1 AS `current_status`,
+ 1 AS `isactive`,
+ 1 AS `is_single_exam`,
+ 1 AS `is_single_date`,
+ 1 AS `centre_list_ready`,
+ 1 AS `undertaking`,
+ 1 AS `contact_person`,
+ 1 AS `email`,
+ 1 AS `phone`,
+ 1 AS `organisation`,
+ 1 AS `organisation_type`,
+ 1 AS `history_id`,
+ 1 AS `status`,
+ 1 AS `history_created`,
+ 1 AS `currently_with`*/;
+SET character_set_client = @saved_cs_client;
+
+--
+-- Final view structure for view `vw_application_latest_status`
+--
+
+/*!50001 DROP VIEW IF EXISTS `vw_application_latest_status`*/;
+/*!50001 SET @saved_cs_client          = @@character_set_client */;
+/*!50001 SET @saved_cs_results         = @@character_set_results */;
+/*!50001 SET @saved_col_connection     = @@collation_connection */;
+/*!50001 SET character_set_client      = utf8mb4 */;
+/*!50001 SET character_set_results     = utf8mb4 */;
+/*!50001 SET collation_connection      = utf8mb4_0900_ai_ci */;
+/*!50001 CREATE ALGORITHM=UNDEFINED */
+/*!50013 DEFINER=`root`@`localhost` SQL SECURITY DEFINER */
+/*!50001 VIEW `vw_application_latest_status` AS select `a`.`id` AS `application_id`,`a`.`id` AS `id`,`a`.`app_no` AS `app_no`,`a`.`user_id` AS `user_id`,`a`.`adequate_arrangement_check` AS `adequate_arrangement_check`,`a`.`jammer_accounted` AS `jammer_accounted`,`a`.`non_intereference` AS `non_intereference`,`a`.`created_at` AS `created_at`,`a`.`current_status` AS `current_status`,`a`.`isactive` AS `isactive`,`a`.`is_single_exam` AS `is_single_exam`,`a`.`is_single_date` AS `is_single_date`,`a`.`centre_list_ready` AS `centre_list_ready`,`a`.`undertaking` AS `undertaking`,`a`.`contact_person` AS `contact_person`,`a`.`email` AS `email`,`a`.`phone` AS `phone`,`a`.`organisation` AS `organisation`,`a`.`organisation_type` AS `organisation_type`,`ah`.`id` AS `history_id`,`ah`.`status` AS `status`,`ah`.`created_at` AS `history_created`,`ah`.`assigned_to` AS `currently_with` from (`application` `a` join `application_history` `ah` on((`ah`.`id` = (select max(`ah2`.`id`) from `application_history` `ah2` where (`ah2`.`app_id` = `a`.`id`))))) where (`a`.`isactive` = 1) */;
+/*!50001 SET character_set_client      = @saved_cs_client */;
+/*!50001 SET character_set_results     = @saved_cs_results */;
+/*!50001 SET collation_connection      = @saved_col_connection */;
+/*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
+
+/*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
+/*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;
+/*!40014 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS */;
+/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
+/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
+/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
+/*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
+
+-- Dump completed on 2026-09-09 16:24:55
+
+
