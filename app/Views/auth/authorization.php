@@ -567,7 +567,7 @@ main.signup-page-main {
     font-size: 12px;
     font-weight: 650;
     letter-spacing: 0.7px;
-    text-transform: uppercase;
+    text-transform: none;
 }
 
 #captcha::placeholder {
