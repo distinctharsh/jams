@@ -1,7 +1,14 @@
 <?php
 ob_start();
 ?>
-<!-- Flash Messages -->
+<?php 
+    $roleIds = session()->get('role_ids') ?? '';
+    $userRoles = array_map('intval', array_filter(explode(',', $roleIds)));
+    $hasRole = function (array $roles) use ($userRoles): bool {
+        return !empty(array_intersect($roles, $userRoles));
+    };
+?>
+
 <?php if (session()->getFlashdata('success')): ?>
 <div class="booking-alert !bg-green-50 !border-green-500">
     <div class="alert-icon !bg-green-500">
@@ -25,6 +32,7 @@ ob_start();
     </div>
 </div>
 <?php endif; ?>
+
 <style>
     .calendar-cell {
         display: flex;
@@ -46,17 +54,14 @@ ob_start();
         color: #cbd5e1;
         cursor: default;
     }
-
     .calendar-cell.event-exam {
         background-color: #fef3c7 !important;
         color: #d97706 !important;
         border: 1px solid #f59e0b !important;
     }
-
     .calendar-cell.is-today {
         border: 2px solid #1e4d7b;
     }
-
     .calendar-cell.active-date {
         background-color: #1e4d7b !important;
         color: #ffffff !important;
@@ -64,7 +69,6 @@ ob_start();
         box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
         border: none !important;
     }
-
     .upcoming-div {
         height: 300px;
         overflow-y: auto;
@@ -72,9 +76,7 @@ ob_start();
     }
 </style>
 
-<!-- stats -->
 <section class="stats-grid">
-    <!-- Total Bookings -->
     <div class="stat-card total">
         <div class="stat-icon"><i class="fas fa-calendar-check"></i></div>
         <div class="stat-content">
@@ -84,7 +86,6 @@ ob_start();
         </div>
     </div>
 
-    <!-- Pending -->
     <div class="stat-card pending">
         <div class="stat-icon"><i class="fas fa-clock"></i></div>
         <div class="stat-content">
@@ -94,7 +95,6 @@ ob_start();
         </div>
     </div>
 
-    <!-- Completed -->
     <div class="stat-card completed">
         <div class="stat-icon"><i class="fas fa-check-circle"></i></div>
         <div class="stat-content">
@@ -104,7 +104,6 @@ ob_start();
         </div>
     </div>
 
-    <!-- Flagged -->
     <div class="stat-card flagged">
         <div class="stat-icon"><i class="fas fa-flag"></i></div>
         <div class="stat-content">
@@ -114,7 +113,6 @@ ob_start();
         </div>
     </div>
 
-    <!-- Working with me -->
     <div class="stat-card assigned-to-me">
         <div class="stat-icon"><i class="fas fa-user-gear"></i></div>
         <div class="stat-content">
@@ -125,217 +123,141 @@ ob_start();
     </div>
 </section>
 
-<!-- table + right rail -->
 <div class="grid grid-cols-1 xl:grid-cols-12 gap-6 items-start">
-    <!-- table -->
     <div class="xl:col-span-8">
         <div class="gov-card overflow-hidden">
             <div class="px-5 py-4 flex items-center justify-between border-b border-slate-100">
-                <div class="flex items-center gap-3"><i class="fas fa-list-check text-[#1e4d7b] text-xl"></i><h2 class="text-base font-bold text-[#1e4d7b]">Pending Requests</h2></div>
-                <button class="btn-orange text-xs px-4 py-1.5"><i class="fas fa-rotate-right"></i> Refresh</button>
+                <div class="flex items-center gap-3">
+                    <i class="fas fa-list-check text-[#1e4d7b] text-xl"></i>
+                    <h2 class="text-base font-bold text-[#1e4d7b]">Pending Requests</h2>
+                </div>
+                <button class="btn-orange text-xs px-4 py-1.5" onclick="location.reload();">
+                    <i class="fas fa-rotate-right"></i> Refresh
+                </button>
             </div>
-            <div class="overflow-x-auto">
-                <table class="w-full text-sm gov-table">
+            <div class="overflow-x-auto p-4">
+                <table class="w-full text-sm gov-table rounded-lg overflow-hidden" id="dashboardRequestsTable">
                     <thead class="bg-[#1e4d7b] text-white">
                         <tr>
-                            <th class="px-5 py-4 text-left">Request ID</th>
-                            <th class="px-5 py-4 text-left">User</th>
-                            <th class="px-5 py-4 text-left">Schedule</th>
-                            <th class="px-5 py-4 text-left">Status</th>
-                            <th class="px-5 py-4 text-right">Actions</th>
+                            <th class="px-5 py-3.5 text-left font-semibold uppercase tracking-wider text-xs">Request ID</th>
+                            <th class="px-5 py-3.5 text-left font-semibold uppercase tracking-wider text-xs">Organisation</th>
+                            <th class="px-5 py-3.5 text-left font-semibold uppercase tracking-wider text-xs">Exam Name</th>
+                            <th class="px-5 py-3.5 text-left font-semibold uppercase tracking-wider text-xs">Exam Date</th>
+                            <th class="px-5 py-3.5 text-left font-semibold uppercase tracking-wider text-xs">Status</th>
+                            <th class="px-5 py-3.5 text-right pr-6 font-semibold uppercase tracking-wider text-xs">Actions</th>
                         </tr>
                     </thead>
-                    <tbody class="divide-y divide-slate-100 bg-white">
-                        <tr class="hover:bg-slate-50 transition">
-                            <td class="px-5 py-4 font-bold text-[#1e4d7b]">#RQ-1092</td>
-                            <td class="px-5 py-4 font-medium text-slate-700">IIT DELHI</td>
-                            <td class="px-5 py-4 text-slate-500">Oct 24, 2023</td>
-                            <td class="px-5 py-4">
-                                <span class="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-gradient-to-r from-amber-50 to-yellow-100 border-l-4 border-amber-500 text-amber-800 font-semibold text-sm shadow-sm">
-                                    <i class="fas fa-hourglass-half text-amber-600"></i> Pending with Dealing Head
-                                </span>
-                            </td>
-                            <td class="px-5 py-4 text-right">
-                                <div class="flex justify-end gap-2">
+                    <tbody class="divide-y divide-slate-100 bg-white text-slate-700">
+                        <?php if (!empty($requests) && is_array($requests)): ?>
+                            <?php foreach ($requests as $request): ?>
+                                <tr class="hover:bg-slate-50 transition-colors duration-150">
+                                    <td class="px-5 py-4 font-bold text-[#1e4d7b]">
+                                        <?= esc($request['app_no'] ?? '#' . str_pad($request['id'], 4, '0', STR_PAD_LEFT)) ?>
+                                    </td>
+                                    
+                                    <td class="px-5 py-4 font-bold text-slate-800">
+                                        <?= !empty($request['organisation']) ? esc($request['organisation']) : 'N/A' ?>
+                                    </td>
 
-                                    <button class="w-9 h-9 rounded-lg bg-blue-50 text-blue-700 hover:bg-blue-100 transition"
-                                        title="View">
-                                        <i class="fas fa-eye"></i>
-                                    </button>
+                                    <td class="px-5 py-4 font-semibold text-slate-800">
+                                        <?php 
+                                        if (!empty($request['exam_names'])) {
+                                            $names = array_unique(explode('||', $request['exam_names']));
+                                            foreach ($names as $name) {
+                                                echo '<div class="leading-tight mb-1 last:mb-0">' . esc($name) . '</div>';
+                                            }
+                                        } else {
+                                            echo 'N/A';
+                                        }
+                                        ?>
+                                    </td>
+                                    
+                                    <td class="px-5 py-4 text-slate-600 font-medium">
+                                        <?php 
+                                        if (!empty($request['exam_dates'])) {
+                                            $dates = explode('||', $request['exam_dates']);
+                                            foreach ($dates as $d) {
+                                                if (!empty($d) && $d !== '0000-00-00 00:00:00') {
+                                                    echo '<div class="leading-tight mb-1 last:mb-0">' . date('d/m/Y', strtotime($d)) . '</div>';
+                                                }
+                                            }
+                                        } else {
+                                            echo 'N/A';
+                                        }
+                                        ?>
+                                    </td>
 
-                                    <button class="w-9 h-9 rounded-lg bg-yellow-50 text-yellow-700 hover:bg-yellow-100 transition"
-                                        title="Edit">
-                                        <i class="fas fa-pen-to-square"></i>
-                                    </button>
+                                    <td class="px-5 py-4 text-left">
+                                        <?php 
+                                        $statusName  = $request['status_name'] ?? 'Pending';
+                                        $statusClass = 'bg-blue-50 text-blue-700 border-blue-500';
+                                        $statusIcon  = 'fa-info-circle';
 
-                                    <button class="w-9 h-9 rounded-lg bg-emerald-50 text-emerald-700 hover:bg-emerald-100 transition"
-                                        title="Approve">
-                                        <i class="fas fa-check"></i>
-                                    </button>
+                                        if (stristr($statusName, 'approve')) {
+                                            $statusClass = 'bg-emerald-50 text-emerald-700 border-emerald-500';
+                                            $statusIcon  = 'fa-check-circle';
+                                        } elseif (stristr($statusName, 'reject')) {
+                                            $statusClass = 'bg-red-50 text-red-700 border-red-500';
+                                            $statusIcon  = 'fa-times-circle';
+                                        } elseif (stristr($statusName, 'pend') || stristr($statusName, 'submit')) {
+                                            $statusClass = 'bg-amber-50 text-amber-700 border-amber-500';
+                                            $statusIcon  = 'fa-clock';
+                                        }
+                                        ?>
+                                        <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg border-l-4 <?= $statusClass ?> font-semibold text-xs shadow-sm">
+                                            <i class="fas <?= $statusIcon ?>"></i>
+                                            <?= esc($statusName) ?>
+                                        </span>
+                                    </td>
 
-                                    <button class="w-9 h-9 rounded-lg bg-rose-50 text-rose-700 hover:bg-rose-100 transition"
-                                        title="Reject">
-                                        <i class="fas fa-xmark"></i>
-                                    </button>
+                                    <td class="px-5 py-4 text-right pr-6">
+                                        <div class="flex justify-end items-center gap-1.5">
+                                            <a href="<?= base_url('requests/view/' . $request['id']) ?>" 
+                                            class="w-9 h-9 rounded-lg bg-blue-50 text-blue-700 hover:bg-blue-100 transition inline-flex items-center justify-center" 
+                                            title="View">
+                                                <i class="fas fa-eye"></i>
+                                            </a>
 
-                                </div>
-                            </td>
-                        </tr>
+                                            <?php if ($hasRole([1])): ?>
+                                                <a href="<?= base_url('requests/edit/' . $request['id']) ?>" 
+                                                class="w-9 h-9 rounded-lg bg-yellow-50 text-yellow-700 hover:bg-yellow-100 transition inline-flex items-center justify-center" 
+                                                title="Edit">
+                                                    <i class="fas fa-pen-to-square"></i>
+                                                </a>
+                                            <?php endif; ?>
 
-                        <!-- Row 2 -->
-                        <tr class="hover:bg-slate-50 transition">
-                            <td class="px-5 py-4 font-bold text-[#1e4d7b]">#RQ-1091</td>
+                                            <?php if ($hasRole([2, 6])): ?>
+                                                <button type="button" 
+                                                        class="w-9 h-9 rounded-lg bg-emerald-50 text-emerald-700 hover:bg-emerald-100 transition inline-flex items-center justify-center" 
+                                                        title="Approve" 
+                                                        onclick="approveRequest(<?= $request['id'] ?>)">
+                                                    <i class="fas fa-check"></i>
+                                                </button>
 
-                            <td class="px-5 py-4 font-medium text-slate-700">
-                            IIT Bombay
-                            </td>
-
-                            <td class="px-5 py-4 text-slate-500">
-                                Oct 23, 2023
-                            </td>
-
-                            <td class="px-5 py-4">
-                                <span class="inline-flex items-center gap-2 px-4 py-2 rounded-lg
-                                            bg-gradient-to-r from-emerald-50 to-green-100
-                                            border-l-4 border-emerald-500
-                                            text-emerald-800 font-semibold text-sm shadow-sm">
-                                    <i class="fas fa-user-check text-emerald-600"></i>
-                                    Approved by S.O
-                                </span>
-                            </td>
-
-                            <td class="px-5 py-4 text-right">
-                                <div class="flex justify-end gap-2">
-
-                                    <button class="w-9 h-9 rounded-lg bg-blue-50 text-blue-700 hover:bg-blue-100">
-                                        <i class="fas fa-eye"></i>
-                                    </button>
-
-                                    <button class="w-9 h-9 rounded-lg bg-yellow-50 text-yellow-700 hover:bg-yellow-100">
-                                        <i class="fas fa-pen-to-square"></i>
-                                    </button>
-
-                                    <button class="w-9 h-9 rounded-lg bg-emerald-50 text-emerald-700 hover:bg-emerald-100">
-                                        <i class="fas fa-check"></i>
-                                    </button>
-
-                                    <button class="w-9 h-9 rounded-lg bg-rose-50 text-rose-700 hover:bg-rose-100">
-                                        <i class="fas fa-xmark"></i>
-                                    </button>
-
-                                </div>
-                            </td>
-                        </tr>
-
-                        <!-- Row 3 -->
-                        <tr class="hover:bg-slate-50 transition">
-                            <td class="px-5 py-4 font-bold text-[#1e4d7b]">#RQ-1090</td>
-
-                            <td class="px-5 py-4 font-medium text-slate-700">
-                                IIT Madras
-                            </td>
-
-                            <td class="px-5 py-4 text-slate-500">
-                                Oct 22, 2023
-                            </td>
-
-                            <td class="px-5 py-4">
-                                <span class="inline-flex items-center gap-2 px-4 py-2 rounded-lg
-                                            bg-gradient-to-r from-rose-50 to-red-100
-                                            border-l-4 border-rose-500
-                                            text-rose-800 font-semibold text-sm shadow-sm">
-                                    <i class="fas fa-ban text-rose-600"></i>
-                                    Not Recommended
-                                </span>
-                            </td>
-
-                            <td class="px-5 py-4 text-right">
-                                <div class="flex justify-end gap-2">
-
-                                    <button class="w-9 h-9 rounded-lg bg-blue-50 text-blue-700 hover:bg-blue-100">
-                                        <i class="fas fa-eye"></i>
-                                    </button>
-
-                                    <button class="w-9 h-9 rounded-lg bg-yellow-50 text-yellow-700 hover:bg-yellow-100">
-                                        <i class="fas fa-pen-to-square"></i>
-                                    </button>
-
-                                    <button class="w-9 h-9 rounded-lg bg-emerald-50 text-emerald-700 hover:bg-emerald-100">
-                                        <i class="fas fa-check"></i>
-                                    </button>
-
-                                    <button class="w-9 h-9 rounded-lg bg-rose-50 text-rose-700 hover:bg-rose-100">
-                                        <i class="fas fa-xmark"></i>
-                                    </button>
-
-                                </div>
-                            </td>
-                        </tr>
-
-                        <!-- Row 4 -->
-                        <tr class="hover:bg-slate-50 transition">
-                            <td class="px-5 py-4 font-bold text-[#1e4d7b]">#RQ-1089</td>
-
-                            <td class="px-5 py-4 font-medium text-slate-700">
-                                IIT Kanpur
-                            </td>
-
-                            <td class="px-5 py-4 text-slate-500">
-                                Oct 21, 2023
-                            </td>
-
-                            <td class="px-5 py-4">
-                                <span class="inline-flex items-center gap-2 px-4 py-2 rounded-lg
-                                            bg-gradient-to-r from-blue-50 to-indigo-100
-                                            border-l-4 border-[#1e4d7b]
-                                            text-[#1e4d7b] font-semibold text-sm shadow-sm">
-                                    <i class="fas fa-circle-check text-[#1e4d7b]"></i>
-                                    Completed by J.S
-                                </span>
-                            </td>
-
-                            <td class="px-5 py-4 text-right">
-                                <div class="flex justify-end gap-2">
-
-                                    <button class="w-9 h-9 rounded-lg bg-blue-50 text-blue-700 hover:bg-blue-100">
-                                        <i class="fas fa-eye"></i>
-                                    </button>
-
-                                    <button class="w-9 h-9 rounded-lg bg-yellow-50 text-yellow-700 hover:bg-yellow-100">
-                                        <i class="fas fa-pen-to-square"></i>
-                                    </button>
-
-                                    <button class="w-9 h-9 rounded-lg bg-emerald-50 text-emerald-700 hover:bg-emerald-100">
-                                        <i class="fas fa-check"></i>
-                                    </button>
-
-                                    <button class="w-9 h-9 rounded-lg bg-rose-50 text-rose-700 hover:bg-rose-100">
-                                        <i class="fas fa-xmark"></i>
-                                    </button>
-
-                                </div>
-                            </td>
-                        </tr>
+                                                <button type="button" 
+                                                        class="w-9 h-9 rounded-lg bg-rose-50 text-rose-700 hover:bg-rose-100 transition inline-flex items-center justify-center" 
+                                                        title="Reject" 
+                                                        onclick="rejectRequest(<?= $request['id'] ?>)">
+                                                    <i class="fas fa-xmark"></i>
+                                                </button>
+                                            <?php endif; ?>
+                                        </div>
+                                    </td>
+                                </tr>
+                            <?php endforeach; ?>
+                        <?php else: ?>
+                            <tr>
+                                <td colspan="6" class="text-center py-4 text-slate-400">No pending requests found.</td>
+                            </tr>
+                        <?php endif; ?>
                     </tbody>
                 </table>
-            </div>
-            <div class="px-5 py-3 flex items-center justify-between border-t border-slate-100">
-                <span class="text-xs text-slate-400">Showing 4 of 1</span>
-                <div class="flex gap-1">
-                    <button class="w-7 h-7 rounded-lg border border-slate-200 text-slate-400 hover:bg-slate-50"><i class="fas fa-chevron-left"></i></button>
-                    <button class="w-7 h-7 rounded-lg bg-[#1e4d7b] text-white text-xs font-bold">1</button>
-                    <button class="w-7 h-7 rounded-lg border border-slate-200 text-slate-500 hover:bg-slate-50 text-xs">2</button>
-                    <button class="w-7 h-7 rounded-lg border border-slate-200 text-slate-500 hover:bg-slate-50 text-xs">3</button>
-                    <button class="w-7 h-7 rounded-lg border border-slate-200 text-slate-400 hover:bg-slate-50"><i class="fas fa-chevron-right"></i></button>
-                </div>
             </div>
         </div>
     </div>
 
-    <!-- right rail -->
     <div class="xl:col-span-4">
         <div class="sticky top-6">
-            <!-- Dynamic Calendar -->
             <div class="gov-card p-5">
                 <div class="flex items-center justify-between mb-3">
                     <h3 class="font-bold text-[#1e4d7b] flex items-center gap-2 text-sm">
@@ -356,7 +278,6 @@ ob_start();
                     <span>M</span><span>T</span><span>W</span><span>T</span><span>F</span><span>S</span><span>S</span>
                 </div>
 
-                <!-- Dynamic Grid Container -->
                 <div id="cal-grid" class="grid grid-cols-7 gap-1"></div>
 
                 <div class="upcoming-div mt-4 space-y-2">
@@ -369,12 +290,31 @@ ob_start();
                 </div>
             </div>
         </div>
-
     </div>
 </div>
 
-<!-- Dynamic Calendar & Deployments Script -->
+<script src="<?= base_url('assets/js/jquery-3.7.0.min.js') ?>"></script>
+<script src="<?= base_url('assets/js/jquery.dataTables.min.js') ?>"></script>
+
 <script>
+$(document).ready(function() {
+    if ($.fn && $.fn.DataTable) {
+        $('#dashboardRequestsTable').DataTable({
+            "dom": 'rtip',
+            "pageLength": 5,
+            "lengthChange": false,
+            "responsive": true,
+            "autoWidth": false,
+            "language": {
+                "paginate": {
+                    "previous": "<i class='fas fa-chevron-left text-xs'></i>",
+                    "next": "<i class='fas fa-chevron-right text-xs'></i>"
+                }
+            }
+        });
+    }
+});
+
 document.addEventListener('DOMContentLoaded', function () {
     const examDatesMap = <?= json_encode($exam_dates_map ?? (object)[]) ?>;
 

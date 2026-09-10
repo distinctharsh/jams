@@ -46,11 +46,13 @@ class Dashboard extends BaseController
         if ((int) session()->get('password_reset_req') === 1) {
             return redirect()->to(base_url('change-password'));
         }
+
         $pendingCount = $this->regModel
             ->where('isactive_authlink', 0)
             ->countAllResults();
 
         $totalCount = $this->regModel->countAll();
+        
         $rawExamEvents = $this->db->table('application_date_mapping as adm')
             ->select('adm.id, adm.app_id, adm.exam_name, DATE(adm.exam_date) as event_date, adm.exam_date, app.app_no')
             ->join('application as app', 'app.id = adm.app_id', 'left')
@@ -74,7 +76,9 @@ class Dashboard extends BaseController
             'pending_count' => $pendingCount,
             'total_count'   => $totalCount,
             'exam_dates_map'    => $examDatesMap,
+            'requests'       => $this->requestModel->getAllRequests(),
         ];
+
         return view('pages/dashboard', $data);
     }
  
