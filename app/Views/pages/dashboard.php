@@ -212,7 +212,7 @@ ob_start();
 
                                     <td class="px-5 py-4 text-right pr-6">
                                         <div class="flex justify-end items-center gap-1.5">
-                                            <a href="<?= base_url('requests/view/' . $request['id']) ?>" 
+                                            <a href="<?= base_url('request-view/' . $request['id']) ?>" 
                                             class="w-9 h-9 rounded-lg bg-blue-50 text-blue-700 hover:bg-blue-100 transition inline-flex items-center justify-center" 
                                             title="View">
                                                 <i class="fas fa-eye"></i>
