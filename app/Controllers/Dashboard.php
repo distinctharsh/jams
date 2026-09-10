@@ -944,19 +944,4 @@ public function toggleLockUser($id = null)
         return view('pages/analytics', $data);
     }
 
-    public function settings()
-    {
-        if (!session()->get('isLoggedIn')) {
-            return redirect()->to(base_url('/'));
-        }
-
-        $data = [
-            'user_id'      => session()->get('user_id'),
-            'username'     => session()->get('username'),
-            'full_name'    => session()->get('full_name'),
-            'email'        => session()->get('email'),
-        ];
-
-        return view('pages/settings', $data);
-    }
 }

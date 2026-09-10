@@ -144,10 +144,16 @@ $routes->post('toggle-lock-user/(:num)', 'Dashboard::toggleLockUser/$1');
 $routes->get('registrations', 'Dashboard::registrations');
 $routes->post('approve-registration', 'Dashboard::approveRegistration');
 
+// Setting Routes
+$routes->get('settings', 'SettingController::index');
+$routes->get('get-settings', 'SettingController::getSettings');
+$routes->get('get-setting/(:num)', 'SettingController::getSetting/$1');
+$routes->post('save-setting', 'SettingController::saveSetting');
+$routes->post('delete-setting/(:num)', 'SettingController::deleteSetting/$1');
+
 // Additional Dashboard Routes
 $routes->get('requests', 'Dashboard::requests');
 $routes->get('analytics', 'Dashboard::analytics');
-$routes->get('settings', 'Dashboard::settings');
 $routes->get('audit-trail', 'AuditController::auditTrail');
 $routes->get('get-audit-logs', 'AuditController::getAuditLogs');
 $routes->get('audit-log', 'AuditController::auditLog');
