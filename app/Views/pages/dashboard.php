@@ -293,7 +293,7 @@ ob_start();
     </div>
 </div>
 
-<script src="<?= base_url('assets/js/jquery-3.7.0.min.js') ?>"></script>
+<script src="<?= base_url('assets/js/jquery.min.js') ?>"></script>
 <script src="<?= base_url('assets/js/jquery.dataTables.min.js') ?>"></script>
 
 <script>

@@ -254,7 +254,8 @@ ob_start();
 
 <!-- View Request Detail Container -->
 <div id="view-request-content" class="hidden"></div>
-<script src="<?= base_url('assets/js/jquery.min.js') ?>"></script>
+<link rel="stylesheet" href="<?= base_url('assets/css/buttons.dataTables.min.css') ?>">
+<script src="<?= base_url('assets/js/jquery-3.7.0.min.js') ?>"></script>
 <script src="<?= base_url('assets/js/select2.min.js') ?>"></script>
 <script src="<?= base_url('assets/js/jquery.dataTables.min.js') ?>"></script>
 <script src="<?= base_url('assets/js/dataTables.buttons.min.js') ?>"></script>
@@ -399,6 +400,24 @@ function showPage(pageName) {
         requestsList.classList.remove('hidden');
         viewRequestContent.add('hidden');
     }
+}
+
+function switchTab(tabName) {
+    const tabs = ['details', 'documents'];
+    tabs.forEach(t => {
+        const btn = document.getElementById(`tab-btn-${t}`);
+        const content = document.getElementById(`tab-content-${t}`);
+        
+        if (t === tabName) {
+            btn.classList.add('text-[#1e4d7b]', 'border-[#1e4d7b]', 'font-bold');
+            btn.classList.remove('text-slate-500', 'border-transparent', 'font-medium');
+            content.classList.remove('hidden');
+        } else {
+            btn.classList.remove('text-[#1e4d7b]', 'border-[#1e4d7b]', 'font-bold');
+            btn.classList.add('text-slate-500', 'border-transparent', 'font-medium');
+            content.classList.add('hidden');
+        }
+    });
 }
 
 function generateRequestHTML(request) {

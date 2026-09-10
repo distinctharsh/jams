@@ -51,7 +51,7 @@ ob_start();
 }
 </style>
 
-<script src="<?= base_url('assets/js/jquery-3.7.0.min.js') ?>"></script>
+<script src="<?= base_url('assets/js/jquery.min.js') ?>"></script>
 <script src="<?= base_url('assets/js/tost.js') ?>"></script>
 <link rel="stylesheet" href="<?= base_url('assets/css/select2.min.css') ?>">
 <link rel="stylesheet" href="<?= base_url('assets/css/buttons.dataTables.min.css') ?>">

@@ -163,7 +163,7 @@ ob_start();
 </div>
 
 <link rel="stylesheet" href="<?= base_url('assets/css/buttons.dataTables.min.css') ?>">
-<script src="<?= base_url('assets/js/jquery-3.7.0.min.js') ?>"></script>
+<script src="<?= base_url('assets/js/jquery.min.js') ?>"></script>
 <script src="<?= base_url('assets/js/tost.js') ?>"></script>
 <script src="<?= base_url('assets/js/jquery.dataTables.min.js') ?>"></script>
 <script src="<?= base_url('assets/js/dataTables.buttons.min.js') ?>"></script>
