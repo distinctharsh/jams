@@ -100,15 +100,10 @@
             <?php endif; ?>
 
             <?php if ($hasRole([1,2,3,4,5,6,7,9])): ?>
-                <?php 
-                    $db = \Config\Database::connect();
-                    $sidebarRequestCount = $db->table('application')->where('isactive', 1)->countAllResults();
-                ?>
                 <a href="<?= base_url('requests') ?>" class="nav-item">
                     <i class="fas fa-clipboard-list"></i> 
                     <span>
                         Total Request 
-                        <span class="badge" id="request-count"><?= $sidebarRequestCount ?></span>
                     </span>
                 </a>
             <?php endif; ?>
