@@ -27,7 +27,8 @@ class SettingController extends BaseController
         }
 
         foreach ($settings as &$setting) {
-            if (trim(strtolower($setting['desc'])) === 'default application landing user') {
+            if (in_array((string)$setting['id'], ['2', '3']) || 
+                in_array(trim(strtolower($setting['desc'])), ['default application landing user', 'permission letter generation'])) {
                 $setting['display_value'] = $userMap[$setting['value']] ?? $setting['value'];
             } else {
                 $setting['display_value'] = $setting['value'];
@@ -51,7 +52,8 @@ class SettingController extends BaseController
         }
 
         foreach ($settings as &$setting) {
-            if (trim(strtolower($setting['desc'])) === 'default application landing user') {
+            if (in_array((string)$setting['id'], ['2', '3']) || 
+                in_array(trim(strtolower($setting['desc'])), ['default application landing user', 'permission letter generation'])) {
                 $setting['display_value'] = $userMap[$setting['value']] ?? $setting['value'];
             } else {
                 $setting['display_value'] = $setting['value'];
@@ -87,24 +89,30 @@ class SettingController extends BaseController
     public function saveSetting()
     {
         $id = $this->request->getPost('id');
+        
+        if (empty($id)) {
+            return $this->response->setJSON([
+                'success' => false,
+                'message' => 'Adding new settings is disabled.',
+                'csrfHash' => csrf_hash()
+            ]);
+        }
+
         $desc = $this->request->getPost('desc');
         $value = $this->request->getPost('value');
         $isactive = $this->request->getPost('isactive') ?? 1;
 
         $data = [
-            'desc' => $desc,
-            'value' => $value,
+            'id'       => $id,
+            'desc'     => $desc,
+            'value'    => $value,
             'isactive' => $isactive
         ];
 
-        if (!empty($id)) {
-            $data['id'] = $id;
-        }
-
         if ($this->settingModel->save($data)) {
             return $this->response->setJSON([
-                'success' => true,
-                'message' => !empty($id) ? 'Setting updated successfully!' : 'Setting added successfully!',
+                'success'  => true,
+                'message'  => 'Setting updated successfully!',
                 'csrfHash' => csrf_hash()
             ]);
         }

@@ -39,9 +39,6 @@ ob_start();
                     <p class="text-xs text-slate-500 mt-0.5">Overview and configuration of system setting parameters.</p>
                 </div>
             </div>
-            <button id="btnAddNewSetting" class="px-4 py-2.5 bg-[#1e4d7b] hover:bg-[#163a5d] text-white font-semibold text-sm rounded-lg transition flex items-center justify-center gap-2 shadow-sm shrink-0">
-                <i class="fas fa-plus text-xs"></i> Add Setting
-            </button>
         </div>
     </div>
 
@@ -105,7 +102,7 @@ ob_start();
         
         <div class="px-6 py-4 bg-slate-50 border-b border-slate-200 flex items-center justify-between">
             <h3 class="text-base font-bold text-[#1e4d7b] flex items-center gap-2" id="settingModalTitle">
-                <i class="fas fa-sliders text-[#e58500]"></i> Add Setting
+                <i class="fas fa-sliders text-[#e58500]"></i> Edit Setting
             </h3>
             <button type="button" class="closeSettingModal text-slate-400 hover:text-slate-600 w-8 h-8 rounded-lg flex items-center justify-center hover:bg-slate-200 transition">
                 <i class="fas fa-times"></i>
@@ -121,7 +118,7 @@ ob_start();
                     <label class="block text-xs font-bold text-slate-600 uppercase tracking-wider mb-1.5">
                         Description <span class="text-red-500">*</span>
                     </label>
-                    <textarea name="desc" id="setting_desc" rows="3" class="w-full px-3.5 py-2.5 text-sm bg-slate-50 border border-slate-300 rounded-lg focus:ring-2 focus:ring-[#1e4d7b] focus:border-[#1e4d7b] focus:bg-white outline-none transition" placeholder="e.g. System Title / Max Upload Limit" required></textarea>
+                    <textarea name="desc" id="setting_desc" rows="3" class="w-full px-3.5 py-2.5 text-sm bg-slate-50 border border-slate-300 rounded-lg focus:ring-2 focus:ring-[#1e4d7b] focus:border-[#1e4d7b] focus:bg-white outline-none transition" required></textarea>
                 </div>
 
                 <div id="valueInputContainer">
@@ -133,7 +130,7 @@ ob_start();
 
                 <div id="valueSelectContainer" class="hidden">
                     <label class="block text-xs font-bold text-slate-600 uppercase tracking-wider mb-1.5">
-                        Select Landing User
+                        Select User
                     </label>
                     <select id="setting_value_user" class="w-full px-3.5 py-2.5 text-sm bg-slate-50 border border-slate-300 rounded-lg focus:ring-2 focus:ring-[#1e4d7b] focus:border-[#1e4d7b] focus:bg-white outline-none transition">
                         <option value="">-- Select User --</option>
@@ -145,10 +142,10 @@ ob_start();
                     </select>
                 </div>
 
-                <div class="p-4 bg-slate-50 border border-slate-200 rounded-xl" id="settingIsActiveContainer" style="display: none;">
+                <div class="p-4 bg-slate-50 border border-slate-200 rounded-xl" id="settingIsActiveContainer">
                     <label class="flex items-center justify-between cursor-pointer">
                         <span class="text-sm font-semibold text-slate-700">Is Active</span>
-                        <input type="checkbox" name="isactive" id="setting_isactive" value="1" checked class="w-4 h-4 text-[#1e4d7b] rounded border-slate-300 focus:ring-[#1e4d7b]">
+                        <input type="checkbox" name="isactive" id="setting_isactive" value="1" class="w-4 h-4 text-[#1e4d7b] rounded border-slate-300 focus:ring-[#1e4d7b]">
                     </label>
                 </div>
             </div>
@@ -221,9 +218,9 @@ $(document).ready(function() {
         }
     }
 
-    function checkDescriptionField() {
-        let descText = $('#setting_desc').val().trim().toLowerCase();
-        if (descText === 'default application landing user') {
+    // Checking if ID is '2' or '3' for User Dropdown
+    function toggleValueInputById(settingId) {
+        if (['2', '3'].includes(String(settingId))) {
             $('#valueInputContainer').addClass('hidden');
             $('#setting_value').attr('name', '');
             
@@ -238,34 +235,13 @@ $(document).ready(function() {
         }
     }
 
-    $('#setting_desc').on('input change', function() {
-        checkDescriptionField();
-    });
-
-    $('#btnAddNewSetting').click(function() {
-        let csrfInput = $('#settingForm input[type="hidden"]').first();
-        let csrfName = csrfInput.attr('name');
-        let csrfVal = csrfInput.val();
-
-        $('#settingForm')[0].reset();
-        csrfInput.attr('name', csrfName).val(csrfVal);
-
-        $('#setting_id').val('');
-        $('#setting_isactive').prop('checked', true);
-        $('#settingIsActiveContainer').hide();
-        $('#settingModalTitle').html('<i class="fas fa-sliders text-[#e58500]"></i> Add Setting');
-        
-        checkDescriptionField();
-        openSettingModal();
-    });
-
     $('#settingForm').submit(function(e) {
         e.preventDefault();
         $('#saveSettingBtn').prop('disabled', true).text('Saving...');
         
         let formData = $(this).serializeArray();
         
-        if ($('#settingIsActiveContainer').is(':visible') && !$('#setting_isactive').is(':checked')) {
+        if (!$('#setting_isactive').is(':checked')) {
             formData.push({ name: 'isactive', value: '0' });
         }
 
@@ -280,7 +256,7 @@ $(document).ready(function() {
                 if(res.success) {
                     closeSettingModal();
                     loadSettings();
-                    showToast('success', res.message || 'Setting saved successfully!');
+                    showToast('success', res.message || 'Setting updated successfully!');
                 } else if(res.errors) {
                     let errorMsg = Object.values(res.errors).join("<br>");
                     showToast('error', errorMsg);
@@ -328,7 +304,14 @@ $(document).ready(function() {
         } else {
             settings.forEach(function(setting, index) {
                 let isActive = (setting.isactive == 1 || setting.isactive == '1');
+                
                 let displayValue = setting.display_value || setting.value;
+                if (['2', '3'].includes(String(setting.id))) {
+                    let foundUser = globalUsers.find(u => String(u.id) === String(setting.value));
+                    if (foundUser) {
+                        displayValue = foundUser.name;
+                    }
+                }
 
                 let row = '<tr class="hover:bg-slate-50/80 transition-colors duration-150">' +
                     '<td class="px-5 py-4 text-left font-bold text-[#1e4d7b]">' + (index + 1) + '</td>' +
@@ -370,9 +353,9 @@ $(document).ready(function() {
                         $('#setting_id').val(res.data.id);
                         $('#setting_desc').val(res.data.desc);
                         
-                        checkDescriptionField();
+                        toggleValueInputById(res.data.id);
 
-                        if (res.data.desc.trim().toLowerCase() === 'default application landing user') {
+                        if (['2', '3'].includes(String(res.data.id))) {
                             $('#setting_value_user').val(res.data.value);
                         } else {
                             $('#setting_value').val(res.data.value);
@@ -384,7 +367,6 @@ $(document).ready(function() {
                             $('#setting_isactive').prop('checked', false);
                         }
 
-                        $('#settingIsActiveContainer').show();
                         $('#settingModalTitle').html('<i class="fas fa-sliders text-[#e58500]"></i> Edit Setting');
                         openSettingModal();
                     } else {
