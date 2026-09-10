@@ -1,9 +1,6 @@
 <?php
 ob_start();
 ?>
-<link rel="stylesheet" href="<?= base_url('assets/css/select2.min.css') ?>">
-<link rel="stylesheet" href="<?= base_url('assets/css/buttons.dataTables.min.css') ?>">
-
 <style>
     .dt-buttons {
         display: inline-flex !important;
@@ -27,52 +24,13 @@ ob_start();
         border-color: #1e4d7b !important;
     }
     .dataTables_length, .dataTables_filter input { margin-bottom: 10px !important }
-
-    .select2-container--default .select2-selection--multiple {
-        background-color: #ffffff !important;
-        border: 1px solid #cbd5e1 !important;
-        border-radius: 0.5rem !important;
-        min-height: 38px !important;
-        padding: 2px 4px !important;
-    }
-    .select2-container--default.select2-container--focus .select2-selection--multiple {
-        border-color: #1e4d7b !important;
-        outline: none !important;
-    }
-    .select2-container--default .select2-selection--multiple .select2-selection__choice {
-        background-color: #1e4d7b !important;
-        color: #ffffff !important;
-        border: none !important;
-        border-radius: 0.375rem !important;
-        font-size: 0.75rem !important;
-        font-weight: 600 !important;
-        padding: 2px 8px !important;
-        margin-top: 4px !important;
-    }
-    .select2-container--default .select2-selection--multiple .select2-selection__choice__display {
-        cursor: default;
-        padding-left: 6px;
-        padding-right: 5px;
-    }
-    .select2-container--default .select2-selection--multiple .select2-selection__choice__remove {
-        color: #ffffff !important;
-        margin-right: 5px !important;
-        border: none !important;
-    }
-    .select2-container--default .select2-selection--multiple .select2-selection__choice__remove:hover {
-        background: transparent !important;
-        color: #f87171 !important;
-    }
-    .select2-container .select2-search--inline .select2-search__field {
-        font-size: 0.75rem !important;
-        margin-top: 4px !important;
-    }
 </style>
 
+<!-- Requests Page Content -->
 <div class="space-y-6" id="requests-list">
-    <div class="gov-card p-5 border border-slate-200 rounded-xl bg-white shadow-sm space-y-4">
-        <div class="flex items-center justify-between pb-3 border-b border-slate-100">
-           <div class="flex items-center gap-3">
+    <div class="gov-card p-6">
+        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <div class="flex items-center gap-3">
                 <div class="w-12 h-12 rounded-xl bg-amber-50 border border-amber-200 flex items-center justify-center shrink-0">
                     <i class="fas fa-clipboard-list text-[#e58500] text-xl"></i>
                 </div>
@@ -81,64 +39,10 @@ ob_start();
                     <p class="text-xs text-slate-500 mt-0.5">Overview and management of all submitted requests.</p>
                 </div>
             </div>
-            <button id="toggleFilterBtn" type="button" class="text-xs text-slate-500 hover:text-[#1e4d7b] font-semibold flex items-center gap-1">
-                <span id="toggleFilterText">Hide Filters</span>
-                <i id="toggleFilterIcon" class="fas fa-chevron-up text-slate-400 text-xs transition-transform duration-200"></i>
-            </button>
-        </div>
-
-        <div id="filterCardBody">
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div>
-                    <label class="block text-xs font-bold text-slate-600 uppercase tracking-wider mb-1.5">Organisation</label>
-                    <select id="filterOrg" class="select2-multi w-full" multiple="multiple" data-placeholder="Select Organisations">
-                        <?php 
-                        if (!empty($requests)) {
-                            $orgs = array_unique(array_filter(array_column($requests, 'organisation')));
-                            sort($orgs);
-                            foreach ($orgs as $org) {
-                                echo '<option value="' . esc($org) . '">' . esc($org) . '</option>';
-                            }
-                        }
-                        ?>
-                    </select>
-                </div>
-
-                <div>
-                    <label class="block text-xs font-bold text-slate-600 uppercase tracking-wider mb-1.5">Status</label>
-                    <select id="filterStatus" class="select2-multi w-full" multiple="multiple" data-placeholder="Select Statuses">
-                        <?php 
-                        if (!empty($requests)) {
-                            $statuses = array_unique(array_filter(array_column($requests, 'status_name')));
-                            sort($statuses);
-                            foreach ($statuses as $st) {
-                                echo '<option value="' . esc($st) . '">' . esc($st) . '</option>';
-                            }
-                        }
-                        ?>
-                    </select>
-                </div>
-
-                <div>
-                    <label class="block text-xs font-bold text-slate-600 uppercase tracking-wider mb-1.5">Center List Uploaded</label>
-                    <select id="filterCenterReady" class="select2-multi w-full" multiple="multiple" data-placeholder="Select Option">
-                        <option value="Yes">Yes</option>
-                        <option value="N/A">N/A</option>
-                    </select>
-                </div>
-            </div>
-
-            <div class="flex items-center justify-end gap-3 mt-4 pt-3 border-t border-slate-100">
-                <button id="btnResetFilter" type="button" class="px-4 py-2 text-xs font-semibold text-slate-500 hover:text-red-600 transition flex items-center gap-1">
-                    <i class="fas fa-rotate-left"></i> Reset
-                </button>
-                <button id="btnApplyFilter" type="button" class="px-5 py-2 bg-[#1e4d7b] hover:bg-[#163a5d] text-white text-xs font-semibold rounded-lg transition shadow-sm flex items-center gap-1.5">
-                    <i class="fas fa-search"></i> Apply Filters
-                </button>
-            </div>
         </div>
     </div>
 
+    <!-- Data Table Card -->
     <div class="gov-card p-5 overflow-hidden shadow-sm border border-slate-200 rounded-xl bg-white">
         <div class="overflow-x-auto">
             <table class="w-full text-sm gov-table rounded-lg overflow-hidden" id="requestsTable">
@@ -158,14 +62,17 @@ ob_start();
                         <?php foreach ($requests as $request): ?>
                             <tr class="hover:bg-slate-50/80 transition-colors duration-150 cursor-pointer" onclick="viewRequest(<?= $request['id'] ?>)">
                                 
+                                <!-- 1. REQUEST ID -->
                                 <td class="px-5 py-4 font-bold text-[#1e4d7b]">
                                     <?= esc($request['app_no'] ?? '#' . str_pad($request['id'], 4, '0', STR_PAD_LEFT)) ?>
                                 </td>
                                 
+                                <!-- 2. ORGANISATION -->
                                 <td class="px-5 py-4 font-bold text-slate-800">
                                     <?= !empty($request['organisation']) ? esc($request['organisation']) : 'N/A' ?>
                                 </td>
 
+                                <!-- 3. EXAM NAME -->
                                 <td class="px-5 py-4 font-semibold text-slate-800">
                                     <?php 
                                     if (!empty($request['exam_names'])) {
@@ -179,6 +86,7 @@ ob_start();
                                     ?>
                                 </td>
                                 
+                                <!-- 4. EXAM DATE  -->
                                 <td class="px-5 py-4 text-slate-600 font-medium">
                                     <?php 
                                     if (!empty($request['exam_dates'])) {
@@ -194,6 +102,7 @@ ob_start();
                                     ?>
                                 </td>
 
+                                <!-- 5. STATUS BADGE -->
                                 <td class="px-5 py-4 text-left">
                                     <?php 
                                     $statusName  = $request['status_name'] ?? 'Pending';
@@ -217,6 +126,7 @@ ob_start();
                                     </span>
                                 </td>
                                 
+                                <!-- 6. CENTER LIST UPLOADED -->
                                 <td class="px-5 py-4 text-slate-600 font-medium">
                                     <?php if (isset($request['centre_list_ready']) && $request['centre_list_ready'] == 1): ?>
                                         <span class="text-xs font-semibold text-emerald-600 bg-emerald-50 px-2.5 py-1 rounded-md border border-emerald-200">Yes</span>
@@ -225,9 +135,12 @@ ob_start();
                                     <?php endif; ?>
                                 </td>
 
+                                <!-- 7. ACTIONS -->
                                 <td class="px-5 py-4 text-right pr-6">
                                     <div class="flex justify-end gap-2" onclick="event.stopPropagation()">
-                                        <button class="w-8 h-8 rounded-lg bg-blue-50 text-[#1e4d7b] hover:bg-blue-100 border border-blue-100 transition flex items-center justify-center" title="View" onclick="viewRequest(<?= $request['id'] ?>)">
+                                        <button class="w-8 h-8 rounded-lg bg-blue-50 text-[#1e4d7b] hover:bg-blue-100 border border-blue-100 transition flex items-center justify-center" 
+                                                title="View" 
+                                                onclick="pageviewRequest(<?= $request['id'] ?>)">
                                             <i class="fas fa-eye text-xs"></i>
                                         </button>
                                     </div>
@@ -241,10 +154,10 @@ ob_start();
     </div>
 </div>
 
+<!-- View Request Detail Container -->
 <div id="view-request-content" class="hidden"></div>
-
+<link rel="stylesheet" href="<?= base_url('assets/css/buttons.dataTables.min.css') ?>">
 <script src="<?= base_url('assets/js/jquery-3.7.0.min.js') ?>"></script>
-<script src="<?= base_url('assets/js/select2.min.js') ?>"></script>
 <script src="<?= base_url('assets/js/jquery.dataTables.min.js') ?>"></script>
 <script src="<?= base_url('assets/js/dataTables.buttons.min.js') ?>"></script>
 <script src="<?= base_url('assets/js/jszip.min.js') ?>"></script>
@@ -256,23 +169,6 @@ ob_start();
 <script>
 $(document).ready(function() {
     let requestsDataTable = null;
-
-    $('.select2-multi').select2({
-        width: '100%',
-        allowClear: true
-    });
-
-    $('#toggleFilterBtn').click(function() {
-        $('#filterCardBody').slideToggle(200, function() {
-            if ($(this).is(':visible')) {
-                $('#toggleFilterText').text('Hide Filters');
-                $('#toggleFilterIcon').removeClass('rotate-180');
-            } else {
-                $('#toggleFilterText').text('Show Filters');
-                $('#toggleFilterIcon').addClass('rotate-180');
-            }
-        });
-    });
 
     function initDataTable() {
         if ($.fn && $.fn.DataTable) {
@@ -287,14 +183,42 @@ $(document).ready(function() {
                 "autoWidth": false,
                 "dom": '<"flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-3"<"flex items-center gap-4"Bl>f>rt<"flex flex-col sm:flex-row sm:items-center justify-between gap-4 mt-4"ip>',
                 "buttons": [
-                    { extend: 'copy', text: '<i class="fas fa-copy me-1"></i> Copy', title: 'All Requests', exportOptions: { columns: [0, 1, 2, 3, 4] } },
-                    { extend: 'csv', text: '<i class="fas fa-file-csv me-1"></i> CSV', title: 'All Requests', filename: 'All_Requests', exportOptions: { columns: [0, 1, 2, 3, 4] } },
-                    { extend: 'excel', text: '<i class="fas fa-file-excel me-1"></i> Excel', title: 'All Requests', filename: 'All_Requests', exportOptions: { columns: [0, 1, 2, 3, 4] } },
-                    { extend: 'pdf', text: '<i class="fas fa-file-pdf me-1"></i> PDF', title: 'All Requests', filename: 'All_Requests', exportOptions: { columns: [0, 1, 2, 3, 4] } },
-                    { extend: 'print', text: '<i class="fas fa-print me-1"></i> Print', title: 'All Requests', exportOptions: { columns: [0, 1, 2, 3, 4] } }
+                    {
+                        extend: 'copy',
+                        text: '<i class="fas fa-copy me-1"></i> Copy',
+                        title: 'All Requests',
+                        exportOptions: { columns: [0, 1, 2, 3, 4] }
+                    },
+                    {
+                        extend: 'csv',
+                        text: '<i class="fas fa-file-csv me-1"></i> CSV',
+                        title: 'All Requests',
+                        filename: 'All_Requests',
+                        exportOptions: { columns: [0, 1, 2, 3, 4] }
+                    },
+                    {
+                        extend: 'excel',
+                        text: '<i class="fas fa-file-excel me-1"></i> Excel',
+                        title: 'All Requests',
+                        filename: 'All_Requests',
+                        exportOptions: { columns: [0, 1, 2, 3, 4] }
+                    },
+                    {
+                        extend: 'pdf',
+                        text: '<i class="fas fa-file-pdf me-1"></i> PDF',
+                        title: 'All Requests',
+                        filename: 'All_Requests',
+                        exportOptions: { columns: [0, 1, 2, 3, 4] }
+                    },
+                    {
+                        extend: 'print',
+                        text: '<i class="fas fa-print me-1"></i> Print',
+                        title: 'All Requests',
+                        exportOptions: { columns: [0, 1, 2, 3, 4] }
+                    }
                 ],
                 "columnDefs": [
-                    { "orderable": false, "targets": [5, 6] }
+                    { "orderable": false, "targets": [5] }
                 ],
                 "language": {
                     "search": "_INPUT_",
@@ -309,53 +233,12 @@ $(document).ready(function() {
                     }
                 }
             });
+        } else {
+            console.error("DataTables plugin is not loaded properly.");
         }
     }
 
     initDataTable();
-
-    function applyMultiFilters() {
-        if (!requestsDataTable) return;
-
-        let selectedOrgs = $('#filterOrg').val() || [];
-        let selectedStatuses = $('#filterStatus').val() || [];
-        let selectedCenters = $('#filterCenterReady').val() || [];
-
-        if (selectedOrgs.length > 0 || selectedStatuses.length > 0 || selectedCenters.length > 0) {
-            $('#activeFilterBadge').removeClass('hidden');
-        } else {
-            $('#activeFilterBadge').addClass('hidden');
-        }
-
-        let orgRegex = selectedOrgs.length ? '^(' + selectedOrgs.map($.fn.dataTable.util.escapeRegex).join('|') + ')$' : '';
-        let statusRegex = selectedStatuses.length ? '(' + selectedStatuses.map($.fn.dataTable.util.escapeRegex).join('|') + ')' : '';
-        let centerRegex = selectedCenters.length ? '(' + selectedCenters.map($.fn.dataTable.util.escapeRegex).join('|') + ')' : '';
-
-        requestsDataTable.column(1).search(orgRegex, true, false);
-        requestsDataTable.column(4).search(statusRegex, true, false);
-        requestsDataTable.column(5).search(centerRegex, true, false);
-
-        requestsDataTable.draw();
-    }
-
-    $('#btnApplyFilter').click(function(e) {
-        e.preventDefault();
-        applyMultiFilters();
-    });
-
-    $('#btnResetFilter').click(function(e) {
-        e.preventDefault();
-        
-        $('#filterOrg').val(null).trigger('change');
-        $('#filterStatus').val(null).trigger('change');
-        $('#filterCenterReady').val(null).trigger('change');
-
-        $('#activeFilterBadge').addClass('hidden');
-
-        if (requestsDataTable) {
-            requestsDataTable.columns().search('').draw();
-        }
-    });
 });
 
 function viewRequest(requestId) {
@@ -385,14 +268,33 @@ function showPage(pageName) {
         viewRequestContent.classList.remove('hidden');
     } else {
         requestsList.classList.remove('hidden');
-        viewRequestContent.add('hidden');
+        viewRequestContent.addClass ? viewRequestContent.classList.add('hidden') : null;
     }
+}
+
+function switchTab(tabName) {
+    const tabs = ['details', 'documents'];
+    tabs.forEach(t => {
+        const btn = document.getElementById(`tab-btn-${t}`);
+        const content = document.getElementById(`tab-content-${t}`);
+        
+        if (t === tabName) {
+            btn.classList.add('text-[#1e4d7b]', 'border-[#1e4d7b]', 'font-bold');
+            btn.classList.remove('text-slate-500', 'border-transparent', 'font-medium');
+            content.classList.remove('hidden');
+        } else {
+            btn.classList.remove('text-[#1e4d7b]', 'border-[#1e4d7b]', 'font-bold');
+            btn.classList.add('text-slate-500', 'border-transparent', 'font-medium');
+            content.classList.add('hidden');
+        }
+    });
 }
 
 function generateRequestHTML(request) {
     const appNo = request.app_no || ('#' + String(request.id).padStart(4, '0'));
     const createdAt = request.created_at ? new Date(request.created_at).toLocaleDateString('en-GB') : 'N/A';
     
+    // Dates array handling
     let datesList = '<p class="text-sm font-semibold text-slate-800">N/A</p>';
     if (request.dates && request.dates.length > 0) {
         datesList = request.dates.map(d => `
@@ -403,6 +305,7 @@ function generateRequestHTML(request) {
         `).join('');
     }
 
+    // Centres array handling
     let centresList = '<p class="text-sm font-semibold text-slate-800">N/A</p>';
     if (request.centres && request.centres.length > 0) {
         centresList = request.centres.map(c => `
@@ -417,14 +320,9 @@ function generateRequestHTML(request) {
     return `
     <div class="space-y-6 max-w-6xl mx-auto">
         <div class="gov-card p-5">
-            <div class="flex justify-between items-center mb-4 pb-2 border-b">
-                <h3 class="text-base font-bold text-[#1e4d7b] flex items-center gap-2">
-                    <i class="fas fa-file-alt text-[#e58500]"></i> Application Details (${appNo})
-                </h3>
-                <button onclick="showPage('list')" class="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold rounded-lg transition border border-slate-300">
-                    <i class="fas fa-arrow-left me-1"></i> Back
-                </button>
-            </div>
+            <h3 class="text-base font-bold text-[#1e4d7b] mb-4 flex items-center gap-2 pb-2 border-b">
+                <i class="fas fa-file-alt text-[#e58500]"></i> Application Details (${appNo})
+            </h3>
             
             <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
                 <div>
@@ -456,8 +354,16 @@ function generateRequestHTML(request) {
     `;
 }
 </script>
-
 <?php
 $page_content = ob_get_clean();
 include dirname(__DIR__) . '/dashboard.php';
 ?>
+<script>
+function pageviewRequest(requestId) {
+    if (requestId) {
+        window.location.href = '/request-view/' + requestId;
+    } else {
+        console.error('Request ID is required');
+    }
+}
+</script>
