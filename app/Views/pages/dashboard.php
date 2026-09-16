@@ -81,17 +81,15 @@ ob_start();
         <div class="stat-icon"><i class="fas fa-calendar-check"></i></div>
         <div class="stat-content">
             <span class="stat-title">Total Jammer Request</span>
-            <h2>1,248</h2>
-            <p><i class="fas fa-arrow-up"></i> 12% this month</p>
+            <h2><?= esc($total_jammer_requests ?? 0) ?></h2>
         </div>
     </div>
 
     <div class="stat-card pending">
         <div class="stat-icon"><i class="fas fa-clock"></i></div>
         <div class="stat-content">
-            <span class="stat-title">Pending</span>
-            <h2>42</h2>
-            <p><i class="fas fa-hourglass-half"></i> 2% Remaining</p>
+            <span class="stat-title">Approval Pending</span>
+            <h2><?= esc($approval_pending_cnt ?? 0) ?></h2>
         </div>
     </div>
 
@@ -99,26 +97,33 @@ ob_start();
         <div class="stat-icon"><i class="fas fa-check-circle"></i></div>
         <div class="stat-content">
             <span class="stat-title">Completed</span>
-            <h2>1,186</h2>
-            <p><i class="fas fa-arrow-up"></i> 8% Growth</p>
+            <h2><?= esc($completed_cnt ?? 0) ?></h2>
         </div>
     </div>
 
     <div class="stat-card flagged">
         <div class="stat-icon"><i class="fas fa-flag"></i></div>
         <div class="stat-content">
-            <span class="stat-title">Rejected</span>
-            <h2>20</h2>
-            <p><i class="fas fa-exclamation-circle"></i> Needs Review</p>
+            <span class="stat-title">Not Approval</span>
+            <h2><?= esc($not_approval_cnt ?? 0) ?></h2>
         </div>
     </div>
+
+    <?php if ($hasRole([1])): ?>
+    <div class="stat-card filled-by-me">
+        <div class="stat-icon"><i class="fas fa-file-signature"></i></div>
+        <div class="stat-content">
+            <span class="stat-title">Request filled by Me</span>
+            <h2><?= esc($request_filled_by_me_cnt ?? 0) ?></h2>
+        </div>
+    </div>
+    <?php endif; ?>
 
     <div class="stat-card assigned-to-me">
         <div class="stat-icon"><i class="fas fa-user-gear"></i></div>
         <div class="stat-content">
             <span class="stat-title">Pending with Me</span>
-            <h2>20</h2>
-            <p><i class="fas fa-spinner"></i> In Progress</p>
+            <h2><?= esc($pending_with_me_cnt ?? 0) ?></h2>
         </div>
     </div>
 </section>
@@ -129,7 +134,7 @@ ob_start();
             <div class="px-5 py-4 flex items-center justify-between border-b border-slate-100">
                 <div class="flex items-center gap-3">
                     <i class="fas fa-list-check text-[#1e4d7b] text-xl"></i>
-                    <h2 class="text-base font-bold text-[#1e4d7b]">Pending Requests</h2>
+                    <h2 class="text-base font-bold text-[#1e4d7b]">Pending With Me</h2>
                 </div>
                 <button class="btn-orange text-xs px-4 py-1.5" onclick="location.reload();">
                     <i class="fas fa-rotate-right"></i> Refresh
@@ -144,6 +149,7 @@ ob_start();
                             <th class="px-5 py-3.5 text-left font-semibold uppercase tracking-wider text-xs">Exam Name</th>
                             <th class="px-5 py-3.5 text-left font-semibold uppercase tracking-wider text-xs">Exam Date</th>
                             <th class="px-5 py-3.5 text-left font-semibold uppercase tracking-wider text-xs">Status</th>
+                            <th class="px-5 py-3">CENTER LIST READY</th>
                             <th class="px-5 py-3.5 text-right pr-6 font-semibold uppercase tracking-wider text-xs">Actions</th>
                         </tr>
                     </thead>
@@ -189,25 +195,39 @@ ob_start();
 
                                     <td class="px-5 py-4 text-left">
                                         <?php 
-                                        $statusName  = $request['status_name'] ?? 'Pending';
-                                        $statusClass = 'bg-blue-50 text-blue-700 border-blue-500';
-                                        $statusIcon  = 'fa-info-circle';
+                                        $statusVal = $request['status_name'] ?? '1';
 
-                                        if (stristr($statusName, 'approve')) {
+                                        if (in_array($statusVal, [9, 10, 11, 12, '9', '10', '11', '12', 'APPROVED', 'COMPLETED'])) {
                                             $statusClass = 'bg-emerald-50 text-emerald-700 border-emerald-500';
                                             $statusIcon  = 'fa-check-circle';
-                                        } elseif (stristr($statusName, 'reject')) {
+                                        } elseif (in_array($statusVal, [14, '14', 'REJECTED'])) {
                                             $statusClass = 'bg-red-50 text-red-700 border-red-500';
                                             $statusIcon  = 'fa-times-circle';
-                                        } elseif (stristr($statusName, 'pend') || stristr($statusName, 'submit')) {
+                                        } elseif (in_array($statusVal, [13, '13', 'RETURNED'])) {
+                                            $statusClass = 'bg-orange-50 text-orange-700 border-orange-500';
+                                            $statusIcon  = 'fa-rotate-left';
+                                        } else {
                                             $statusClass = 'bg-amber-50 text-amber-700 border-amber-500';
                                             $statusIcon  = 'fa-clock';
                                         }
                                         ?>
+
                                         <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg border-l-4 <?= $statusClass ?> font-semibold text-xs shadow-sm">
                                             <i class="fas <?= $statusIcon ?>"></i>
-                                            <?= esc($statusName) ?>
+                                            <?= esc($statusVal) ?>
                                         </span>
+                                    </td>
+
+                                    <td class="px-5 py-4 text-left">
+                                        <?php if (!empty($request['center_list_ready']) && $request['center_list_ready'] == 1): ?>
+                                            <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold bg-green-100 text-green-800">
+                                                <i class="fas fa-check-circle"></i> Yes
+                                            </span>
+                                        <?php else: ?>
+                                            <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold bg-red-100 text-red-800">
+                                                <i class="fas fa-times-circle"></i> No
+                                            </span>
+                                        <?php endif; ?>
                                     </td>
 
                                     <td class="px-5 py-4 text-right pr-6">
@@ -245,10 +265,6 @@ ob_start();
                                     </td>
                                 </tr>
                             <?php endforeach; ?>
-                        <?php else: ?>
-                            <tr>
-                                <td colspan="6" class="text-center py-4 text-slate-400">No pending requests found.</td>
-                            </tr>
                         <?php endif; ?>
                     </tbody>
                 </table>
@@ -299,6 +315,7 @@ ob_start();
 <script>
 $(document).ready(function() {
     if ($.fn && $.fn.DataTable) {
+        $.fn.dataTable.ext.errMode = 'none';
         $('#dashboardRequestsTable').DataTable({
             "dom": 'rtip',
             "pageLength": 5,
@@ -306,6 +323,7 @@ $(document).ready(function() {
             "responsive": true,
             "autoWidth": false,
             "language": {
+                "emptyTable": "No pending requests found.",
                 "paginate": {
                     "previous": "<i class='fas fa-chevron-left text-xs'></i>",
                     "next": "<i class='fas fa-chevron-right text-xs'></i>"

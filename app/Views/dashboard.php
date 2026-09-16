@@ -656,6 +656,22 @@
     color:#7c3aed;
 }
 
+.filled-by-me{
+    border-left:5px solid #06b6d4;
+}
+
+.filled-by-me .stat-icon{
+    background:linear-gradient(135deg,#06b6d4,#22d3ee);
+}
+
+.filled-by-me::after{
+    background:#06b6d4;
+}
+
+.filled-by-me p{
+    color:#0891b2;
+}
+
 @media(max-width:768px){
     .stat-content h2{
         font-size:28px;

@@ -36,27 +36,37 @@ class RequestModel extends Model
     /**
      * Get All Applications
      */
-    public function getAllRequests()
+    public function getAllRequests(?int $userId = null)
     {
-        return $this->db->table('application a')
+        $builder = $this->db->table('vw_application_latest_status v')
             ->select('
-                a.id,
-                a.app_no,
-                a.created_at,
-                a.current_status,
-                a.organisation,
-                a.centre_list_ready,
-                act.name as status_name,
+                v.application_id as id,
+                v.app_no,
+                v.organisation,
+                v.current_status as status_name,
+                v.currently_with,
+                v.created_at,
+                v.centre_list_ready,
                 GROUP_CONCAT(DISTINCT d.exam_name SEPARATOR "||") as exam_names,
                 GROUP_CONCAT(d.exam_date ORDER BY d.exam_date ASC SEPARATOR "||") as exam_dates
             ')
-            ->join('application_date_mapping d', 'd.app_id = a.id', 'left')
-            ->join('mas_application_action act', 'act.id = a.current_status', 'left')
-            ->where('a.isactive', 1)
-            ->groupBy('a.id, a.app_no, a.created_at, a.current_status, a.organisation, a.centre_list_ready, act.name')
-            ->orderBy('a.created_at', 'DESC')
-            ->get()
-            ->getResultArray();
+            ->join('application_date_mapping d', 'd.app_id = v.application_id', 'left')
+            ->groupBy('
+                v.application_id, 
+                v.app_no, 
+                v.organisation, 
+                v.current_status, 
+                v.currently_with, 
+                v.created_at, 
+                v.centre_list_ready
+            ')
+            ->orderBy('v.created_at', 'DESC');
+
+        if ($userId !== null) {
+            $builder->where('v.currently_with', $userId);
+        }
+
+        return $builder->get()->getResultArray();
     }
 
     /**

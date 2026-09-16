@@ -38,7 +38,7 @@ class Dashboard extends BaseController
         $this->db           = Config::connect();
     }
 
-    public function index()
+public function index()
     {
         if (!session()->get('isLoggedIn')) {
             return redirect()->to(base_url('/'));
@@ -46,6 +46,8 @@ class Dashboard extends BaseController
         if ((int) session()->get('password_reset_req') === 1) {
             return redirect()->to(base_url('change-password'));
         }
+
+        $currentUserId = (int) session()->get('user_id');
 
         $pendingCount = $this->regModel
             ->where('isactive_authlink', 0)
@@ -68,15 +70,44 @@ class Dashboard extends BaseController
             $examDatesMap[$date][] = $event;
         }
 
+
+        $totalJammerRequests = $this->db->table('vw_application_latest_status')->countAllResults();
+
+        $approvalPendingCount = $this->db->table('vw_application_latest_status')
+            ->whereIn('current_status', [1, 2, 3, 4, 5, 6, 7, 8])
+            ->countAllResults();
+
+        $completedCount = $this->db->table('vw_application_latest_status')
+            ->whereIn('current_status', [9, 10, 11, 12])
+            ->countAllResults();
+
+        $notApprovalCount = $this->db->table('vw_application_latest_status')
+            ->where('current_status', 14)
+            ->countAllResults();
+
+        $requestFilledByMeCount = $this->db->table('vw_application_latest_status')
+            ->where('user_id', $currentUserId)
+            ->countAllResults();
+
+        $pendingWithMeCount = $this->db->table('vw_application_latest_status')
+            ->where('currently_with', $currentUserId)
+            ->countAllResults();
+
         $data = [
-            'user_id'       => session()->get('user_id'),
+            'user_id'       => $currentUserId,
             'username'      => session()->get('username'),
             'full_name'     => session()->get('full_name'),
             'email'         => session()->get('email'),
             'pending_count' => $pendingCount,
             'total_count'   => $totalCount,
             'exam_dates_map'    => $examDatesMap,
-            'requests'       => $this->requestModel->getAllRequests(),
+            'requests'       => $this->requestModel->getAllRequests($currentUserId),
+            'total_jammer_requests'    => $totalJammerRequests,
+            'approval_pending_cnt'     => $approvalPendingCount,
+            'completed_cnt'            => $completedCount,
+            'not_approval_cnt'         => $notApprovalCount,
+            'request_filled_by_me_cnt' => $requestFilledByMeCount,
+            'pending_with_me_cnt'      => $pendingWithMeCount,
         ];
 
         return view('pages/dashboard', $data);
