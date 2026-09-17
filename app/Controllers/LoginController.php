@@ -132,15 +132,13 @@ class LoginController extends BaseController
 
             if ($mfaRequired === 1) {
                 $otp = (string) random_int(100000, 999999);
-                $otpExpiresAt = date('Y-m-d H:i:s', strtotime('+10 minutes'));
-
-                // Save OTP to DB
-                $this->loginModel->update($user['id'], [
-                    'login_otp'      => $otp,
-                    'otp_expires_at' => $otpExpiresAt
+                $otpExpiresAt = time() + 600;
+                $this->session->set('pending_otp_data', [
+                    'user_id'    => $user['id'],
+                    'email'      => $user['email'],
+                    'otp'        => $otp,
+                    'expires_at' => $otpExpiresAt
                 ]);
-
-                $this->session->set('pending_otp_user_id', $user['id']);
 
                 /*
                 // Send Email OTP
@@ -226,27 +224,18 @@ class LoginController extends BaseController
             }
 
             $userOtp = trim((string) $this->request->getPost('otp'));
-            $pendingUserId = $this->session->get('pending_otp_user_id');
+            $otpData = $this->session->get('pending_otp_data');
 
-            if (!$pendingUserId || $userOtp === '') {
+            if (!$otpData || empty($otpData['otp'])) {
                 return $this->response->setJSON([
                     'success'  => false,
-                    'message'  => 'Session expired or invalid OTP.',
+                    'message'  => 'Session expired or invalid OTP request.',
                     'csrfHash' => csrf_hash()
                 ]);
             }
 
-            $user = $this->loginModel->findUserByEmail($this->loginModel->find($pendingUserId)['email'] ?? '');
-
-            if (!$user || empty($user['login_otp'])) {
-                return $this->response->setJSON([
-                    'success'  => false,
-                    'message'  => 'Invalid request.',
-                    'csrfHash' => csrf_hash()
-                ]);
-            }
-
-            if (strtotime($user['otp_expires_at']) < time()) {
+            if (time() > $otpData['expires_at']) {
+                $this->session->remove('pending_otp_data');
                 return $this->response->setJSON([
                     'success'  => false,
                     'message'  => 'OTP has expired.',
@@ -254,7 +243,7 @@ class LoginController extends BaseController
                 ]);
             }
 
-            if ($user['login_otp'] !== $userOtp) {
+            if ($otpData['otp'] !== $userOtp) {
                 return $this->response->setJSON([
                     'success'  => false,
                     'message'  => 'Incorrect OTP code.',
@@ -262,13 +251,18 @@ class LoginController extends BaseController
                 ]);
             }
 
-            // OTP verified, clear OTP values
-            $this->loginModel->update($user['id'], [
-                'login_otp'      => null,
-                'otp_expires_at' => null
-            ]);
+            // OTP verified
+            $user = $this->loginModel->findUserByIdWithRoles((int) $otpData['user_id']);
 
-            $this->session->remove('pending_otp_user_id');
+            if (!$user) {
+                return $this->response->setJSON([
+                    'success'  => false,
+                    'message'  => 'User not found.',
+                    'csrfHash' => csrf_hash()
+                ]);
+            }
+
+            $this->session->remove('pending_otp_data');
 
             $passwordResetReq = (int) ($user['password_reset_req'] ?? 0);
             $this->session->regenerate(true);
