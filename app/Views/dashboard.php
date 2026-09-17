@@ -4,6 +4,8 @@
  <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>JAMS</title>
+  <link href="<?= base_url('assets/image/Emblem_of_India.svg.webp') ?>" rel="icon">
+  <link href="<?= base_url('assets/image/apple-touch-icon.png') ?>" rel="apple-touch-icon">
   <!-- Font Awesome 6 -->
   <link href="<?= base_url('assets/vendor/fontawesome-free/css/all.min.css') ?>" rel="stylesheet">
   <!-- Google Font: Inter -->

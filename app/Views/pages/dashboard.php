@@ -255,15 +255,13 @@ ob_start();
                                             <?php if ($hasRole([2, 6])): ?>
                                                 <button type="button" 
                                                         class="w-9 h-9 rounded-lg bg-emerald-50 text-emerald-700 hover:bg-emerald-100 transition inline-flex items-center justify-center" 
-                                                        title="Approve" 
-                                                        onclick="approveRequest(<?= $request['id'] ?>)">
+                                                        title="Approve">
                                                     <i class="fas fa-check"></i>
                                                 </button>
 
                                                 <button type="button" 
                                                         class="w-9 h-9 rounded-lg bg-rose-50 text-rose-700 hover:bg-rose-100 transition inline-flex items-center justify-center" 
-                                                        title="Reject" 
-                                                        onclick="rejectRequest(<?= $request['id'] ?>)">
+                                                        title="Reject">
                                                     <i class="fas fa-xmark"></i>
                                                 </button>
                                             <?php endif; ?>
