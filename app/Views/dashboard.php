@@ -1439,7 +1439,7 @@
     }
   }
 
-// Notification popup functions
+  // Notification popup functions
   let notificationTimer = null;
 
   function hideNotification() {
@@ -1457,7 +1457,16 @@
   }
 
   document.addEventListener('DOMContentLoaded', () => {
-      setTimeout(showNotification, 1000);
+      const currentPath = window.location.pathname;
+      const popup = document.getElementById('complaintNotification');
+
+      if (currentPath.endsWith('/dashboard') || currentPath.endsWith('/dashboard/')) {
+          setTimeout(showNotification, 1000);
+      } else {
+          if (popup) {
+              popup.style.display = 'none';
+          }
+      }
   });
 </script>
 
