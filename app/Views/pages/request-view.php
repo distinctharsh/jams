@@ -2749,18 +2749,11 @@ $csrfHash = $data['csrf_hash'] ?? csrf_hash();
                         <div></div>
                     <?php elseif (in_array($currentStatus, [9, 10, 11])): ?>
                         <!-- Permission Letter Button -->
-                        <!-- <button type="button"
+                        <button type="button"
                                 id="permission_downloadBtn"
                                 class="btn btn-sm btn-success d-block mx-auto permission-btn"
                                 data-app-id="<?= $appId ?? '' ?>"
                                 onclick="permission_downloadApplicationPreview(this.dataset.appId)">
-                            <i class="fas fa-download"></i>
-                            PERMISSION LETTER GENERATED
-                        </button>  -->
-                        <button type="button"
-                                id="permission_downloadBtn"
-                                class="btn btn-sm btn-success d-block mx-auto permission-btn"
-                                >
                             <i class="fas fa-download"></i>
                             PERMISSION LETTER GENERATED
                         </button> 
@@ -4808,402 +4801,945 @@ function permission_generateApplicationPdfHTML(response) {
 }
 
 /* =========================================================
-   SINGLE EXAMINATION TEMPLATE
+   PERMISSION LETTER - COMMON HELPERS
    ========================================================= */
-function permission_generateSingleExamLetter(data) {
-    const createdDate = data.createdAt ? new Date(data.createdAt) : new Date();
-    const formattedDate = createdDate.toLocaleDateString('en-GB', {
+
+/* =========================================================
+   PERMISSION LETTER - COMMON HELPERS
+   ========================================================= */
+
+function permission_escapeHtml(value) {
+    if (value === null || value === undefined) {
+        return '';
+    }
+
+    return String(value)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+}
+
+
+/* =========================================================
+   DATE FORMAT
+   ========================================================= */
+
+function permission_formatDate(dateValue) {
+
+    const date = dateValue
+        ? new Date(dateValue)
+        : new Date();
+
+    if (isNaN(date.getTime())) {
+        return '';
+    }
+
+    return date.toLocaleDateString('en-GB', {
         day: '2-digit',
         month: 'short',
         year: 'numeric'
     });
-
-    return `
-<style>
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { 
-        font-family: 'Times New Roman', Arial, Helvetica, sans-serif;
-        background: #ffffff;
-        color: #0f172a;
-        padding: 20px;
-    }
-    @page { 
-        size: A4; 
-        margin: 15mm;
-    }
-    @media print { body { padding: 0; } }
-    
-    .document {
-        width: 100%;
-        max-width: 210mm;
-        margin: 0 auto;
-        background: #ffffff;
-    }
-    
-    .pdf-header {
-        text-align: center;
-        margin-bottom: 20px;
-    }
-    .pdf-header .emblem {
-        height: 70px;
-        width: auto;
-        display: block;
-        margin: 0 auto 6px;
-    }
-    .pdf-header .govt-line {
-        font-size: 16px;
-        font-weight: 700;
-        letter-spacing: 0.5px;
-    }
-    .pdf-header .dept-line {
-        font-size: 14px;
-        font-weight: 600;
-        margin-top: 2px;
-    }
-    .pdf-header .address-line {
-        font-size: 12px;
-        margin-top: 4px;
-        color: #2d2d2d;
-    }
-    
-    .file-no-row {
-        display: flex;
-        justify-content: space-between;
-        font-size: 12px;
-        margin-top: 25px;
-        border-bottom: 1px solid #aaa;
-        padding-bottom: 6px;
-    }
-    
-    .to-block {
-        margin-top: 25px;
-        font-size: 13px;
-    }
-    .to-block p { margin-bottom: 3px; }
-    
-    .subject {
-        margin-top: 22px;
-        font-weight: 700;
-        font-size: 13px;
-        text-decoration: underline;
-        text-underline-offset: 3px;
-        line-height: 1.6;
-    }
-    
-    .salutation {
-        margin-top: 20px;
-        font-size: 13px;
-    }
-    
-    .body-text {
-        margin-top: 15px;
-        font-size: 13px;
-        text-align: justify;
-        line-height: 1.7;
-    }
-    .body-text p { margin-bottom: 12px; }
-    
-    .roman-list {
-        margin: 10px 0 12px 30px;
-        font-size: 13px;
-        line-height: 1.7;
-    }
-    .roman-list li {
-        margin-bottom: 8px;
-        text-align: justify;
-    }
-    
-    .signature {
-        margin-top: 35px;
-        font-size: 13px;
-        text-align: right;
-        line-height: 1.6;
-    }
-    .signature .name { font-weight: 600; }
-    
-    .copy-to {
-        margin-top: 30px;
-        font-size: 12px;
-        border-top: 1px dashed #999;
-        padding-top: 15px;
-        line-height: 1.6;
-        text-align: justify;
-    }
-    .copy-to p { margin-bottom: 6px; }
-    
-    .noo {
-        margin-top: 25px;
-        font-size: 12px;
-        line-height: 1.6;
-    }
-    .noo p { margin-bottom: 4px; }
-    
-    .dynamic-fill {
-        background: #f0f7ff;
-        padding: 0 2px;
-        border-radius: 3px;
-        font-weight: 500;
-    }
-    
-    @media print {
-        .dynamic-fill { background: transparent !important; padding: 0; }
-    }
-</style>
-
-<div class="document">
-    <div class="pdf-header">
-        <img src="${data.emblemPath}" class="emblem" alt="Government of India Emblem" onerror="this.style.display='none'" crossorigin="anonymous">
-        <div class="govt-line">Govt. of India</div>
-        <div class="dept-line">Cabinet Secretariat</div>
-        <div class="dept-line">Office of the Secretary (Security)</div>
-        <div class="address-line">Room No.218, Seva Teerth, Motilal Nehru Marg, New Delhi</div>
-    </div>
-
-    <div class="file-no-row">
-        <span>File No. <span class="dynamic-fill">${permission_escapeHtml(data.appNo)}</span></span>
-        <span>Dated: <span class="dynamic-fill">${permission_escapeHtml(formattedDate)}</span></span>
-    </div>
-
-    <div class="to-block">
-        <p><strong>To</strong></p>
-        <p><span class="dynamic-fill">${permission_escapeHtml(data.contactPerson)}</span></p>
-        <p><span class="dynamic-fill">${permission_escapeHtml(data.orgName)}</span></p>
-        <p><span class="dynamic-fill">${permission_escapeHtml(data.orgType || 'Examination Conducting Body')}</span></p>
-        <p>${permission_escapeHtml(data.email)} | ${permission_escapeHtml(data.phone)}</p>
-    </div>
-
-    <div class="subject">
-        Subject: Permission for deployment of low powered jammers in examination halls for the examination to be conducted by <span class="dynamic-fill">${permission_escapeHtml(data.orgName)}</span>.
-    </div>
-
-    <div class="salutation">Sir/Madam,</div>
-
-    <div class="body-text">
-        <p>I am directed to refer to your <span class="dynamic-fill">[Letter Number: ${permission_escapeHtml(data.appNo)}]</span>, <span class="dynamic-fill">[Dated: ${permission_escapeHtml(formattedDate)}]</span>, on the subject mentioned above.</p>
-        
-        <p>2. Approval of the Secretary (Security), Cabinet Secretariat, is hereby conveyed for deployment of low powered jammers, through <span class="dynamic-fill">${permission_escapeHtml(data.vendorNames)}</span>, in the examination to be conducted by <span class="dynamic-fill">${permission_escapeHtml(data.orgName)}</span> ${data.examLocationDate}, as per the details furnished in the letter under reference, subject to the following:</p>
-
-        <ol class="roman-list" type="i">
-            <li>The jammer models deployed will be as per approved model of <span class="dynamic-fill">${permission_escapeHtml(data.vendorNames)}</span> (details uploaded at www.cabsec.gov.in/circulars/policyofjammer).</li>
-            <li>Adequate arrangements should be made for safe custody of the jammers during its deployment in examination centers. Each jammer deployed at the examination centers, as indicated in Annexures of the letter under reference, will be accounted for and any discrepancy in this regard will be reported immediately to the appropriate law enforcement agency and to the Office of Secretary (Security).</li>
-            <li>While deploying the jammers it will be ensured by <span class="dynamic-fill">${permission_escapeHtml(data.orgName)}</span> that the jammers do not interfere with existing mobile communication network outside examination center.</li>
-        </ol>
-
-        <p>3. An effective coordination mechanism with <span class="dynamic-fill">${permission_escapeHtml(data.vendorNames)}</span> may be established well in advance for finalizing various details relating to the deployment of jammers.</p>
-        
-        <p>4. Performance of all jammers at each examination center may be verified before commencement of examination as effectiveness of the jammers depends on various factors like its power output, signal strength of BTS, traffic load on BTS at a given point of time, distance of jammer from the BTS, sensitivity of receiver, terrain, topography, line of sight etc.</p>
-        
-        <p>5. It may kindly be ensured that all WiFi and Bluetooth devices within the vicinity of examination halls are switched off during operation of the jammers.</p>
-    </div>
-
-    <div class="signature">
-        <p>Yours faithfully,</p>
-        <p class="name">[Name]</p>
-        <p>Under Security (Security)</p>
-        <p>Tel.No.23093763</p>
-    </div>
-
-    <div class="copy-to">
-        <p><strong>Copy to:</strong></p>
-        <p>CMD, <span class="dynamic-fill">${permission_escapeHtml(data.vendorNames)}</span></p>
-        <p>It is requested that all provisions of jammer policy of GoI may be strictly followed while deploying the jammers. Copy of letter from <span class="dynamic-fill">${permission_escapeHtml(data.orgName)}</span>, referred at Para-1, enclosed. It should be ensured that in areas where 5G roll out is complete, only jammers upgraded to handle upto 5G should be deployed.</p>
-    </div>
-
-    <div class="noo">
-        <p><strong>N.O.O</strong></p>
-        <p>1. [Name], Director, SPG.</p>
-        <p>2. [Name], [Special/Additional] Director, IB</p>
-        <p>alongwith a copy of the letter as mentioned in Para-1 above.</p>
-        <p style="margin-top:12px;">[Name]</p>
-        <p>Under Security (Security)</p>
-        <p>Tel.No.23093763</p>
-    </div>
-</div>
-    `;
 }
 
 /* =========================================================
-   MULTIPLE EXAMINATION TEMPLATE
+   PERMISSION LETTER - COMMON HELPERS
    ========================================================= */
-function permission_generateMultipleExamLetter(data) {
-    const createdDate = data.createdAt ? new Date(data.createdAt) : new Date();
-    const formattedDate = createdDate.toLocaleDateString('en-GB', {
+function permission_escapeHtml(value) {
+    if (value === null || value === undefined) {
+        return '';
+    }
+
+    return String(value)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+}
+
+function permission_formatDate(dateValue) {
+    const date = dateValue ? new Date(dateValue) : new Date();
+
+    if (isNaN(date.getTime())) {
+        return '';
+    }
+
+    return date.toLocaleDateString('en-GB', {
         day: '2-digit',
         month: 'short',
         year: 'numeric'
     });
+}
 
+function permission_commonStyles() {
     return `
-<style>
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { 
-        font-family: 'Times New Roman', Arial, Helvetica, sans-serif;
-        background: #ffffff;
-        color: #0f172a;
-        padding: 20px;
+    <style>
+    * {
+        box-sizing: border-box;
     }
-    @page { size: A4; margin: 15mm; }
-    @media print { body { padding: 0; } }
-    
-    .document {
+
+    html,
+    body {
+        margin: 0;
+        padding: 0;
+        background: #ffffff;
+    }
+
+    body {
+        font-family: "Times New Roman", Times, serif;
+        color: #000000;
+        font-size: 16px;
+        line-height: 1.55;
+    }
+
+    @page {
+        size: A4;
+        margin: 15mm 18mm 15mm 18mm;
+    }
+
+    .permission-document {
         width: 100%;
-        max-width: 210mm;
+        max-width: 174mm;
         margin: 0 auto;
         background: #ffffff;
     }
-    
-    .pdf-header { text-align: center; margin-bottom: 20px; }
-    .pdf-header .emblem {
-        height: 70px;
-        width: auto;
+
+    @media print {
+        html,
+        body {
+            width: 210mm;
+            min-height: 297mm;
+            margin: 0;
+            padding: 0;
+            background: #ffffff;
+        }
+
+        .permission-document {
+            width: 100%;
+            max-width: none;
+            margin: 0;
+            padding: 0;
+        }
+
+        .dynamic-fill {
+            background: transparent !important;
+            padding: 0 !important;
+            border-radius: 0 !important;
+        }
+
+        .page-break-before {
+            page-break-before: always !important;
+            break-before: page !important;
+        }
+
+        .copy-section,
+        .noo-section {
+            page-break-inside: avoid;
+            break-inside: avoid;
+        }
+
+        .copy-title,
+        .noo-title {
+            page-break-after: avoid;
+            break-after: avoid;
+        }
+    }
+
+    .official-header {
+        width: 100%;
+        text-align: center;
+        margin: 0;
+        padding: 0;
+    }
+
+    .official-emblem {
         display: block;
-        margin: 0 auto 6px;
+        width: auto;
+        height: 58px;
+        margin: 0 auto 7px auto;
+        object-fit: contain;
     }
-    .pdf-header .govt-line { font-size: 16px; font-weight: 700; letter-spacing: 0.5px; }
-    .pdf-header .dept-line { font-size: 14px; font-weight: 600; margin-top: 2px; }
-    .pdf-header .address-line { font-size: 12px; margin-top: 4px; color: #2d2d2d; }
-    
-    .file-no-row {
-        display: flex;
-        justify-content: space-between;
-        font-size: 12px;
-        margin-top: 25px;
-        border-bottom: 1px solid #aaa;
-        padding-bottom: 6px;
+
+    .govt-title {
+        font-size: 17px;
+        font-weight: bold;
+        line-height: 1.25;
+        margin: 0;
     }
-    
-    .to-block { margin-top: 25px; font-size: 13px; }
-    .to-block p { margin-bottom: 3px; }
-    
-    .subject {
-        margin-top: 22px;
-        font-weight: 700;
-        font-size: 13px;
-        text-decoration: underline;
-        text-underline-offset: 3px;
-        line-height: 1.6;
+
+    .cabinet-title {
+        font-size: 16px;
+        font-weight: bold;
+        line-height: 1.3;
+        margin-top: 2px;
     }
-    
-    .salutation { margin-top: 20px; font-size: 13px; }
-    
-    .body-text {
-        margin-top: 15px;
-        font-size: 13px;
-        text-align: justify;
-        line-height: 1.7;
+
+    .office-title {
+        font-size: 16px;
+        font-weight: bold;
+        line-height: 1.3;
+        margin-top: 2px;
     }
-    .body-text p { margin-bottom: 12px; }
-    
-    .roman-list { margin: 10px 0 12px 30px; font-size: 13px; line-height: 1.7; }
-    .roman-list li { margin-bottom: 8px; text-align: justify; }
-    
-    .signature {
-        margin-top: 35px;
-        font-size: 13px;
+
+    .office-address {
+        font-size: 17px;
+        line-height: 1.4;
+        margin-top: 4px;
+        font-weight: normal;
+    }
+
+    .reference-row {
+        width: 100%;
+        margin-top: 18px;
+        font-size: 15px;
+        line-height: 1.45;
+    }
+
+    .reference-row table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    .reference-row td {
+        padding: 0;
+        vertical-align: top;
+    }
+
+    .reference-file {
+        width: 55%;
+        text-align: left;
+    }
+
+    .reference-date {
+        width: 45%;
         text-align: right;
-        line-height: 1.6;
     }
-    .signature .name { font-weight: 600; }
-    
-    .copy-to {
-        margin-top: 30px;
-        font-size: 12px;
-        border-top: 1px dashed #999;
-        padding-top: 15px;
-        line-height: 1.6;
+
+    .to-section {
+        margin-top: 22px;
+        margin-bottom: 20px;
+        font-family: "Times New Roman", Times, serif;
+        font-size: 16px;
+        line-height: 1.5;
+    }
+
+    .to-title {
+        font-weight: bold;
+        margin-bottom: 8px;
+    }
+
+    .to-address {
+        margin-left: 28px;
+        font-weight: normal;
+    }
+
+    .to-address div {
+        margin: 0;
+        padding: 0;
+        line-height: 1.5;
+    }
+
+    .subject-section {
+        margin-top: 14px;
+        margin-bottom: 14px;
+        font-size: 17px;
+        font-weight: bold;
+        line-height: 1.5;
         text-align: justify;
     }
-    .copy-to p { margin-bottom: 6px; }
-    
-    .noo { margin-top: 25px; font-size: 12px; line-height: 1.6; }
-    .noo p { margin-bottom: 4px; }
-    
+
+    .subject-label {
+        font-size: 17px;
+        font-weight: bold;
+    }
+
+    .salutation {
+        margin-top: 12px;
+        margin-bottom: 8px;
+        font-size: 17px;
+        font-weight: normal;
+        line-height: 1.5;
+    }
+
+    .letter-body {
+        margin-top: 4px;
+        font-size: 16px;
+        line-height: 1.55;
+        text-align: justify;
+    }
+
+    .letter-body p {
+        margin: 0 0 12px 0;
+        padding: 0;
+        text-align: justify;
+    }
+
+    .conditions {
+        margin-top: 3px;
+        margin-bottom: 12px;
+        padding-left: 30px;
+        font-size: 16px;
+        line-height: 1.55;
+    }
+
+    .conditions li {
+        padding-left: 6px;
+        margin-bottom: 8px;
+        text-align: justify;
+    }
+
+    .signature-section {
+        margin-top: 28px;
+        width: 100%;
+        font-size: 17px;
+        line-height: 1.5;
+        text-align: right;
+        padding-right: 5px;
+    }
+
+    .signature-text {
+        margin: 0;
+        padding: 0;
+        font-size: 17px;
+        line-height: 1.5;
+    }
+
+    .page-break-before {
+        page-break-before: always;
+        break-before: page;
+    }
+
+    .copy-section {
+        margin-top: 5px;
+        font-size: 16px;
+        line-height: 1.55;
+        text-align: justify;
+    }
+
+    .copy-title {
+        font-weight: bold;
+        margin-bottom: 9px;
+        font-size: 17px;
+    }
+
+    .copy-section p {
+        margin: 0 0 12px 0;
+        padding: 0;
+        text-align: justify;
+    }
+
+    .noo-section {
+        margin-top: 20px;
+        font-size: 16px;
+        line-height: 1.5;
+    }
+
+    .noo-title {
+        font-weight: bold;
+        margin-bottom: 9px;
+        font-size: 17px;
+    }
+
+    .noo-item {
+        margin: 0 0 5px 0;
+        padding: 0;
+    }
+
+    .noo-final {
+        margin-top: 14px;
+        text-align: left;
+    }
+
     .dynamic-fill {
         background: #f0f7ff;
         padding: 0 2px;
-        border-radius: 3px;
-        font-weight: 500;
+        border-radius: 2px;
     }
-    
+
     @media print {
-        .dynamic-fill { background: transparent !important; padding: 0; }
+        body {
+            font-size: 16px;
+            line-height: 1.55;
+        }
+
+        .official-emblem {
+            height: 58px;
+        }
+
+        .office-address {
+            font-size: 17px;
+            line-height: 1.4;
+        }
+
+        .subject-section,
+        .subject-label {
+            font-size: 17px;
+            line-height: 1.5;
+        }
+
+        .salutation {
+            font-size: 17px;
+            line-height: 1.5;
+        }
+
+        .letter-body {
+            font-size: 16px;
+            line-height: 1.55;
+        }
+
+        .conditions {
+            font-size: 16px;
+            line-height: 1.55;
+        }
+
+        .signature-section,
+        .signature-text {
+            font-size: 17px;
+            line-height: 1.5;
+        }
+
+        .copy-section {
+            font-size: 16px;
+            line-height: 1.55;
+        }
+
+        .noo-section {
+            font-size: 16px;
+            line-height: 1.5;
+        }
     }
-</style>
-
-<div class="document">
-    <div class="pdf-header">
-        <img src="${data.emblemPath}" class="emblem" alt="Government of India Emblem" onerror="this.style.display='none'" crossorigin="anonymous">
-        <div class="govt-line">Govt. of India</div>
-        <div class="dept-line">Cabinet Secretariat</div>
-        <div class="dept-line">Office of the Secretary (Security)</div>
-        <div class="address-line">Room No.218, Seva Teerth, Motilal Nehru Marg, New Delhi</div>
-    </div>
-
-    <div class="file-no-row">
-        <span>File No. <span class="dynamic-fill">${permission_escapeHtml(data.appNo)}</span></span>
-        <span>Dated: <span class="dynamic-fill">${permission_escapeHtml(formattedDate)}</span></span>
-    </div>
-
-    <div class="to-block">
-        <p><strong>To</strong></p>
-        <p><span class="dynamic-fill">${permission_escapeHtml(data.contactPerson)}</span></p>
-        <p><span class="dynamic-fill">${permission_escapeHtml(data.orgName)}</span></p>
-        <p><span class="dynamic-fill">${permission_escapeHtml(data.orgType || 'Examination Conducting Body')}</span></p>
-        <p>${permission_escapeHtml(data.email)} | ${permission_escapeHtml(data.phone)}</p>
-    </div>
-
-    <div class="subject">
-        Subject: Permission for deployment of low powered jammers in the examinations to be conducted by <span class="dynamic-fill">${permission_escapeHtml(data.orgName)}</span>, ${data.periodText || 'during [period of time/year]'}.
-    </div>
-
-    <div class="salutation">Sir/Madam,</div>
-
-    <div class="body-text">
-        <p>I am directed to refer to your <span class="dynamic-fill">[Letter Number: ${permission_escapeHtml(data.referenceNo)}]</span>, <span class="dynamic-fill">[Dated: ${permission_escapeHtml(formattedDate)}]</span>, on the subject mentioned above.</p>
-        
-        <p>2. Approval of the Secretary (Security), Cabinet Secretariat, is hereby conveyed for deployment of low powered jammers, through <span class="dynamic-fill">${permission_escapeHtml(data.vendorNames)}</span>, for various examinations/recruitment tests to be conducted by <span class="dynamic-fill">${permission_escapeHtml(data.orgName)}</span> ${data.periodText || 'during [period of time/year]'}, as per the details furnished in the letter under reference, subject to the following:-</p>
-
-        <ol class="roman-list" type="i">
-            <li>The jammer models deployed will be as per approved model of <span class="dynamic-fill">${permission_escapeHtml(data.vendorNames)}</span> (details uploaded at www.cabsec.gov.in/circulars/policyofjammer).</li>
-            <li>Adequate arrangements should be made for safe custody of the jammers during its deployment in examination centers. Each jammer deployed at the examination centers, as indicated in Annexures of the letter under reference, will be accounted for and any discrepancy in this regard will be reported immediately to the appropriate law enforcement agency and to the Office of Secretary (Security).</li>
-            <li>While deploying the jammers it will be ensured by <span class="dynamic-fill">${permission_escapeHtml(data.orgName)}</span> that the jammers do not interfere with existing mobile communication network outside examination center.</li>
-        </ol>
-
-        <p>3. The approval is also subject to the condition that list of examination centers, along with their full address, and the number of jammers to be installed in each center, will be provided to this office by <span class="dynamic-fill">${permission_escapeHtml(data.orgName)}</span>, before the actual date of examination/deployment of jammers.</p>
-        
-        <p>4. An effective coordination mechanism with <span class="dynamic-fill">${permission_escapeHtml(data.vendorNames)}</span> may be established well in advance for finalizing various details relating to the deployment of jammers.</p>
-        
-        <p>5. Performance of all jammers at each examination center may be verified before commencement of examination as effectiveness of the jammers depends on various factors like its power output, signal strength of BTS, traffic load on BTS at a given point of time, distance of jammer from the BTS, sensitivity of receiver, terrain, topography, line of sight etc.</p>
-        
-        <p>6. It may kindly be ensured that all WiFi and Bluetooth devices within the vicinity of examination halls are switched off during operation of the jammers.</p>
-    </div>
-
-    <div class="signature">
-        <p>Yours faithfully,</p>
-        <p class="name">[Name]</p>
-        <p>Under Security (Security)</p>
-        <p>Tel.No.23093763</p>
-    </div>
-
-    <div class="copy-to">
-        <p><strong>Copy to:</strong></p>
-        <p>CMD, <span class="dynamic-fill">${permission_escapeHtml(data.vendorNames)}</span></p>
-        <p>It is requested that all provisions of jammer policy of GoI may be strictly followed while deploying the jammers. Copy of letter from <span class="dynamic-fill">${permission_escapeHtml(data.orgName)}</span>, referred at Para-1, enclosed. It should be ensured that in areas where 5G roll out is complete, only jammers upgraded to handle upto 5G should be deployed. Also, compliance by <span class="dynamic-fill">${permission_escapeHtml(data.orgName)}</span> with the condition at para 3 above may be verified before deployment of jammers.</p>
-    </div>
-
-    <div class="noo">
-        <p><strong>N.O.O</strong></p>
-        <p>1. [Name], Director, SPG.</p>
-        <p>2. [Name], [Special/Additional] Director, IB</p>
-        <p>alongwith a copy of the letter as mentioned in Para-1 above.</p>
-        <p style="margin-top:12px;">[Name]</p>
-        <p>Under Security (Security)</p>
-        <p>Tel.No.23093763</p>
-    </div>
-</div>
+    </style>
     `;
 }
 
+function permission_generateSingleExamLetter(data) {
+    const formattedDate = permission_formatDate(data.createdAt);
+    const appNo = permission_escapeHtml(data.appNo || '');
+    const contactPerson = permission_escapeHtml(data.contactPerson || '');
+    const orgName = permission_escapeHtml(data.orgName || '');
+    const orgType = permission_escapeHtml(data.orgType || 'Examination Conducting Body');
+    const email = permission_escapeHtml(data.email || '');
+    const phone = permission_escapeHtml(data.phone || '');
+    const vendorNames = permission_escapeHtml(data.vendorNames || '');
+    const referenceNo = permission_escapeHtml(data.referenceNo || data.appNo || '');
+    const examLocationDate = data.examLocationDate ? data.examLocationDate : '';
+
+    return `
+        ${permission_commonStyles()}
+
+        <div class="permission-document">
+            <div class="official-header">
+                <div class="govt-title">
+                    File No. ${appNo}
+                </div>
+                <div class="govt-title">
+                    Govt. of India
+                </div>
+                <div class="cabinet-title">
+                    Cabinet Secretariat
+                </div>
+                <div class="office-title">
+                    Office of the Secretary (Security)
+                </div>
+                <div class="office-address">
+                    Room No. 218, Seva Teerth,<br>
+                    Motilal Nehru Marg, New Delhi
+                </div>
+            </div>
+
+            <div class="reference-row">
+                <table>
+                    <tr>
+                        <td class="reference-file">
+                        </td>
+                        <td class="reference-date">
+                            Dated:
+                            ${permission_escapeHtml(formattedDate)}
+                        </td>
+                    </tr>
+                </table>
+            </div>
+
+            <div class="to-section">
+                <div class="to-title">
+                    To
+                </div>
+                <div class="to-address">
+                    <div>
+                        ${contactPerson}
+                    </div>
+                    <div>
+                        ${orgName}
+                    </div>
+                    <div>
+                        ${orgType}
+                    </div>
+                    ${
+                        email || phone
+                            ? `
+                                <div>
+                                    ${email}
+                                    ${email && phone ? ' | ' : ''}
+                                    ${phone}
+                                </div>
+                              `
+                            : ''
+                    }
+                </div>
+            </div>
+
+            <div class="subject-section">
+                <span class="subject-label">
+                    Subject:
+                </span>
+                Permission for deployment of low powered
+                jammers in examination halls for the examination
+                to be conducted by ${orgName}.
+            </div>
+
+            <div class="salutation">
+                Sir/Madam,
+            </div>
+
+            <div class="letter-body">
+                <p>
+                    I am directed to refer to your
+                    <span class="dynamic-fill">
+                        Letter Number: ${appNo}
+                    </span>,
+                    <span class="dynamic-fill">
+                        Dated:
+                        ${permission_escapeHtml(formattedDate)}
+                    </span>,
+                    on the subject mentioned above.
+                </p>
+
+                <p>
+                    2. Approval of the Secretary (Security),
+                    Cabinet Secretariat, is hereby conveyed for
+                    deployment of low powered jammers, through
+                    <span class="dynamic-fill">
+                        ${vendorNames}
+                    </span>,
+                    in the examination to be conducted by
+                    <span class="dynamic-fill">
+                        ${orgName}
+                    </span>
+                    ${examLocationDate},
+                    as per the details furnished in the letter
+                    under reference, subject to the following:
+                </p>
+
+                <ol class="conditions" type="i">
+                    <li>
+                        The jammer models deployed will be as per
+                        approved model of
+                        <span class="dynamic-fill">
+                            ${vendorNames}
+                        </span>
+                        (details uploaded at
+                        www.cabsec.gov.in/circulars/policyofjammer).
+                    </li>
+                    <li>
+                        Adequate arrangements should be made for
+                        safe custody of the jammers during its
+                        deployment in examination centers. Each
+                        jammer deployed at the examination centers,
+                        as indicated in Annexures of the letter under
+                        reference, will be accounted for and any
+                        discrepancy in this regard will be reported
+                        immediately to the appropriate law
+                        enforcement agency and to the Office of
+                        Secretary (Security).
+                    </li>
+                    <li>
+                        While deploying the jammers it will be
+                        ensured by
+                        <span class="dynamic-fill">
+                            ${orgName}
+                        </span>
+                        that the jammers do not interfere with
+                        existing mobile communication network
+                        outside examination center.
+                    </li>
+                </ol>
+
+                <p>
+                    3. An effective coordination mechanism with
+                    <span class="dynamic-fill">
+                        ${vendorNames}
+                    </span>
+                    may be established well in advance for
+                    finalizing various details relating to the
+                    deployment of jammers.
+                </p>
+
+                <p>
+                    4. Performance of all jammers at each
+                    examination center may be verified before
+                    commencement of examination as effectiveness
+                    of the jammers depends on various factors like
+                    its power output, signal strength of BTS,
+                    traffic load on BTS at a given point of time,
+                    distance of jammer from the BTS, sensitivity
+                    of receiver, terrain, topography, line of sight
+                    etc.
+                </p>
+
+                <p>
+                    5. It may kindly be ensured that all WiFi and
+                    Bluetooth devices within the vicinity of
+                    examination halls are switched off during
+                    operation of the jammers.
+                </p>
+            </div>
+
+            <div class="signature-section">
+                <p class="signature-text">
+                    Yours faithfully,
+                </p>
+                <br>
+                <p class="signature-text">
+                    <div class="designation" style="margin-top:3px;">Name: _________________</div>
+                </p>
+                <p class="signature-text">
+                    Under Security (Security)
+                </p>
+                <p class="signature-text">
+                    Tel. No. 23093763
+                </p>
+            </div>
+
+            <div class="page-break-before">
+                <div class="copy-section">
+                    <div class="copy-title">
+                        Copy to:
+                    </div>
+                    <p>
+                        CMD,
+                        <span class="dynamic-fill">
+                            ${vendorNames}
+                        </span>
+                    </p>
+                    <p>
+                        It is requested that all provisions of jammer
+                        policy of GoI may be strictly followed while
+                        deploying the jammers. Copy of letter from
+                        <span class="dynamic-fill">
+                            ${orgName}
+                        </span>,
+                        referred at Para-1, enclosed. It should be
+                        ensured that in areas where 5G roll out is
+                        complete, only jammers upgraded to handle
+                        upto 5G should be deployed.
+                    </p>
+                </div>
+
+                <div class="noo-section">
+                    <div class="noo-title">
+                        N.O.O
+                    </div>
+                    <div class="noo-item">
+                        1. <div class="designation" style="margin-top:3px;">Name: _________________</div> Director, SPG.
+                    </div>
+                    <div class="noo-item">
+                        2. <div class="designation" style="margin-top:3px;">Name: _________________</div> [Special/Additional] Director, IB
+                    </div>
+                    <div class="noo-item">
+                        alongwith a copy of the letter as mentioned
+                        in Para-1 above.
+                    </div>
+                    <div class="noo-final">
+                        <div>
+                            <div class="designation" style="margin-top:3px;">Name: _________________</div>
+                        </div>
+                        <div>
+                            Under Security (Security)
+                        </div>
+                        <div>
+                            Tel. No. 23093763
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+}
+
+function permission_generateMultipleExamLetter(data) {
+    const formattedDate = permission_formatDate(data.createdAt);
+    const appNo = permission_escapeHtml(data.appNo || '');
+    const contactPerson = permission_escapeHtml(data.contactPerson || '');
+    const orgName = permission_escapeHtml(data.orgName || '');
+    const orgType = permission_escapeHtml(data.orgType || 'Examination Conducting Body');
+    const email = permission_escapeHtml(data.email || '');
+    const phone = permission_escapeHtml(data.phone || '');
+    const vendorNames = permission_escapeHtml(data.vendorNames || '');
+    const referenceNo = permission_escapeHtml(data.referenceNo || data.appNo || '');
+    const periodText = permission_escapeHtml(data.periodText || 'during [period of time/year]');
+
+    return `
+        ${permission_commonStyles()}
+
+        <div class="permission-document">
+            <div class="official-header">
+                <div class="govt-title">
+                    File No. ${appNo}
+                </div>
+                <div class="govt-title">
+                    Govt. of India
+                </div>
+                <div class="cabinet-title">
+                    Cabinet Secretariat
+                </div>
+                <div class="office-title">
+                    Office of the Secretary (Security)
+                </div>
+                <div class="office-address">
+                    Room No. 218, Seva Teerth,<br>
+                    Motilal Nehru Marg, New Delhi
+                </div>
+            </div>
+
+            <div class="reference-row">
+                <table>
+                    <tr>
+                        <td class="reference-file">
+                        </td>
+                        <td class="reference-date">
+                            Dated:
+                            ${permission_escapeHtml(formattedDate)}
+                        </td>
+                    </tr>
+                </table>
+            </div>
+
+            <div class="to-section">
+                <div class="to-title">
+                    To
+                </div>
+                <div class="to-address">
+                    <div>
+                        ${contactPerson}
+                    </div>
+                    <div>
+                        ${orgName}
+                    </div>
+                    <div>
+                        ${orgType}
+                    </div>
+                    ${
+                        email || phone
+                            ? `
+                                <div>
+                                    ${email}
+                                    ${email && phone ? ' | ' : ''}
+                                    ${phone}
+                                </div>
+                              `
+                            : ''
+                    }
+                </div>
+            </div>
+
+            <div class="subject-section">
+                <span class="subject-label">
+                    Subject:
+                </span>
+                Permission for deployment of low powered
+                jammers in the examinations to be conducted by
+                ${orgName}, ${periodText}.
+            </div>
+
+            <div class="salutation">
+                Sir/Madam,
+            </div>
+
+            <div class="letter-body">
+                <p>
+                    I am directed to refer to your
+                    <span class="dynamic-fill">
+                        Letter Number: ${appNo}
+                    </span>,
+                    <span class="dynamic-fill">
+                        [Dated:
+                        ${permission_escapeHtml(formattedDate)}]
+                    </span>,
+                    on the subject mentioned above.
+                </p>
+
+                <p>
+                    2. Approval of the Secretary (Security),
+                    Cabinet Secretariat, is hereby conveyed for
+                    deployment of low powered jammers, through
+                    <span class="dynamic-fill">
+                        ${vendorNames}
+                    </span>,
+                    for various examinations/recruitment tests to
+                    be conducted by
+                    <span class="dynamic-fill">
+                        ${orgName}
+                    </span>
+                    ${periodText},
+                    as per the details furnished in the letter under
+                    reference, subject to the following:-
+                </p>
+
+                <ol class="conditions" type="i">
+                    <li>
+                        The jammer models deployed will be as per
+                        approved model of
+                        <span class="dynamic-fill">
+                            ${vendorNames}
+                        </span>
+                        (details uploaded at
+                        www.cabsec.gov.in/circulars/policyofjammer).
+                    </li>
+                    <li>
+                        Adequate arrangements should be made for
+                        safe custody of the jammers during its
+                        deployment in examination centers. Each
+                        jammer deployed at the examination centers,
+                        as indicated in Annexures of the letter under
+                        reference, will be accounted for and any
+                        discrepancy in this regard will be reported
+                        immediately to the appropriate law
+                        enforcement agency and to the Office of
+                        Secretary (Security).
+                    </li>
+                    <li>
+                        While deploying the jammers it will be
+                        ensured by
+                        <span class="dynamic-fill">
+                            ${orgName}
+                        </span>
+                        that the jammers do not interfere with
+                        existing mobile communication network
+                        outside examination center.
+                    </li>
+                </ol>
+
+                <p>
+                    3. The approval is also subject to the condition
+                    that list of examination centers, along with
+                    their full address, and the number of jammers
+                    to be installed in each center, will be provided
+                    to this office by
+                    <span class="dynamic-fill">
+                        ${orgName}
+                    </span>,
+                    before the actual date of examination/deployment
+                    of jammers.
+                </p>
+
+                <p>
+                    4. An effective coordination mechanism with
+                    <span class="dynamic-fill">
+                        ${vendorNames}
+                    </span>
+                    may be established well in advance for
+                    finalizing various details relating to the
+                    deployment of jammers.
+                </p>
+
+                <p>
+                    5. Performance of all jammers at each
+                    examination center may be verified before
+                    commencement of examination as effectiveness
+                    of the jammers depends on various factors like
+                    its power output, signal strength of BTS,
+                    traffic load on BTS at a given point of time,
+                    distance of jammer from the BTS, sensitivity
+                    of receiver, terrain, topography, line of sight
+                    etc.
+                </p>
+
+                <p>
+                    6. It may kindly be ensured that all WiFi and
+                    Bluetooth devices within the vicinity of
+                    examination halls are switched off during
+                    operation of the jammers.
+                </p>
+            </div>
+
+            <div class="signature-section">
+                <p class="signature-text">
+                    Yours faithfully,
+                </p>
+                <br>
+                <p class="signature-text">
+                    <div class="designation" style="margin-top:3px;">Name: _________________</div>
+                </p>
+                <p class="signature-text">
+                    Under Security (Security)
+                </p>
+                <p class="signature-text">
+                    Tel. No. 23093763
+                </p>
+            </div>
+
+            <div class="page-break-before">
+                <div class="copy-section">
+                    <div class="copy-title">
+                        Copy to:
+                    </div>
+                    <p>
+                        CMD,
+                        <span class="dynamic-fill">
+                            ${vendorNames}
+                        </span>
+                    </p>
+                    <p>
+                        It is requested that all provisions of jammer
+                        policy of GoI may be strictly followed while
+                        deploying the jammers. Copy of letter from
+                        <span class="dynamic-fill">
+                            ${orgName}
+                        </span>,
+                        referred at Para-1, enclosed. It should be
+                        ensured that in areas where 5G roll out is
+                        complete, only jammers upgraded to handle
+                        upto 5G should be deployed. Also, compliance by
+                        <span class="dynamic-fill">
+                            ${orgName}
+                        </span>
+                        with the condition at para 3 above may be
+                        verified before deployment of jammers.
+                    </p>
+                </div>
+
+                <div class="noo-section">
+                    <div class="noo-title">
+                        N.O.O
+                    </div>
+                    <div class="noo-item">
+                        1.<div class="designation" style="margin-top:3px;">Name: _________________</div> Director, SPG.
+                    </div>
+                    <div class="noo-item">
+                        2. <div class="designation" style="margin-top:3px;">Name: _________________</div> [Special/Additional] Director, IB
+                    </div>
+                    <div class="noo-item">
+                        alongwith a copy of the letter as mentioned
+                        in Para-1 above.
+                    </div>
+                    <div class="noo-final">
+                        <div>
+                            <div class="designation" style="margin-top:3px;">Name: _________________</div>
+                        </div>
+                        <div>
+                            Under Security (Security)
+                        </div>
+                        <div>
+                            Tel. No. 23093763
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+}
 /* =========================================================
    PREVIEW APPLICATION PDF
    ========================================================= */
