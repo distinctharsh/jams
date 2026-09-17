@@ -77,52 +77,46 @@ ob_start();
 </style>
 
 <section class="stats-grid">
-    <?php 
-    $hasHigherRole = $hasRole([2, 3, 4, 5, 6, 7, 8, 9]); 
-    ?>
-
-    <?php if ($hasHigherRole): ?>
-        <div class="stat-card total">
-            <div class="stat-icon"><i class="fas fa-calendar-check"></i></div>
-            <div class="stat-content">
-                <span class="stat-title">Total Jammer Request</span>
-                <h2><?= esc($total_jammer_requests ?? 0) ?></h2>
-            </div>
+    <div class="stat-card total">
+        <div class="stat-icon"><i class="fas fa-calendar-check"></i></div>
+        <div class="stat-content">
+            <span class="stat-title">Total Jammer Request</span>
+            <h2><?= esc($total_jammer_requests ?? 0) ?></h2>
         </div>
+    </div>
 
-        <div class="stat-card pending">
-            <div class="stat-icon"><i class="fas fa-clock"></i></div>
-            <div class="stat-content">
-                <span class="stat-title">Approval Pending</span>
-                <h2><?= esc($approval_pending_cnt ?? 0) ?></h2>
-            </div>
+    <div class="stat-card pending">
+        <div class="stat-icon"><i class="fas fa-clock"></i></div>
+        <div class="stat-content">
+            <span class="stat-title">Approval Pending</span>
+            <h2><?= esc($approval_pending_cnt ?? 0) ?></h2>
         </div>
+    </div>
 
-        <div class="stat-card completed">
-            <div class="stat-icon"><i class="fas fa-check-circle"></i></div>
-            <div class="stat-content">
-                <span class="stat-title">Completed</span>
-                <h2><?= esc($completed_cnt ?? 0) ?></h2>
-            </div>
+    <div class="stat-card completed">
+        <div class="stat-icon"><i class="fas fa-check-circle"></i></div>
+        <div class="stat-content">
+            <span class="stat-title">Completed</span>
+            <h2><?= esc($completed_cnt ?? 0) ?></h2>
         </div>
+    </div>
 
-        <div class="stat-card flagged">
-            <div class="stat-icon"><i class="fas fa-flag"></i></div>
-            <div class="stat-content">
-                <span class="stat-title">Not Approval</span>
-                <h2><?= esc($not_approval_cnt ?? 0) ?></h2>
-            </div>
+    <div class="stat-card flagged">
+        <div class="stat-icon"><i class="fas fa-flag"></i></div>
+        <div class="stat-content">
+            <span class="stat-title">Not Approval</span>
+            <h2><?= esc($not_approval_cnt ?? 0) ?></h2>
         </div>
-    <?php endif; ?>
+    </div>
 
     <?php if ($hasRole([1])): ?>
-        <div class="stat-card filled-by-me">
-            <div class="stat-icon"><i class="fas fa-file-signature"></i></div>
-            <div class="stat-content">
-                <span class="stat-title">Request filled by Me</span>
-                <h2><?= esc($request_filled_by_me_cnt ?? 0) ?></h2>
-            </div>
+    <div class="stat-card filled-by-me">
+        <div class="stat-icon"><i class="fas fa-file-signature"></i></div>
+        <div class="stat-content">
+            <span class="stat-title">Request filled by Me</span>
+            <h2><?= esc($request_filled_by_me_cnt ?? 0) ?></h2>
         </div>
+    </div>
     <?php endif; ?>
 
     <div class="stat-card assigned-to-me">
@@ -155,7 +149,7 @@ ob_start();
                             <th class="px-5 py-3.5 text-left font-semibold uppercase tracking-wider text-xs">Exam Name</th>
                             <th class="px-5 py-3.5 text-left font-semibold uppercase tracking-wider text-xs">Exam Date</th>
                             <th class="px-5 py-3.5 text-left font-semibold uppercase tracking-wider text-xs">Status</th>
-                            <th class="px-5 py-3.5 text-left font-semibold uppercase tracking-wider text-xs">Center List Ready</th>
+                            <th class="px-5 py-3">CENTER LIST READY</th>
                             <th class="px-5 py-3.5 text-right pr-6 font-semibold uppercase tracking-wider text-xs">Actions</th>
                         </tr>
                     </thead>
@@ -225,13 +219,13 @@ ob_start();
                                     </td>
 
                                     <td class="px-5 py-4 text-left">
-                                        <?php if (!empty($request['centre_list_ready']) && $request['centre_list_ready'] == 1): ?>
-                                            <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold bg-green-100 text-green-800 border border-green-300">
-                                                <i class="fas fa-check-circle text-green-600"></i> Yes
+                                        <?php if (!empty($request['center_list_ready']) && $request['center_list_ready'] == 1): ?>
+                                            <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold bg-green-100 text-green-800">
+                                                <i class="fas fa-check-circle"></i> Yes
                                             </span>
                                         <?php else: ?>
-                                            <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold bg-red-100 text-red-800 border border-red-300">
-                                                <i class="fas fa-times-circle text-red-600"></i> No
+                                            <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold bg-red-100 text-red-800">
+                                                <i class="fas fa-times-circle"></i> No
                                             </span>
                                         <?php endif; ?>
                                     </td>
