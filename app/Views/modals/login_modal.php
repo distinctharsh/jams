@@ -316,7 +316,7 @@
                                 style="color:#1e4d7b;">
                                 Login to JAMS
                             </h2>
-                            <p class="text-center text-muted mb-4">
+                            <p class="text-center text-muted mb-4" id="modalSubTitle">
                                 Welcome Back
                             </p>
                             <form id="loginForm">
@@ -412,6 +412,43 @@
                                     </a>
                                 </div>
                             </form>
+
+                            <!-- OTP VERIFICATION FORM -->
+                            <form id="otpForm" style="display: none;">
+                                <?= csrf_field() ?>
+                                <div class="mb-4">
+                                    <label for="login_otp" class="form-label fw-semibold">
+                                        Enter Security OTP
+                                    </label>
+                                    <div class="input-group">
+                                        <span class="input-group-text">
+                                            <i class="bi bi-key-fill"></i>
+                                        </span>
+                                        <input type="text"
+                                               class="form-control login-input text-center fw-bold fs-5"
+                                               id="login_otp"
+                                               name="otp"
+                                               placeholder="6-Digit OTP"
+                                               maxlength="6"
+                                               required>
+                                    </div>
+                                    <small class="text-muted mt-1 d-block">
+                                        OTP sent to your registered official email. Valid for 10 minutes.
+                                    </small>
+                                </div>
+                                <div class="d-grid mt-4">
+                                    <button type="submit" class="btn login-submit" id="verifyOtpBtn">
+                                        <i class="bi bi-shield-check me-2"></i>
+                                        Verify OTP & Continue
+                                    </button>
+                                </div>
+                                <div class="text-center mt-3">
+                                    <button type="button" class="btn btn-link text-decoration-none p-0" id="backToLoginBtn">
+                                        <i class="bi bi-arrow-left me-1"></i> Back to Login
+                                    </button>
+                                </div>
+                            </form>
+
                         </div>
                     </div>
                 </div>
@@ -419,3 +456,81 @@
         </div>
     </div>
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const loginForm = document.getElementById('loginForm');
+    const otpForm = document.getElementById('otpForm');
+    const modalSubTitle = document.getElementById('modalSubTitle');
+    const backToLoginBtn = document.getElementById('backToLoginBtn');
+
+    loginForm.addEventListener('submit', function (e) {
+        e.preventDefault();
+        
+        let formData = new FormData(loginForm);
+
+        fetch('<?= base_url('login') ?>', {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // If OTP is required by server response
+                if (data.step === 'otp_required') {
+                    loginForm.style.display = 'none';
+                    otpForm.style.display = 'block';
+                    if (modalSubTitle) modalSubTitle.innerText = 'Verify Email OTP';
+                } else if (data.redirect) {
+                    window.location.href = data.redirect;
+                }
+            } else {
+                alert(data.message || 'Login failed.');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('An error occurred during request.');
+        });
+    });
+
+    // Handle OTP AJAX Submit
+    otpForm.addEventListener('submit', function (e) {
+        e.preventDefault();
+
+        let formData = new FormData(otpForm);
+
+        fetch('<?= base_url('login/verifyOtp') ?>', {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success && data.redirect) {
+                window.location.href = data.redirect;
+            } else {
+                alert(data.message || 'OTP Verification failed.');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('An error occurred during verification.');
+        });
+    });
+
+    // Back to main login view
+    if (backToLoginBtn) {
+        backToLoginBtn.addEventListener('click', function () {
+            otpForm.style.display = 'none';
+            loginForm.style.display = 'block';
+            if (modalSubTitle) modalSubTitle.innerText = 'Welcome Back';
+        });
+    }
+});
+</script>

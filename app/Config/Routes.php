@@ -15,6 +15,7 @@ $routes->post(
     'login-crypto-config',
     'LoginController::cryptoConfig'
 );
+$routes->post('verify-otp', 'LoginController::verifyOtp');
 $routes->get(
     'logout',
     'LoginController::logout'

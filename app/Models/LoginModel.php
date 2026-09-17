@@ -13,7 +13,10 @@ class LoginModel extends Model
         'name',
         'email',
         'hash',
-        'password_reset_req'
+        'password_reset_req',
+        'mfa_required',
+        'login_otp',
+        'otp_expires_at'
     ];
 
     public function findUserByEmail(string $email): ?array
@@ -54,6 +57,42 @@ class LoginModel extends Model
 
         } catch (\Throwable $e) {
             log_message('error', 'Error in findUserByEmail: ' . $e->getMessage());
+            return null;
+        }
+    }
+
+    public function findUserByIdWithRoles(int $id): ?array
+    {
+        try {
+            if ($id <= 0) return null;
+
+            return $this->db
+                ->table('user')
+                ->select('
+                    user.*,
+                    GROUP_CONCAT(
+                        DISTINCT mas_role.id
+                        ORDER BY mas_role.id
+                        SEPARATOR ", "
+                    ) AS role_ids
+                ')
+                ->join(
+                    'user_role_mapping',
+                    'user_role_mapping.user_id = user.id AND user_role_mapping.isactive = 1',
+                    'left'
+                )
+                ->join(
+                    'mas_role',
+                    'mas_role.id = user_role_mapping.role_id',
+                    'left'
+                )
+                ->where('user.id', $id)
+                ->groupBy('user.id')
+                ->get()
+                ->getRowArray() ?: null;
+
+        } catch (\Throwable $e) {
+            log_message('error', 'Error in findUserByIdWithRoles: ' . $e->getMessage());
             return null;
         }
     }

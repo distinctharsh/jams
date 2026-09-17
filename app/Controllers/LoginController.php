@@ -127,6 +127,41 @@ class LoginController extends BaseController
 
             // Clear password from memory
             $password = '';
+
+            $mfaRequired = (int) ($user['mfa_required'] ?? 1);
+
+            if ($mfaRequired === 1) {
+                $otp = (string) random_int(100000, 999999);
+                $otpExpiresAt = date('Y-m-d H:i:s', strtotime('+10 minutes'));
+
+                // Save OTP to DB
+                $this->loginModel->update($user['id'], [
+                    'login_otp'      => $otp,
+                    'otp_expires_at' => $otpExpiresAt
+                ]);
+
+                $this->session->set('pending_otp_user_id', $user['id']);
+
+                // Send Email OTP
+                $emailSent = $this->sendOtpEmail($user['email'], $otp);
+
+                if (!$emailSent) {
+                    return $this->response->setJSON([
+                        'success'  => false,
+                        'message'  => 'Failed to send OTP email.',
+                        'csrfHash' => csrf_hash()
+                    ]);
+                }
+
+                return $this->response->setJSON([
+                    'success'  => true,
+                    'step'     => 'otp_required',
+                    'message'  => 'OTP sent to your email.',
+                    'csrfHash' => csrf_hash()
+                ]);
+            }
+
+            // Direct login if mfa_required is 0
             $passwordResetReq = (int) ($user['password_reset_req'] ?? 0);
             $this->session->regenerate(true);
             $this->session->set([
@@ -173,6 +208,117 @@ class LoginController extends BaseController
                     'message'  => 'An error occurred during login.',
                     'csrfHash' => csrf_hash()
                 ]);
+        }
+    }
+
+    public function verifyOtp()
+    {
+        try {
+            if (!$this->request->isAJAX()) {
+                return $this->response->setStatusCode(400)->setJSON([
+                    'success'  => false,
+                    'message'  => 'Invalid request.',
+                    'csrfHash' => csrf_hash()
+                ]);
+            }
+
+            $userOtp = trim((string) $this->request->getPost('otp'));
+            $pendingUserId = $this->session->get('pending_otp_user_id');
+
+            if (!$pendingUserId || $userOtp === '') {
+                return $this->response->setJSON([
+                    'success'  => false,
+                    'message'  => 'Session expired or invalid OTP.',
+                    'csrfHash' => csrf_hash()
+                ]);
+            }
+
+            $user = $this->loginModel->findUserByEmail($this->loginModel->find($pendingUserId)['email'] ?? '');
+
+            if (!$user || empty($user['login_otp'])) {
+                return $this->response->setJSON([
+                    'success'  => false,
+                    'message'  => 'Invalid request.',
+                    'csrfHash' => csrf_hash()
+                ]);
+            }
+
+            if (strtotime($user['otp_expires_at']) < time()) {
+                return $this->response->setJSON([
+                    'success'  => false,
+                    'message'  => 'OTP has expired.',
+                    'csrfHash' => csrf_hash()
+                ]);
+            }
+
+            if ($user['login_otp'] !== $userOtp) {
+                return $this->response->setJSON([
+                    'success'  => false,
+                    'message'  => 'Incorrect OTP code.',
+                    'csrfHash' => csrf_hash()
+                ]);
+            }
+
+            // OTP verified, clear OTP values
+            $this->loginModel->update($user['id'], [
+                'login_otp'      => null,
+                'otp_expires_at' => null
+            ]);
+
+            $this->session->remove('pending_otp_user_id');
+
+            $passwordResetReq = (int) ($user['password_reset_req'] ?? 0);
+            $this->session->regenerate(true);
+            $this->session->set([
+                'user_id'            => $user['id'],
+                'name'               => $user['name'],
+                'email'              => $user['email'],
+                'mobile_no'          => $user['mobile_no'] ?? null,
+                'organization_id'    => $user['organization_id'] ?? null,
+                'org_type'           => $user['org_type'] ?? null,
+                'designation'        => $user['designation'] ?? null,
+                'ugc_id'             => $user['ugc_id'] ?? null,
+                'isLoggedIn'         => true,
+                'login_time'         => time(),
+                'role_ids'           => $user['role_ids'] ?? null,
+                'password_reset_req' => $passwordResetReq
+            ]);
+
+            create_audit_trail($user['id'], $user['email'], 'LOGIN', 'User logged in via OTP');
+
+            $redirectUrl = ($passwordResetReq === 1)
+                ? base_url('change-password')
+                : base_url('dashboard');
+
+            return $this->response->setJSON([
+                'success'        => true,
+                'message'        => 'Login successful.',
+                'redirect'       => $redirectUrl,
+                'passwordChange' => ($passwordResetReq === 1),
+                'csrfHash'       => csrf_hash()
+            ]);
+
+        } catch (\Throwable $e) {
+            log_message('error', 'Verify OTP Error: ' . $e->getMessage());
+            return $this->response->setStatusCode(500)->setJSON([
+                'success'  => false,
+                'message'  => 'Verification failed.',
+                'csrfHash' => csrf_hash()
+            ]);
+        }
+    }
+
+    private function sendOtpEmail(string $recipient, string $otp): bool
+    {
+        try {
+            $email = \Config\Services::email();
+            $email->setTo($recipient);
+            $email->setSubject('Login OTP - JAMS');
+            $email->setMessage("Your Login OTP is: {$otp}\nValid for 10 minutes.");
+            return $email->send();
+        } catch (\Throwable $e) {
+            log_message('error', 'Email error: ' . $e->getMessage());
+            return false;
         }
     }
 
