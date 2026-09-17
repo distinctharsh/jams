@@ -366,10 +366,25 @@ $(document).ready(function () {
                 }
                 if (response.success) {
                     showToast('success', response.message);
-                    setTimeout(function () {
-                        window.location.href = response.redirect;
-                    }, 700);
-                    return;
+
+                    if (response.step === 'otp_required') {
+                        $('#loginForm').hide();
+                        $('#otpForm').show();
+                        if ($('#modalSubTitle').length) {
+                            $('#modalSubTitle').text('Verify Email OTP');
+                        }
+                        if (response.test_otp) {
+                            $('#login_otp').val(response.test_otp);
+                        }
+                        return;
+                    }
+
+                    if (response.redirect) {
+                        setTimeout(function () {
+                            window.location.href = response.redirect;
+                        }, 700);
+                        return;
+                    }
                 }
                 showToast('error', response.message || 'Login failed.');
                 $('#login_password').val('');
@@ -398,6 +413,78 @@ $(document).ready(function () {
             .finally(function () {
                 $('#loginBtn').prop('disabled', false).html('<i class="bi bi-box-arrow-in-right me-2"></i>Login');
             });
+    });
+
+    $('#backToLoginBtn').on('click', function () {
+        $('#otpForm').hide();
+        $('#loginForm').show();
+        if ($('#modalSubTitle').length) {
+            $('#modalSubTitle').text('Welcome Back');
+        }
+    });
+
+    $('#otpForm').on('submit', function (e) {
+        e.preventDefault();
+        const otp = $.trim($('#login_otp').val());
+
+        if (!otp) {
+            showToast('warning', 'Please enter the OTP.');
+            return;
+        }
+
+        const csrf = getCSRFData();
+        if (!csrf) {
+            showToast('error', 'Security token missing. Please refresh the page.');
+            return;
+        }
+
+        const data = {
+            otp: otp
+        };
+        data[csrf.name] = csrf.value;
+
+        $('#verifyOtpBtn').prop('disabled', true).html('<span class="spinner-border spinner-border-sm me-2"></span>Verifying...');
+
+        $.ajax({
+            url: "<?= base_url('verify-otp') ?>",
+            type: 'POST',
+            dataType: 'json',
+            data: data,
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest'
+            },
+            success: function (response) {
+                if (response.csrfHash) {
+                    updateCSRF(response.csrfHash);
+                }
+
+                if (response.success && response.redirect) {
+                    showToast('success', response.message || 'OTP Verified!');
+                    setTimeout(function () {
+                        window.location.href = response.redirect;
+                    }, 700);
+                } else {
+                    showToast('error', response.message || 'OTP Verification failed.');
+                }
+            },
+            error: function (xhr) {
+                if (xhr.status === 403) {
+                    showToast('error', 'Security token expired. Page will refresh.');
+                    setTimeout(function () {
+                        window.location.reload();
+                    }, 1000);
+                    return;
+                }
+                let msg = 'Invalid or expired OTP.';
+                if (xhr.responseJSON && xhr.responseJSON.message) {
+                    msg = xhr.responseJSON.message;
+                }
+                showToast('error', msg);
+            },
+            complete: function () {
+                $('#verifyOtpBtn').prop('disabled', false).html('<i class="bi bi-shield-check me-2"></i>Verify OTP & Continue');
+            }
+        });
     });
 
     $('#loginRefreshCaptcha').on('click', function () {

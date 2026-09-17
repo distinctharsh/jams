@@ -142,6 +142,7 @@ class LoginController extends BaseController
 
                 $this->session->set('pending_otp_user_id', $user['id']);
 
+                /*
                 // Send Email OTP
                 $emailSent = $this->sendOtpEmail($user['email'], $otp);
 
@@ -152,11 +153,13 @@ class LoginController extends BaseController
                         'csrfHash' => csrf_hash()
                     ]);
                 }
+                */
 
                 return $this->response->setJSON([
                     'success'  => true,
                     'step'     => 'otp_required',
-                    'message'  => 'OTP sent to your email.',
+                    'message'  => 'OTP Generated successfully.',
+                    'test_otp' => $otp,
                     'csrfHash' => csrf_hash()
                 ]);
             }
