@@ -916,14 +916,17 @@ public function toggleLockUser($id = null)
         $remarks    = $this->request->getPost('remarks');
         $approvedBy = session()->get('user_id') ?? 1;
         $regModel = new \App\Models\RegistrationModel();
+        $registration = $regModel->find($regId);
+        $userEmail    = $registration['email'] ?? '';
 
         if ($action == 4) { 
             $plainPassword = get_default_password(); 
             $passwordHash  = get_default_password_hash();
-            $regModel->approveRegistrationSp($regId, $approvedBy, $action, $remarks,$passwordHash);
+            $regModel->approveRegistrationSp($regId, $approvedBy, $action, $remarks, $passwordHash);
             return $this->response->setJSON([
                 'success'  => true,
                 'is_approved' => true,
+                'email'       => $userEmail,
                 'password'    => $plainPassword,
                 'message'     => 'Application Approved Successfully!',
                 'csrfHash'    => csrf_hash()
