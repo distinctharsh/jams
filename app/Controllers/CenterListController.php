@@ -3,7 +3,6 @@
 namespace App\Controllers;
 
 use App\Models\UserModel;
-use App\Models\RequestModel;
 use CodeIgniter\Database\Config;
 
 // PhpSpreadsheet Imports
@@ -27,42 +26,82 @@ class CenterListController extends BaseController
     public function index()
     {
         if (!session()->get('isLoggedIn')) {
-            return redirect()->to(base_url('/'));
+            return redirect()->to(base_url('login'));
         }
 
         $currentUserId = (int) session()->get('user_id');
-        $applications = $this->db->table('application')
-            ->select('id, app_no, contact_person, organisation')
-            ->where('user_id', $currentUserId)
-            ->get()->getResultArray();
 
-        $data = [
-            'user_id'      => $currentUserId,
-            'username'     => session()->get('username'),
-            'full_name'    => session()->get('full_name'),
-            'email'        => session()->get('email'),
-            'applications' => $applications ?? []
-        ];
+        $builder = $this->db->table('application a');
+        $builder->select('
+            a.id, 
+            a.app_no, 
+            a.created_at, 
+            u.name as uploaded_by_name, 
+            act.name as status_name
+        ');
+        $builder->join('user u', 'u.id = a.user_id', 'left');
+        $builder->join('mas_application_action act', 'act.id = a.current_status', 'left');
+        $builder->where('a.user_id', $currentUserId);
+        $builder->where('a.centre_list_ready', 1);
+        $builder->where('a.isactive', 1);
+        $builder->orderBy('a.id', 'DESC');
+
+        $data['center_lists'] = $builder->get()->getResultArray();
 
         return view('pages/center-list-upload', $data);
     }
-
     /**
-     * Sample Excel Download Logic (Application No Removed)
+     * Standard Excel Format Download Logic with State Dropdown
      */
     public function downloadFormat()
     {
         try {
             $spreadsheet = new Spreadsheet();
-            $sheet       = $spreadsheet->getActiveSheet();
+
+            $statesList = $this->db->table('state')
+                ->select('id, state_name')
+                ->orderBy('state_name', 'ASC')
+                ->get()->getResultArray();
+
+            $citiesList = $this->db->table('city')
+                ->select('city_name')
+                ->where('status', 1)
+                ->orderBy('city_name', 'ASC')
+                ->get()->getResultArray();
+
+            $statesArray = array_column($statesList, 'state_name');
+            $citiesArray = array_column($citiesList, 'city_name');
+
+            $lookupSheet = $spreadsheet->createSheet();
+            $lookupSheet->setTitle('LookupData');
+
+            $stateRowCount = count($statesArray);
+            for ($i = 0; $i < $stateRowCount; $i++) {
+                $lookupSheet->setCellValue('A' . ($i + 1), $statesArray[$i]);
+            }
+
+            $cityRowCount = count($citiesArray);
+            for ($j = 0; $j < $cityRowCount; $j++) {
+                $lookupSheet->setCellValue('B' . ($j + 1), $citiesArray[$j]);
+            }
+
+            $lookupSheet->setSheetState(\PhpOffice\PhpSpreadsheet\Worksheet\Worksheet::SHEETSTATE_HIDDEN);
+
+            $spreadsheet->setActiveSheetIndex(0);
+            $sheet = $spreadsheet->getActiveSheet();
             $sheet->setTitle('CenterUploadFormat');
 
             $headers = [
-                'A1' => 'Contact Person Name*',
-                'B1' => 'Email*',
-                'C1' => 'Phone*',
-                'D1' => 'Organisation*',
-                'E1' => 'Organisation Type*'
+                'A1' => 'Exam Name*',
+                'B1' => 'Exam Date (DD/MM/YYYY)*',
+                'C1' => 'Center Name*',
+                'D1' => 'Center Address*',
+                'E1' => 'District/City*',
+                'F1' => 'State*',
+                'G1' => 'Coordinator Name*',
+                'H1' => 'Coordinator Mobile*',
+                'I1' => 'Latitude (Optional)',
+                'J1' => 'Longitude (Optional)'
             ];
 
             foreach ($headers as $cell => $value) {
@@ -72,18 +111,45 @@ class CenterListController extends BaseController
                 $sheet->getStyle($cell)->getFont()->getColor()->setARGB('FFFFFFFF');
             }
 
-            // Sample Dummy Data
-            $sheet->setCellValue('A2', 'Harsh Singh');
-            $sheet->setCellValue('B2', 'harsh@example.com');
-            $sheet->setCellValue('C2', '9876543210');
-            $sheet->setCellValue('D2', 'ABC Education Board');
-            $sheet->setCellValue('E2', 'Autonomous');
+            $stateFormula = '=LookupData!$A$1:$A$' . max($stateRowCount, 1);
+            $cityFormula  = '=LookupData!$B$1:$B$' . max($cityRowCount, 1);
 
-            foreach (range('A', 'E') as $col) {
+            for ($row = 2; $row <= 500; $row++) {
+                if (!empty($citiesArray)) {
+                    $cityValidation = $sheet->getCell('E' . $row)->getDataValidation();
+                    $cityValidation->setType(\PhpOffice\PhpSpreadsheet\Cell\DataValidation::TYPE_LIST);
+                    $cityValidation->setErrorStyle(\PhpOffice\PhpSpreadsheet\Cell\DataValidation::STYLE_STOP);
+                    $cityValidation->setAllowBlank(true);
+                    $cityValidation->setShowDropDown(true);
+                    $cityValidation->setFormula1($cityFormula);
+                }
+
+                if (!empty($statesArray)) {
+                    $stateValidation = $sheet->getCell('F' . $row)->getDataValidation();
+                    $stateValidation->setType(\PhpOffice\PhpSpreadsheet\Cell\DataValidation::TYPE_LIST);
+                    $stateValidation->setErrorStyle(\PhpOffice\PhpSpreadsheet\Cell\DataValidation::STYLE_STOP);
+                    $stateValidation->setAllowBlank(true);
+                    $stateValidation->setShowDropDown(true);
+                    $stateValidation->setFormula1($stateFormula);
+                }
+            }
+
+            $sheet->setCellValue('A2', 'Combined Recruitment Exam 2026');
+            $sheet->setCellValue('B2', '15/10/2026');
+            $sheet->setCellValue('C2', 'Govt Model Senior Secondary School');
+            $sheet->setCellValue('D2', 'Sector 10, Main Road');
+            $sheet->setCellValue('E2', $citiesArray[0] ?? 'Central Delhi');
+            $sheet->setCellValue('F2', $statesArray[0] ?? 'Delhi');
+            $sheet->setCellValue('G2', 'Harsh Singh');
+            $sheet->setCellValue('H2', '9876543210');
+            $sheet->setCellValue('I2', '28.6139');
+            $sheet->setCellValue('J2', '77.2090');
+
+            foreach (range('A', 'J') as $col) {
                 $sheet->getColumnDimension($col)->setAutoSize(true);
             }
 
-            $filename = 'Bulk_Application_Format.xlsx';
+            $filename = 'Center_List_Upload_Format.xlsx';
             header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
             header('Content-Disposition: attachment;filename="' . $filename . '"');
             header('Cache-Control: max-age=0');
@@ -99,7 +165,7 @@ class CenterListController extends BaseController
     }
 
     /**
-     * Bulk Excel Upload - Uses $appId from Form/Backend
+     * Excel File Bulk Upload & Mapping Logic with Lat/Long & City-State Validation
      */
     public function upload()
     {
@@ -107,8 +173,8 @@ class CenterListController extends BaseController
             return $this->response->setJSON(['success' => false, 'message' => 'Unauthorized access']);
         }
 
-        $appId = $this->request->getPost('app_id');
-        $file  = $this->request->getFile('excel_file');
+        $currentUserId = (int) session()->get('user_id');
+        $file          = $this->request->getFile('excel_file');
 
         if (!$file || !$file->isValid()) {
             return $this->response->setJSON([
@@ -118,58 +184,234 @@ class CenterListController extends BaseController
             ]);
         }
 
+        $states = $this->db->table('state')->select('id, state_name')->get()->getResultArray();
+        $stateMap = [];
+        foreach ($states as $s) {
+            $stateMap[strtolower(trim($s['state_name']))] = $s['id'];
+        }
+
+        $cities = $this->db->table('city')->select('state_id, city_name')->where('status', 1)->get()->getResultArray();
+        $cityMap = [];
+        foreach ($cities as $c) {
+            $cityMap[strtolower(trim($c['city_name']))][] = $c['state_id'];
+        }
+
+        $user = $this->db->table('user')->select('organization_id')->where('id', $currentUserId)->get()->getRowArray();
+        $organizationId = $user['organization_id'] ?? null;
+
+        try {
+            try {
+                $this->db->query("CALL generate_application_no(?, @app_no)", [$organizationId ?? 0]);
+                $result = $this->db->query("SELECT @app_no AS app_no");
+                $row = $result->getRow();
+
+                if (!$row || empty($row->app_no)) {
+                    throw new \RuntimeException('Application number stored procedure failed.');
+                }
+                $appNo = $row->app_no;
+            } catch (\Exception $e) {
+                $appNo = $this->generateApplicationNumber($organizationId);
+            }
+        } catch (\Throwable $e) {
+            log_message('error', 'Excel Upload App No Generation Error: ' . $e->getMessage());
+            return $this->response->setJSON([
+                'success'  => false,
+                'message'  => 'Failed to generate application number.',
+                'csrfHash' => csrf_hash()
+            ]);
+        }
+
         try {
             $spreadsheet = IOFactory::load($file->getTempName());
             $sheet       = $spreadsheet->getActiveSheet();
             $highestRow  = $sheet->getHighestRow();
 
-            $updatedCount = 0;
+            $validationErrors = [];
 
             for ($row = 2; $row <= $highestRow; $row++) {
-                $contactName  = trim($sheet->getCell('A' . $row)->getValue() ?? '');
-                $email        = trim($sheet->getCell('B' . $row)->getValue() ?? '');
-                $phone        = trim($sheet->getCell('C' . $row)->getValue() ?? '');
-                $organisation = trim($sheet->getCell('D' . $row)->getValue() ?? '');
-                $orgType      = trim($sheet->getCell('E' . $row)->getValue() ?? '');
+                $centreName = trim($sheet->getCell('C' . $row)->getValue() ?? '');
+                $examName   = trim($sheet->getCell('A' . $row)->getValue() ?? '');
+                $district   = trim($sheet->getCell('E' . $row)->getValue() ?? '');
+                $state      = trim($sheet->getCell('F' . $row)->getValue() ?? '');
 
-                if (empty($contactName) && empty($email)) {
+                if (empty($centreName) && empty($examName)) {
                     continue;
                 }
 
-                $updateData = [
-                    'contact_person'    => $contactName,
-                    'email'             => $email,
-                    'phone'             => $phone,
-                    'organisation'      => $organisation,
-                    'organisation_type' => $orgType,
-                ];
+                $stateKey = strtolower($state);
+                $cityKey  = strtolower($district);
 
-                if ($appId) {
-                    $this->db->table('application')
-                        ->where('id', $appId)
-                        ->update($updateData);
-                } else {
-                    $currentUserId = (int) session()->get('user_id');
-                    $this->db->table('application')
-                        ->where('user_id', $currentUserId)
-                        ->update($updateData);
+                if (!empty($state) && !isset($stateMap[$stateKey])) {
+                    $validationErrors[] = "Row {$row}: Invalid State '{$state}'.";
+                    continue;
                 }
 
-                $updatedCount++;
+                if (!empty($district) && !empty($state)) {
+                    $selectedStateId = $stateMap[$stateKey] ?? null;
+                    $validStateIdsForCity = $cityMap[$cityKey] ?? [];
+
+                    if (!in_array($selectedStateId, $validStateIdsForCity)) {
+                        $validationErrors[] = "Row {$row}: District/City '{$district}' does not belong to State '{$state}'.";
+                    }
+                }
+            }
+
+            if (!empty($validationErrors)) {
+                return $this->response->setJSON([
+                    'success'  => false,
+                    'message'  => "Validation Failed:<br>" . implode("<br>", array_slice($validationErrors, 0, 5)) . (count($validationErrors) > 5 ? "<br>...and more." : ""),
+                    'csrfHash' => csrf_hash()
+                ]);
+            }
+
+            $this->db->transStart();
+
+            $this->db->table('application')->insert([
+                'app_no'            => $appNo,
+                'user_id'           => $currentUserId,
+                'current_status'    => 1,
+                'centre_list_ready' => 1,
+                'isactive'          => 1,
+                'created_at'        => date('Y-m-d H:i:s')
+            ]);
+            $appId = $this->db->insertID();
+
+            $insertedCentersCount = 0;
+
+            for ($row = 2; $row <= $highestRow; $row++) {
+                $examName    = trim($sheet->getCell('A' . $row)->getValue() ?? '');
+                $examDateRaw = trim($sheet->getCell('B' . $row)->getValue() ?? '');
+                $centreName  = trim($sheet->getCell('C' . $row)->getValue() ?? '');
+                $address     = trim($sheet->getCell('D' . $row)->getValue() ?? '');
+                $district    = trim($sheet->getCell('E' . $row)->getValue() ?? '');
+                $state       = trim($sheet->getCell('F' . $row)->getValue() ?? '');
+                $coordName   = trim($sheet->getCell('G' . $row)->getValue() ?? '');
+                $coordMobile = trim($sheet->getCell('H' . $row)->getValue() ?? '');
+                $latitude    = trim($sheet->getCell('I' . $row)->getValue() ?? '');
+                $longitude   = trim($sheet->getCell('J' . $row)->getValue() ?? '');
+
+                if (empty($centreName) && empty($examName)) {
+                    continue;
+                }
+
+                $examDate = null;
+                if (!empty($examDateRaw)) {
+                    if (is_numeric($examDateRaw)) {
+                        $examDate = \PhpOffice\PhpSpreadsheet\Shared\Date::excelToDateTimeObject($examDateRaw)->format('Y-m-d');
+                    } else {
+                        $dateObj = \DateTime::createFromFormat('d/m/Y', $examDateRaw);
+                        $examDate = $dateObj ? $dateObj->format('Y-m-d') : date('Y-m-d', strtotime($examDateRaw));
+                    }
+                }
+
+                $centreCoordinates = null;
+                if ($latitude !== '' || $longitude !== '') {
+                    $centreCoordinates = $latitude . ',' . $longitude;
+                }
+
+                if ($examName && $examDate) {
+                    $this->db->table('application_date_mapping')->insert([
+                        'app_id'    => $appId,
+                        'exam_name' => $examName,
+                        'exam_date' => $examDate
+                    ]);
+                }
+
+                $this->db->table('application_centre_mapping')->insert([
+                    'app_id'                => $appId,
+                    'centre_name'           => $centreName,
+                    'centre_address'        => $address,
+                    'state'                 => $state,
+                    'district'              => $district,
+                    'centre_coordinates'    => $centreCoordinates,
+                    'coorrdinator_name'     => $coordName,
+                    'coordinator_mobile_no' => $coordMobile
+                ]);
+
+                $insertedCentersCount++;
+            }
+
+            $this->db->table('application_history')->insert([
+                'app_id'       => $appId,
+                'status'       => 1,
+                'performed_by' => $currentUserId,
+                'remarks'      => 'Center list uploaded via Excel batch import.',
+                'created_at'   => date('Y-m-d H:i:s')
+            ]);
+
+            $this->db->transComplete();
+
+            if ($this->db->transStatus() === FALSE) {
+                return $this->response->setJSON([
+                    'success'  => false,
+                    'message'  => 'Database transaction failed during upload.',
+                    'csrfHash' => csrf_hash()
+                ]);
             }
 
             return $this->response->setJSON([
                 'success'  => true,
-                'message'  => "Data successfully updated for {$updatedCount} record(s)!",
+                'message'  => "Successfully imported {$insertedCentersCount} center records (App No: {$appNo})!",
                 'csrfHash' => csrf_hash()
             ]);
 
         } catch (\Exception $e) {
+            $this->db->transRollback();
             return $this->response->setJSON([
                 'success'  => false,
-                'message'  => 'Upload error: ' . $e->getMessage(),
+                'message'  => 'Upload Error: ' . $e->getMessage(),
                 'csrfHash' => csrf_hash()
             ]);
         }
+    }
+
+    /**
+     * Delete Record
+     */
+    public function delete($id)
+    {
+        if (!session()->get('isLoggedIn')) {
+            return $this->response->setJSON(['success' => false, 'message' => 'Unauthorized']);
+        }
+
+        $this->db->table('application')->where('id', $id)->delete();
+        $this->db->table('application_date_mapping')->where('app_id', $id)->delete();
+        $this->db->table('application_centre_mapping')->where('app_id', $id)->delete();
+
+        return $this->response->setJSON([
+            'success'  => true,
+            'message'  => 'Record deleted successfully!',
+            'csrfHash' => csrf_hash()
+        ]);
+    }
+
+    /**
+     * Generate application number manually (fallback)
+     */
+    private function generateApplicationNumber($organizationId)
+    {
+        $db = \Config\Database::connect();
+        $year = date('Y');
+        $month = date('m');
+        
+        try {
+            $org = $db->table('mas_organization')->where('id', $organizationId)->get()->getRow();
+            $orgCode = $org ? substr(preg_replace('/[^A-Za-z0-9]/', '', $org->org_name), 0, 5) : 'ORG';
+        } catch (\Exception $e) {
+            $orgCode = 'ORG';
+        }
+        
+        try {
+            $count = $db->table('application')
+                ->where('YEAR(created_at)', $year)
+                ->where('MONTH(created_at)', $month)
+                ->countAllResults();
+        } catch (\Exception $e) {
+            $count = 0;
+        }
+        
+        $sequence = str_pad($count + 1, 4, '0', STR_PAD_LEFT);
+        
+        return $orgCode . '/' . $year . $month . '/' . $sequence;
     }
 }

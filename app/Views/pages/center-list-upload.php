@@ -40,7 +40,7 @@ ob_start();
         <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
             <div class="flex items-center gap-3">
                 <div class="w-12 h-12 rounded-xl bg-blue-50 border border-blue-200 flex items-center justify-center shrink-0">
-                    <i class="fas fas fa-upload text-[#1e4d7b] text-xl"></i>
+                    <i class="fas fa-upload text-[#1e4d7b] text-xl"></i>
                 </div>
                 <div>
                     <h2 class="text-xl font-bold text-[#1e4d7b]">Upload Center Lists</h2>
@@ -77,12 +77,10 @@ ob_start();
                 <thead class="bg-[#1e4d7b] text-white">
                     <tr>
                         <th class="px-5 py-3.5 text-left w-16 font-semibold uppercase tracking-wider text-xs">S.No.</th>
-                        <th class="px-5 py-3.5 text-left font-semibold uppercase tracking-wider text-xs">Application No / Request</th>
-                        <th class="px-5 py-3.5 text-left font-semibold uppercase tracking-wider text-xs">File Name</th>
-                        <th class="px-5 py-3.5 text-left font-semibold uppercase tracking-wider text-xs">Uploaded By</th>
-                        <th class="px-5 py-3.5 text-left font-semibold uppercase tracking-wider text-xs">Uploaded At</th>
-                        <th class="px-5 py-3.5 text-left font-semibold uppercase tracking-wider text-xs">Status</th>
-                        <th class="px-5 py-3.5 text-left pr-6 font-semibold uppercase tracking-wider text-xs">Actions</th>
+                        <th class="px-5 py-3.5 text-left font-semibold uppercase tracking-wider text-xs">APPLICATION NO / REQUEST</th>
+                        <th class="px-5 py-3.5 text-left font-semibold uppercase tracking-wider text-xs">UPLOADED BY</th>
+                        <th class="px-5 py-3.5 text-left font-semibold uppercase tracking-wider text-xs">UPLOADED AT</th>
+                        <th class="px-5 py-3.5 text-left font-semibold uppercase tracking-wider text-xs">STATUS</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-slate-100 bg-white text-slate-700">
@@ -91,27 +89,12 @@ ob_start();
                             <tr class="hover:bg-slate-50/80 transition-colors duration-150">
                                 <td class="px-5 py-4 text-left font-bold text-[#1e4d7b]"><?= $index + 1 ?></td>
                                 <td class="px-5 py-4 font-bold text-left text-slate-800"><?= esc($item['app_no'] ?? 'N/A') ?></td>
-                                <td class="px-5 py-4 text-slate-600 font-medium text-left">
-                                    <span class="flex items-center gap-1.5 text-emerald-700 font-semibold">
-                                        <i class="fas fa-file-excel"></i> <?= esc($item['file_name']) ?>
-                                    </span>
-                                </td>
                                 <td class="px-5 py-4 text-slate-600 font-medium text-left"><?= esc($item['uploaded_by_name'] ?? 'System') ?></td>
                                 <td class="px-5 py-4 text-slate-500 text-xs text-left"><?= date('d-m-Y h:i A', strtotime($item['created_at'])) ?></td>
                                 <td class="px-5 py-4 text-left">
                                     <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg border-l-4 border-emerald-500 bg-emerald-50 text-emerald-700 font-semibold text-xs shadow-sm">
-                                        <i class="fas fa-check-circle"></i> Uploaded
+                                        <i class="fas fa-check-circle"></i> <?= esc($item['status_name'] ?? 'Pending') ?>
                                     </span>
-                                </td>
-                                <td class="px-5 py-4 text-left pr-6">
-                                    <div class="flex justify-left gap-2">
-                                        <a href="<?= base_url('center-lists/download/'.$item['id']) ?>" class="w-8 h-8 rounded-lg bg-blue-50 text-[#1e4d7b] hover:bg-blue-100 border border-blue-100 transition flex items-center justify-center" title="Download Excel">
-                                            <i class="fas fa-download text-xs"></i>
-                                        </a>
-                                        <button type="button" class="w-8 h-8 rounded-lg bg-red-50 text-red-600 hover:bg-red-100 border border-red-100 transition delete-center-list-btn flex items-center justify-center" data-id="<?= $item['id'] ?>" title="Delete">
-                                            <i class="fas fa-trash-can text-xs"></i>
-                                        </button>
-                                    </div>
                                 </td>
                             </tr>
                         <?php endforeach; ?>
@@ -135,8 +118,7 @@ $(document).ready(function() {
             "searching": true,
             "info": true,
             "responsive": true,
-            "autoWidth": false,
-            "columnDefs": [{ "orderable": false, "targets": [6] }]
+            "autoWidth": false
         });
     }
 
@@ -161,6 +143,7 @@ $(document).ready(function() {
         }
     }
 
+    // Upload Form Submission
     $('#directUploadForm').submit(function(e) {
         e.preventDefault();
         
