@@ -353,7 +353,7 @@ class CenterListController extends BaseController
                 'success'  => true,
                 'message'  => "Successfully imported {$insertedCentersCount} center records (App No: {$appNo})!",
                 'csrfHash' => csrf_hash()
-            ]);
+                            ]);
 
         } catch (\Exception $e) {
             $this->db->transRollback();
@@ -363,26 +363,6 @@ class CenterListController extends BaseController
                 'csrfHash' => csrf_hash()
             ]);
         }
-    }
-
-    /**
-     * Delete Record
-     */
-    public function delete($id)
-    {
-        if (!session()->get('isLoggedIn')) {
-            return $this->response->setJSON(['success' => false, 'message' => 'Unauthorized']);
-        }
-
-        $this->db->table('application')->where('id', $id)->delete();
-        $this->db->table('application_date_mapping')->where('app_id', $id)->delete();
-        $this->db->table('application_centre_mapping')->where('app_id', $id)->delete();
-
-        return $this->response->setJSON([
-            'success'  => true,
-            'message'  => 'Record deleted successfully!',
-            'csrfHash' => csrf_hash()
-        ]);
     }
 
     /**
