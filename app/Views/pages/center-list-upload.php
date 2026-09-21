@@ -81,6 +81,7 @@ ob_start();
                         <th class="px-5 py-3.5 text-left font-semibold uppercase tracking-wider text-xs">UPLOADED BY</th>
                         <th class="px-5 py-3.5 text-left font-semibold uppercase tracking-wider text-xs">UPLOADED AT</th>
                         <th class="px-5 py-3.5 text-left font-semibold uppercase tracking-wider text-xs">STATUS</th>
+                        <th class="px-5 py-3.5 text-right pr-6 font-semibold uppercase tracking-wider text-xs">Actions</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-slate-100 bg-white text-slate-700">
@@ -95,6 +96,15 @@ ob_start();
                                     <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg border-l-4 border-emerald-500 bg-emerald-50 text-emerald-700 font-semibold text-xs shadow-sm">
                                         <i class="fas fa-check-circle"></i> <?= esc($item['status_name'] ?? 'Pending') ?>
                                     </span>
+                                </td>
+                                <td class="px-5 py-4 text-right pr-6">
+                                    <div class="flex justify-end gap-2">
+                                        <button class="w-8 h-8 rounded-lg bg-blue-50 text-[#1e4d7b] hover:bg-blue-100 border border-blue-100 transition flex items-center justify-center" 
+                                                title="View" 
+                                                onclick="pageviewRequest(<?= $item['id'] ?>)">
+                                            <i class="fas fa-eye text-xs"></i>
+                                        </button>
+                                    </div>
                                 </td>
                             </tr>
                         <?php endforeach; ?>
@@ -176,6 +186,14 @@ $(document).ready(function() {
         });
     });
 });
+
+function pageviewRequest(requestId) {
+    if (requestId) {
+        window.location.href = '/request-view/' + requestId;
+    } else {
+        console.error('Request ID is required');
+    }
+}
 </script>
 
 <?php
