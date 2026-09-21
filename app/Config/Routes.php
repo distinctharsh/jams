@@ -166,3 +166,7 @@ $routes->get('audit-log', 'AuditController::auditLog');
 $routes->get('get-audit-actions', 'AuditController::getAuditActions');
 
 $routes->get('uploads/authorization/(:segment)', 'PdfController::viewPdf/$1');
+
+$routes->get('center-lists', 'CenterListController::index');
+$routes->get('center-lists/download-format', 'CenterListController::downloadFormat');
+$routes->post('center-lists/upload', 'CenterListController::upload');

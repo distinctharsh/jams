@@ -114,7 +114,7 @@
             <?php endif; ?>
 
             <?php if ($hasRole([1,2,3,4,5,6,7,9])): ?>
-                <a href="<?= base_url('requests') ?>" class="nav-item">
+                <a href="<?= base_url('center-lists') ?>" class="nav-item">
                     <i class="fas fa-upload"></i> 
                     <span>Upload Center Lists</span>
                 </a>
