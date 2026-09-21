@@ -46,19 +46,6 @@
     margin: 8px 12px;
 }
 
-/* --- Active Item Styling --- */
-.nav-item.active {
-    background-color: #1e4d7b !important;
-    color: #ffffff !important;
-    font-weight: 700 !important;
-    border-left: 4px solid #e58500 !important;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-
-.nav-item.active i {
-    color: #ffffff !important;
-}
-
 .gov-sidebar.collapsed .sidebar-top-bar {
     justify-content: center;
     padding: 10px 0;
@@ -94,12 +81,9 @@
             $hasRole = function (array $roles) use ($userRoles): bool {
                 return !empty(array_intersect($roles, $userRoles));
             };
-
-            // Current URL segment get karne ke liye helper
-            $currentUri = uri_string();
             ?>
 
-            <a href="<?= base_url('dashboard') ?>" class="nav-item <?= ($currentUri == 'dashboard' || $currentUri == '') ? 'active' : '' ?>">
+            <a href="<?= base_url('dashboard') ?>" class="nav-item">
                 <i class="fas fa-layer-group"></i> 
                 <span>Dashboard</span>
             </a>
@@ -107,14 +91,14 @@
             <hr class="dashboard-hr">
 
             <?php if ($hasRole([1])): ?>
-                <a href="<?= base_url('new-request') ?>" class="nav-item booking-btn <?= ($currentUri == 'new-request') ? 'active' : '' ?>">
+                <a href="<?= base_url('new-request') ?>" class="nav-item booking-btn">
                     <i class="fas fa-calendar-check"></i>
                     <span>New Jammer Request</span>
                 </a>
             <?php endif; ?>
 
             <?php if ($hasRole([1,2,3,4,5,6,7,9])): ?>
-                <a href="<?= base_url('requests') ?>" class="nav-item <?= (strpos($currentUri, 'requests') !== false) ? 'active' : '' ?>">
+                <a href="<?= base_url('requests') ?>" class="nav-item">
                     <i class="fas fa-clipboard-list"></i> 
                     <span>
                         Total Request 
@@ -130,14 +114,14 @@
             <?php endif; ?>
 
             <?php if ($hasRole([1,2,3,4,5,6,7,9])): ?>
-                <a href="<?= base_url('center-lists') ?>" class="nav-item <?= (strpos($currentUri, 'center-lists') !== false) ? 'active' : '' ?>">
+                <a href="<?= base_url('center-lists') ?>" class="nav-item">
                     <i class="fas fa-upload"></i> 
                     <span>Upload Center Lists</span>
                 </a>
             <?php endif; ?>
 
             <?php if ($hasRole([1,2,3,4,5,6,7,8,9])): ?>
-                <a href="<?= base_url('analytics') ?>" class="nav-item <?= ($currentUri == 'analytics') ? 'active' : '' ?>">
+                <a href="<?= base_url('analytics') ?>" class="nav-item">
                     <i class="fas fa-chart-simple"></i> 
                     <span>Reports</span>
                 </a>
@@ -146,19 +130,19 @@
             <?php if ($hasRole([9])): ?>
                 <div class="sidebar-category-header nav-label">System</div>
             <?php endif; ?>
-            <?php if ($hasRole([9])): ?><a href="<?= base_url('settings') ?>" class="nav-item <?= ($currentUri == 'settings') ? 'active' : '' ?>"><i class="fas fa-sliders"></i> <span>Settings</span></a><?php endif; ?>
-            <?php if ($hasRole([9])): ?><a href="<?= base_url('audit-log') ?>" class="nav-item <?= ($currentUri == 'audit-log') ? 'active' : '' ?>"><i class="fas fa-shield-halved"></i> <span>Audit Log</span></a><?php endif; ?>
-            <?php if ($hasRole([9])): ?><a href="<?= base_url('audit-trail') ?>" class="nav-item <?= ($currentUri == 'audit-trail') ? 'active' : '' ?>"><i class="fas fa-history"></i> <span>Audit Trail</span></a><?php endif; ?>
+            <?php if ($hasRole([9])): ?><a href="<?= base_url('settings') ?>" class="nav-item"><i class="fas fa-sliders"></i> <span>Settings</span></a><?php endif; ?>
+            <?php if ($hasRole([9])): ?><a href="<?= base_url('audit-log') ?>" class="nav-item"><i class="fas fa-shield-halved"></i> <span>Audit Log</span></a><?php endif; ?>
+            <?php if ($hasRole([9])): ?><a href="<?= base_url('audit-trail') ?>" class="nav-item"><i class="fas fa-history"></i> <span>Audit Trail</span></a><?php endif; ?>
 
             <?php if ($hasRole([4,9])): ?>
                 <div class="sidebar-category-header nav-label">Admin</div>
             <?php endif; ?>
-            <?php if ($hasRole([4,7,9])): ?><a href="<?= base_url('registrations') ?>" class="nav-item <?= ($currentUri == 'registrations') ? 'active' : '' ?>"><i class="fas fa-id-card"></i> <span>Pending Registration</span></a><?php endif; ?>
-            <?php if ($hasRole([4,9])): ?><a href="<?= base_url('users') ?>" class="nav-item <?= (strpos($currentUri, 'users') !== false) ? 'active' : '' ?>"><i class="fas fa-users"></i> <span>Users</span></a><?php endif; ?>
-            <?php if ($hasRole([4,9])): ?><a href="<?= base_url('organizations') ?>" class="nav-item <?= (strpos($currentUri, 'organizations') !== false) ? 'active' : '' ?>"><i class="fa-solid fa-sitemap"></i> <span>Manage Organization</span></a><?php endif; ?>
-            <?php if ($hasRole([4,9])): ?><a href="<?= base_url('organization-types') ?>" class="nav-item <?= (strpos($currentUri, 'organization-types') !== false) ? 'active' : '' ?>"><i class="fa-solid fa-layer-group"></i> <span>Organization Types</span></a><?php endif; ?>
-            <?php if ($hasRole([4,9])): ?><a href="<?= base_url('vendors') ?>" class="nav-item <?= (strpos($currentUri, 'vendors') !== false) ? 'active' : '' ?>"><i class="fas fa-handshake"></i> <span>Vendor</span></a><?php endif; ?>
-            <?php if ($hasRole([4,9])): ?><a href="<?= base_url('models') ?>" class="nav-item <?= (strpos($currentUri, 'models') !== false) ? 'active' : '' ?>"><i class="fas fa-microchip"></i> <span>Model</span></a><?php endif; ?>
+            <?php if ($hasRole([4,7,9])): ?><a href="<?= base_url('registrations') ?>" class="nav-item"><i class="fas fa-id-card"></i> <span>Pending Registration</span></a><?php endif; ?>
+            <?php if ($hasRole([4,9])): ?><a href="<?= base_url('users') ?>" class="nav-item"><i class="fas fa-users"></i> <span>Users</span></a><?php endif; ?>
+            <?php if ($hasRole([4,9])): ?><a href="<?= base_url('organizations') ?>" class="nav-item"><i class="fa-solid fa-sitemap"></i> <span>Manage Organization</span></a><?php endif; ?>
+            <?php if ($hasRole([4,9])): ?><a href="<?= base_url('organization-types') ?>" class="nav-item"><i class="fa-solid fa-layer-group"></i> <span>Organization Types</span></a><?php endif; ?>
+            <?php if ($hasRole([4,9])): ?><a href="<?= base_url('vendors') ?>" class="nav-item"><i class="fas fa-handshake"></i> <span>Vendor</span></a><?php endif; ?>
+            <?php if ($hasRole([4,9])): ?><a href="<?= base_url('models') ?>" class="nav-item"><i class="fas fa-microchip"></i> <span>Model</span></a><?php endif; ?>
         </nav>
     </div>
     </aside>
