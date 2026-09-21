@@ -200,27 +200,28 @@ ob_start();
                                     ?>
                                 </td>
 
-                                <!-- 5. STATUS BADGE -->
                                 <td class="px-5 py-4 text-left">
                                     <?php 
-                                    $statusName  = $request['status_name'] ?? 'Pending';
-                                    $statusClass = 'bg-blue-50 text-blue-700 border-blue-500';
-                                    $statusIcon  = 'fa-info-circle';
+                                    $statusVal = $request['status_name'] ?? '1';
 
-                                    if (stristr($statusName, 'approve')) {
+                                    if (in_array($statusVal, [9, 10, 11, 12, '9', '10', '11', '12', 'APPROVED', 'COMPLETED'])) {
                                         $statusClass = 'bg-emerald-50 text-emerald-700 border-emerald-500';
                                         $statusIcon  = 'fa-check-circle';
-                                    } elseif (stristr($statusName, 'reject')) {
+                                    } elseif (in_array($statusVal, [14, '14', 'REJECTED'])) {
                                         $statusClass = 'bg-red-50 text-red-700 border-red-500';
                                         $statusIcon  = 'fa-times-circle';
-                                    } elseif (stristr($statusName, 'pend') || stristr($statusName, 'submit')) {
+                                    } elseif (in_array($statusVal, [13, '13', 'RETURNED'])) {
+                                        $statusClass = 'bg-orange-50 text-orange-700 border-orange-500';
+                                        $statusIcon  = 'fa-rotate-left';
+                                    } else {
                                         $statusClass = 'bg-amber-50 text-amber-700 border-amber-500';
                                         $statusIcon  = 'fa-clock';
                                     }
                                     ?>
+
                                     <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg border-l-4 <?= $statusClass ?> font-semibold text-xs shadow-sm">
                                         <i class="fas <?= $statusIcon ?>"></i>
-                                        <?= esc($statusName) ?>
+                                        <?= esc($statusVal) ?>
                                     </span>
                                 </td>
                                 
