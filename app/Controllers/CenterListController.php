@@ -36,22 +36,29 @@ class CenterListController extends BaseController
             a.id, 
             a.app_no, 
             a.created_at, 
+            a.centre_list_ready,
             u.name as uploaded_by_name, 
-            act.name as status_name
+            o.org_name as organisation,
+            act.name as status_name,
+            GROUP_CONCAT(DISTINCT adm.exam_name SEPARATOR "||") as exam_names,
+            GROUP_CONCAT(DISTINCT adm.exam_date SEPARATOR "||") as exam_dates
         ');
         $builder->join('user u', 'u.id = a.user_id', 'left');
+        $builder->join('mas_organization o', 'o.id = u.organization_id', 'left');
         $builder->join('mas_application_action act', 'act.id = a.current_status', 'left');
+        $builder->join('application_date_mapping adm', 'adm.app_id = a.id', 'left');
         $builder->where('a.user_id', $currentUserId);
-        $builder->where('a.centre_list_ready', 1);
         $builder->where('a.isactive', 1);
+        $builder->groupBy('a.id');
         $builder->orderBy('a.id', 'DESC');
 
         $data['center_lists'] = $builder->get()->getResultArray();
 
         return view('pages/center-list-upload', $data);
     }
+
     /**
-     * Standard Excel Format Download Logic with State Dropdown
+     * Standard Excel Format Download
      */
     public function downloadFormat()
     {
@@ -165,7 +172,7 @@ class CenterListController extends BaseController
     }
 
     /**
-     * Excel File Bulk Upload & Mapping Logic with Lat/Long & City-State Validation
+     * Excel File Upload
      */
     public function upload()
     {
@@ -175,6 +182,15 @@ class CenterListController extends BaseController
 
         $currentUserId = (int) session()->get('user_id');
         $file          = $this->request->getFile('excel_file');
+        $appId         = $this->request->getPost('app_id');
+
+        if (empty($appId)) {
+            return $this->response->setJSON([
+                'success'  => false, 
+                'message'  => 'Target Request ID is required for center list upload.', 
+                'csrfHash' => csrf_hash()
+            ]);
+        }
 
         if (!$file || !$file->isValid()) {
             return $this->response->setJSON([
@@ -194,31 +210,6 @@ class CenterListController extends BaseController
         $cityMap = [];
         foreach ($cities as $c) {
             $cityMap[strtolower(trim($c['city_name']))][] = $c['state_id'];
-        }
-
-        $user = $this->db->table('user')->select('organization_id')->where('id', $currentUserId)->get()->getRowArray();
-        $organizationId = $user['organization_id'] ?? null;
-
-        try {
-            try {
-                $this->db->query("CALL generate_application_no(?, @app_no)", [$organizationId ?? 0]);
-                $result = $this->db->query("SELECT @app_no AS app_no");
-                $row = $result->getRow();
-
-                if (!$row || empty($row->app_no)) {
-                    throw new \RuntimeException('Application number stored procedure failed.');
-                }
-                $appNo = $row->app_no;
-            } catch (\Exception $e) {
-                $appNo = $this->generateApplicationNumber($organizationId);
-            }
-        } catch (\Throwable $e) {
-            log_message('error', 'Excel Upload App No Generation Error: ' . $e->getMessage());
-            return $this->response->setJSON([
-                'success'  => false,
-                'message'  => 'Failed to generate application number.',
-                'csrfHash' => csrf_hash()
-            ]);
         }
 
         try {
@@ -266,15 +257,9 @@ class CenterListController extends BaseController
 
             $this->db->transStart();
 
-            $this->db->table('application')->insert([
-                'app_no'            => $appNo,
-                'user_id'           => $currentUserId,
-                'current_status'    => 1,
-                'centre_list_ready' => 1,
-                'isactive'          => 1,
-                'created_at'        => date('Y-m-d H:i:s')
-            ]);
-            $appId = $this->db->insertID();
+            $this->db->table('application')
+                ->where('id', $appId)
+                ->update(['centre_list_ready' => 1]);
 
             $insertedCentersCount = 0;
 
@@ -351,9 +336,9 @@ class CenterListController extends BaseController
 
             return $this->response->setJSON([
                 'success'  => true,
-                'message'  => "Successfully imported {$insertedCentersCount} center records (App No: {$appNo})!",
+                'message'  => "Successfully imported {$insertedCentersCount} center records!",
                 'csrfHash' => csrf_hash()
-                            ]);
+            ]);
 
         } catch (\Exception $e) {
             $this->db->transRollback();
@@ -363,35 +348,5 @@ class CenterListController extends BaseController
                 'csrfHash' => csrf_hash()
             ]);
         }
-    }
-
-    /**
-     * Generate application number manually (fallback)
-     */
-    private function generateApplicationNumber($organizationId)
-    {
-        $db = \Config\Database::connect();
-        $year = date('Y');
-        $month = date('m');
-        
-        try {
-            $org = $db->table('mas_organization')->where('id', $organizationId)->get()->getRow();
-            $orgCode = $org ? substr(preg_replace('/[^A-Za-z0-9]/', '', $org->org_name), 0, 5) : 'ORG';
-        } catch (\Exception $e) {
-            $orgCode = 'ORG';
-        }
-        
-        try {
-            $count = $db->table('application')
-                ->where('YEAR(created_at)', $year)
-                ->where('MONTH(created_at)', $month)
-                ->countAllResults();
-        } catch (\Exception $e) {
-            $count = 0;
-        }
-        
-        $sequence = str_pad($count + 1, 4, '0', STR_PAD_LEFT);
-        
-        return $orgCode . '/' . $year . $month . '/' . $sequence;
     }
 }
