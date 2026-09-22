@@ -39,6 +39,7 @@ $routes->post(
 
 // Signup Auth Routes
 $routes->get('signup', 'Auth::signup');
+$routes->get('check_email', 'Auth::checkMail');
 $routes->post('auth/register', 'Auth::register');
 $routes->get(
     'auth/authorization',

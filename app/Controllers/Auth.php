@@ -840,4 +840,31 @@ class Auth extends BaseController
             return redirect()->to(base_url('/'))->with('error', 'Unable to load page.');
         }
     }
+
+    public function checkMail()
+    {
+        $email = $this->request->getGet('email');
+
+        if (!$email) {
+            return $this->response->setJSON([
+                'status' => 'error',
+                'message' => 'Email parameter is missing'
+            ]);
+        }
+
+        $userModel = new \App\Models\UserModel();
+        $exists = $userModel->where('email', $email)->first();
+
+        if ($exists) {
+            return $this->response->setJSON([
+                'exists' => true,
+                'message' => 'Email is already registered.'
+            ]);
+        }
+
+        return $this->response->setJSON([
+            'exists' => false,
+            'message' => 'Email is available.'
+        ]);
+    }
 }

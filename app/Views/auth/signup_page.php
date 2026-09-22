@@ -3366,6 +3366,52 @@ $(document).ready(function () {
 
 
    
+/*
+ * =========================================================
+ * EMAIL BLUR (Format Validation + AJAX Check)
+ * =========================================================
+ */
+$('#signup_email').on('blur', function() {
+    var emailInput = $(this);
+    var email = $.trim(emailInput.val());
+
+    emailInput.removeClass('is-invalid is-valid');
+    emailInput.siblings('.invalid-feedback').remove();
+    $('#email-err').remove();
+
+    if (email === '') {
+        return;
+    }
+
+    if (validateEmail(email)) {
+        $.ajax({
+            url: '<?= base_url("check_email") ?>',
+            type: 'GET',
+            data: { email: email },
+            dataType: 'json',
+            success: function(response) {
+                if (response.exists) {
+                    emailInput.addClass('is-invalid').removeClass('is-valid');
+                    emailInput.after('<div id="email-err" class="invalid-feedback d-block">Already Registered</div>');
+                    $('#signupBtn').prop('disabled', true);
+                } else {
+                    emailInput.removeClass('is-invalid').addClass('is-valid');
+                    $('#signupBtn').prop('disabled', false);
+                }
+            },
+            error: function() {
+                showToast('error', 'Email verify karne mein dikkat aayi.');
+            }
+        });
+    } else {
+        emailInput.addClass('is-invalid');
+        emailInput.after('<div class="invalid-feedback d-block">Please enter a valid email address.</div>');
+        $('#signupBtn').prop('disabled', true);
+    }
+});                                    
+
+
+
 /* 
  * =========================================================
  * SIGNUP FORM SUBMIT
