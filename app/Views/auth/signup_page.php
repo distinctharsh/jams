@@ -2613,7 +2613,8 @@ main.signup-page-main {
                                         <?php if (!empty($organizations)): ?>
                                             <?php foreach ($organizations as $org): ?>
                                                 <option value="<?= esc($org['org_name']) ?>"
-                                                        data-org-type="<?= esc($org['org_type']) ?>">
+                                                        data-org-type="<?= esc($org['org_type']) ?>"
+                                                        data-org-id="<?= esc($org['id']) ?>">
                                                     <?= esc($org['org_name']) ?>
                                                 </option>
                                             <?php endforeach; ?>
@@ -3376,7 +3377,7 @@ $('#signupForm').on('submit', function (e) {
     const email    = $.trim($('#signup_email').val() || '');
     const mobile   = $.trim($('#signup_mobile').val() || '');
     const selectedBodyOption = $('#signup_body_name option:selected');
-    const bodyName = selectedBodyOption.attr('data-org-type') || '';
+    const bodyName = selectedBodyOption.attr('data-org-id') || '';
     const selectedTypeOption = $('#signup_body_type option:selected');
     const bodyType = selectedTypeOption.attr('data-type-id') || '';
     const ugcRequired = selectedTypeOption.attr('data-ugc-required') || '';
