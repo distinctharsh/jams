@@ -188,7 +188,7 @@ ob_start();
             <?= csrf_field() ?>
             <input type="hidden" name="app_id" id="modal_app_id">
 
-            <div class="bg-blue-50/70 rounded-xl p-3.5 border border-blue-100 flex items-center justify-between">
+            <div class="bg-blue-50/70 rounded-xl p-3 border border-blue-100 flex items-center justify-between">
                 <span class="text-xs font-medium text-slate-600">Target Request ID:</span>
                 <span id="modal_app_no_display" class="text-xs font-bold text-[#1e4d7b] bg-white px-2.5 py-1 rounded-md border border-blue-200">#0000</span>
             </div>
