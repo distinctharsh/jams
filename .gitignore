@@ -7,6 +7,8 @@
 .AppleDouble
 .LSOverride
 
+node_modules/
+
 # OS X Thumbnails
 ._*
 
