@@ -411,7 +411,7 @@
                                 </div>
 
                                 <!-- FORGOT PASSWORD LINK -->
-                                <div class="text-end mb-3">
+                                <div class="text-center mb-3">
                                     <a href="javascript:void(0)" id="showForgotPasswordBtn" class="forgot-link text-decoration-none mt-5">
                                         Forgot Password?
                                     </a>
