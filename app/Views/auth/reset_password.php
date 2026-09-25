@@ -67,20 +67,6 @@
         color: #fff;
         transform: translateY(-2px);
     }
-
-    .strength-meter {
-        height: 5px;
-        background-color: #e0e0e0;
-        border-radius: 3px;
-        margin-top: 6px;
-        overflow: hidden;
-    }
-
-    .strength-bar {
-        height: 100%;
-        width: 0%;
-        transition: width 0.3s ease;
-    }
 </style>
 
 <div class="main">
@@ -107,12 +93,6 @@
                             <i class="bi bi-eye-fill"></i>
                         </button>
                     </div>
-                    <div class="strength-meter">
-                        <div class="strength-bar" id="strengthBar"></div>
-                    </div>
-                    <small class="text-muted d-block mt-1" style="font-size: 11px;">
-                        Must be at least 8 chars, include uppercase, lowercase, number & special character.
-                    </small>
                 </div>
 
                 <!-- CONFIRM PASSWORD -->
