@@ -371,3 +371,9 @@ ADD COLUMN `jammer_id` INT NULL AFTER `vendor_id`;
 /////////////////////////////////////       21 Sept 2026 //////////////////////////////////////////////////////////
 
 composer require phpoffice/phpspreadsheet
+
+
+/////////////////////////////////////       25 Sept 2026 //////////////////////////////////////////////////////////
+ALTER TABLE `user` 
+ADD COLUMN `reset_token` VARCHAR(255) NULL AFTER `password_reset_req`,
+ADD COLUMN `reset_expires_at` DATETIME NULL AFTER `reset_token`;

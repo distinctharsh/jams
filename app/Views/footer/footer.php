@@ -541,7 +541,7 @@ $(document).ready(function () {
         const data = { email: email };
         data[csrf.name] = csrf.value;
 
-        $('#forgotBtn').prop('disabled', true).html('<span class="spinner-border spinner-border-sm me-2"></span>Sending link...');
+        $('#forgotBtn').prop('disabled', true).html('<span class="spinner-border spinner-border-sm me-2"></span>Generating link...');
 
         $.ajax({
             url: "<?= base_url('forgot-password') ?>",
@@ -556,12 +556,24 @@ $(document).ready(function () {
                     updateCSRF(response.csrfHash);
                 }
 
-                if (response.success) {
-                    showToast('success', response.message || 'Reset link sent to your email.');
+                if (response.success && response.resetLink) {
+                    showToast('success', 'Reset link generated successfully.');
+                    
+                    // Set Link in Preview Modal Button
+                    $('#previewResetLinkBtn').attr('href', response.resetLink);
+
+                    // Hide Login Modal & Show Email Preview Modal
+                    $('#loginModal').modal('hide');
                     $('.back-to-login').trigger('click');
                     $('#forgot_email').val('');
+
+                    setTimeout(function () {
+                        const emailModal = new bootstrap.Modal(document.getElementById('emailPreviewModal'));
+                        emailModal.show();
+                    }, 400);
+
                 } else {
-                    showToast('error', response.message || 'Failed to send reset link.');
+                    showToast('error', response.message || 'Failed to generate reset link.');
                 }
             },
             error: function (xhr) {

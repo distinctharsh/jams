@@ -362,13 +362,6 @@
                                     </div>
                                 </div>
 
-                                <!-- FORGOT PASSWORD LINK -->
-                                <div class="text-end mb-3">
-                                    <a href="javascript:void(0)" id="showForgotPasswordBtn" class="forgot-link text-decoration-none mt-5">
-                                        Forgot Password?
-                                    </a>
-                                </div>
-
                                 <div class="mb-3">
                                     <label class="form-label">
                                         <i class="bi bi-shield-lock me-1"></i> CAPTCHA
@@ -414,6 +407,13 @@
                                     </span>
                                     <a href="<?= base_url('signup') ?>" class="fw-semibold text-decoration-none">
                                         Sign Up Here
+                                    </a>
+                                </div>
+
+                                <!-- FORGOT PASSWORD LINK -->
+                                <div class="text-end mb-3">
+                                    <a href="javascript:void(0)" id="showForgotPasswordBtn" class="forgot-link text-decoration-none mt-5">
+                                        Forgot Password?
                                     </a>
                                 </div>
                             </form>
@@ -492,6 +492,40 @@
                         </div>
                     </div>
                 </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- Simulated Email Preview Modal -->
+<div class="modal fade" id="emailPreviewModal" tabindex="-1" aria-hidden="true" style="z-index: 1060;">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content shadow-lg border-0 rounded-4">
+            <div class="modal-header bg-primary text-white border-0 py-3">
+                <h5 class="modal-title fw-bold text-white">
+                    <i class="bi bi-envelope-open-fill me-2"></i> [DEMO] Email Preview
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body p-4">
+                <div class="border rounded-3 p-3 bg-light mb-3">
+                    <p class="mb-1 text-muted small"><strong>From:</strong> no-reply@jams.gov.in (JAMS Portal)</p>
+                    <p class="mb-1 text-muted small"><strong>Subject:</strong> Password Reset Request - JAMS</p>
+                </div>
+                <div class="p-3 bg-white border rounded-3">
+                    <p>Hello,</p>
+                    <p>We received a request to reset your password. Click the link below to set a new password:</p>
+                    <div class="text-center my-4">
+                        <a href="#" id="previewResetLinkBtn" class="btn btn-warning fw-bold px-4 py-2" target="_blank">
+                            <i class="bi bi-shield-lock-fill me-1"></i> Reset Password
+                        </a>
+                    </div>
+                    <p class="small text-muted mb-0">This link is valid for 1 hour.</p>
+                </div>
+            </div>
+            <div class="modal-footer border-0 bg-light">
+                <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Close</button>
             </div>
         </div>
     </div>

@@ -216,21 +216,19 @@ class LoginController extends BaseController
     {
         try {
             if (!$this->request->isAJAX()) {
-                return $this->response
-                    ->setStatusCode(400)
-                    ->setJSON([
-                        'success'  => false,
-                        'message'  => 'Invalid request.',
-                        'csrfHash' => csrf_hash()
-                    ]);
+                return $this->response->setStatusCode(400)->setJSON([
+                    'success' => false,
+                    'message' => 'Invalid request.',
+                    'csrfHash' => csrf_hash()
+                ]);
             }
 
             $email = trim((string) $this->request->getPost('email'));
 
-            if ($email === '') {
+            if (empty($email)) {
                 return $this->response->setJSON([
-                    'success'  => false,
-                    'message'  => 'Please enter your registered email address.',
+                    'success' => false,
+                    'message' => 'Email address is required.',
                     'csrfHash' => csrf_hash()
                 ]);
             }
@@ -239,45 +237,48 @@ class LoginController extends BaseController
 
             if (!$user) {
                 return $this->response->setJSON([
-                    'success'  => false,
-                    'message'  => 'No account found with this email address.',
+                    'success' => true,
+                    'message' => 'If this email is registered, a password reset link has been generated.',
                     'csrfHash' => csrf_hash()
                 ]);
             }
 
             $token = bin2hex(random_bytes(32));
-            $tokenExpiresAt = date('Y-m-d H:i:s', strtotime('+1 hour'));
+            $expiresAt = date('Y-m-d H:i:s', strtotime('+1 hour'));
 
-            if (method_exists($this->loginModel, 'saveResetToken')) {
-                $this->loginModel->saveResetToken($user['id'], $token, $tokenExpiresAt);
-            }
+            $this->loginModel->update($user['id'], [
+                'reset_token'      => $token,
+                'reset_expires_at' => $expiresAt
+            ]);
 
-            $resetLink = base_url("reset-password?token={$token}");
-            $emailSent = $this->sendForgotPasswordEmail($email, $resetLink);
+            create_audit_trail($user['id'], $email, 'PASSWORD_RESET_REQUEST', 'Requested password reset link');
 
-            if (!$emailSent) {
-                return $this->response->setJSON([
-                    'success'  => false,
-                    'message'  => 'Failed to send password reset email.',
-                    'csrfHash' => csrf_hash()
-                ]);
-            }
+            $resetLink = base_url("reset-password/{$token}");
+
+            $emailBody = "
+                <p>Hello,</p>
+                <p>We received a request to reset your password. Click the link below to set a new password:</p>
+                <p style='text-align: center;'>
+                    <a href='{$resetLink}' style='background: #FFC107; color: #000; padding: 10px 20px; text-decoration: none; border-radius: 5px; font-weight: bold;'>Reset Password</a>
+                </p>
+                <p><small>This link is valid for 1 hour.</small></p>
+            ";
 
             return $this->response->setJSON([
-                'success'  => true,
-                'message'  => 'Password reset link has been sent to your registered email address.',
-                'csrfHash' => csrf_hash()
+                'success'   => true,
+                'message'   => 'Password reset link sent successfully!',
+                'resetLink' => $resetLink,
+                'emailBody' => $emailBody,
+                'csrfHash'  => csrf_hash()
             ]);
 
         } catch (\Throwable $e) {
             log_message('error', 'Forgot Password Error: ' . $e->getMessage());
-            return $this->response
-                ->setStatusCode(500)
-                ->setJSON([
-                    'success'  => false,
-                    'message'  => 'An error occurred while processing your request.',
-                    'csrfHash' => csrf_hash()
-                ]);
+            return $this->response->setStatusCode(500)->setJSON([
+                'success' => false,
+                'message' => 'An error occurred while processing your request.',
+                'csrfHash' => csrf_hash()
+            ]);
         }
     }
 
@@ -293,6 +294,100 @@ class LoginController extends BaseController
         } catch (\Throwable $e) {
             log_message('error', 'Forgot Password Email Error: ' . $e->getMessage());
             return false;
+        }
+    }
+
+    public function resetPassword($token = null)
+    {
+        if (empty($token)) {
+            return redirect()->to(base_url('/'))->with('error', 'Invalid password reset token.');
+        }
+
+        $user = $this->loginModel->where('reset_token', $token)
+            ->where('reset_expires_at >=', date('Y-m-d H:i:s'))
+            ->first();
+
+        if (!$user) {
+            return redirect()->to(base_url('/'))->with('error', 'Reset link is invalid or has expired.');
+        }
+
+        $data = [
+            'title' => 'Reset Password - JAMS',
+            'token' => $token
+        ];
+
+        return view('auth/reset_password', $data);
+    }
+
+    public function updatePassword()
+    {
+        try {
+            if (!$this->request->isAJAX()) {
+                return $this->response->setStatusCode(400)->setJSON([
+                    'success'  => false,
+                    'message'  => 'Invalid request.',
+                    'csrfHash' => csrf_hash()
+                ]);
+            }
+
+            $token = trim((string) $this->request->getPost('token'));
+            $encryptedPassword = trim((string) $this->request->getPost('encryptedPassword'));
+
+            if (empty($token) || empty($encryptedPassword)) {
+                return $this->response->setJSON([
+                    'success'  => false,
+                    'message'  => 'All fields are required.',
+                    'csrfHash' => csrf_hash()
+                ]);
+            }
+
+            $password = $this->decryptPassword($encryptedPassword);
+
+            if ($password === null || strlen($password) < 8) {
+                return $this->response->setJSON([
+                    'success'  => false,
+                    'message'  => 'Invalid password structure. Password must be at least 8 characters.',
+                    'csrfHash' => csrf_hash()
+                ]);
+            }
+
+            $user = $this->loginModel->where('reset_token', $token)
+                                    ->where('reset_expires_at >=', date('Y-m-d H:i:s'))
+                                    ->first();
+
+            if (!$user) {
+                return $this->response->setJSON([
+                    'success'  => false,
+                    'message'  => 'Password reset token is invalid or expired.',
+                    'csrfHash' => csrf_hash()
+                ]);
+            }
+
+            $newHash = password_hash($password, PASSWORD_BCRYPT);
+
+            $this->loginModel->update($user['id'], [
+                'hash'              => $newHash,
+                'reset_token'       => null,
+                'reset_expires_at'  => null,
+                'password_reset_req' => 0
+            ]);
+
+            create_audit_trail($user['id'], $user['email'], 'PASSWORD_RESET', 'User successfully reset password via token link');
+
+            return $this->response->setJSON([
+                'success'  => true,
+                'message'  => 'Password reset successfully! Redirecting to login...',
+                'redirect' => base_url('/'),
+                'csrfHash' => csrf_hash()
+            ]);
+
+        } catch (\Throwable $e) {
+            log_message('error', 'Update Password Error: ' . $e->getMessage());
+            return $this->response->setStatusCode(500)->setJSON([
+                'success'  => false,
+                'message'  => 'An error occurred while updating password.',
+                'csrfHash' => csrf_hash()
+            ]);
         }
     }
 
