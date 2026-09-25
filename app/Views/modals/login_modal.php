@@ -216,9 +216,6 @@
     color: #174a78;
     user-select: none;
     font-family: "Courier New", monospace;
-    /* text-shadow:
-        1px 1px 0 #ffffff,
-        2px 2px 0 rgba(23, 74, 120, 0.08); */
     transform: skew(-4deg);
 }
 
@@ -313,7 +310,7 @@
                         </div>
                         <div class="px-5 pb-5">
                             <h2 class="fw-bold text-center mb-2"
-                                style="color:#1e4d7b;">
+                                style="color:#1e4d7b;" id="modalTitle">
                                 Login to JAMS
                             </h2>
                             <p class="text-center text-muted mb-4" id="modalSubTitle">
@@ -321,7 +318,7 @@
                             </p>
                             <form id="loginForm">
                                 <?= csrf_field() ?>
-                                 <div class="mb-3">
+                                <div class="mb-3">
                                     <label for="login_email"
                                            class="form-label fw-semibold">
                                         Official Email
@@ -342,7 +339,7 @@
                                 </div>
 
 
-                                <div class="mb-4">
+                                <div class="mb-2">
                                     <label class="form-label fw-semibold">
                                         Password
                                     </label>
@@ -364,6 +361,14 @@
                                         </button>
                                     </div>
                                 </div>
+
+                                <!-- FORGOT PASSWORD LINK -->
+                                <div class="text-end mb-3">
+                                    <a href="javascript:void(0)" id="showForgotPasswordBtn" class="forgot-link text-decoration-none mt-5">
+                                        Forgot Password?
+                                    </a>
+                                </div>
+
                                 <div class="mb-3">
                                     <label class="form-label">
                                         <i class="bi bi-shield-lock me-1"></i> CAPTCHA
@@ -407,9 +412,44 @@
                                     <span class="text-muted">
                                         Don't have an account?
                                     </span>
-                                    <a href="<?= base_url('signup') ?>"  class="fw-semibold text-decoration-none">
+                                    <a href="<?= base_url('signup') ?>" class="fw-semibold text-decoration-none">
                                         Sign Up Here
                                     </a>
+                                </div>
+                            </form>
+
+                            <!-- FORGOT PASSWORD FORM -->
+                            <form id="forgotPasswordForm" style="display: none;">
+                                <?= csrf_field() ?>
+                                <div class="mb-4">
+                                    <label for="forgot_email" class="form-label fw-semibold">
+                                        Enter Registered Official Email
+                                    </label>
+                                    <div class="input-group">
+                                        <span class="input-group-text">
+                                            <i class="bi bi-envelope-at-fill"></i>
+                                        </span>
+                                        <input type="email"
+                                               class="form-control login-input"
+                                               id="forgot_email"
+                                               name="email"
+                                               placeholder="name@example.com"
+                                               required>
+                                    </div>
+                                    <small class="text-muted mt-2 d-block">
+                                        We will send a password reset link to your registered official email address.
+                                    </small>
+                                </div>
+                                <div class="d-grid mt-4">
+                                    <button type="submit" class="btn login-submit" id="forgotBtn">
+                                        <i class="bi bi-send-fill me-2"></i>
+                                        Send Reset Link
+                                    </button>
+                                </div>
+                                <div class="text-center mt-3">
+                                    <button type="button" class="btn btn-link text-decoration-none p-0 back-to-login">
+                                        <i class="bi bi-arrow-left me-1"></i> Back to Login
+                                    </button>
                                 </div>
                             </form>
 
@@ -443,7 +483,7 @@
                                     </button>
                                 </div>
                                 <div class="text-center mt-3">
-                                    <button type="button" class="btn btn-link text-decoration-none p-0" id="backToLoginBtn">
+                                    <button type="button" class="btn btn-link text-decoration-none p-0 back-to-login">
                                         <i class="bi bi-arrow-left me-1"></i> Back to Login
                                     </button>
                                 </div>

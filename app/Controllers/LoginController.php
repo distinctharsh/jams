@@ -212,6 +212,90 @@ class LoginController extends BaseController
         }
     }
 
+    public function forgotPassword()
+    {
+        try {
+            if (!$this->request->isAJAX()) {
+                return $this->response
+                    ->setStatusCode(400)
+                    ->setJSON([
+                        'success'  => false,
+                        'message'  => 'Invalid request.',
+                        'csrfHash' => csrf_hash()
+                    ]);
+            }
+
+            $email = trim((string) $this->request->getPost('email'));
+
+            if ($email === '') {
+                return $this->response->setJSON([
+                    'success'  => false,
+                    'message'  => 'Please enter your registered email address.',
+                    'csrfHash' => csrf_hash()
+                ]);
+            }
+
+            $user = $this->loginModel->findUserByEmail($email);
+
+            if (!$user) {
+                return $this->response->setJSON([
+                    'success'  => false,
+                    'message'  => 'No account found with this email address.',
+                    'csrfHash' => csrf_hash()
+                ]);
+            }
+
+            $token = bin2hex(random_bytes(32));
+            $tokenExpiresAt = date('Y-m-d H:i:s', strtotime('+1 hour'));
+
+            if (method_exists($this->loginModel, 'saveResetToken')) {
+                $this->loginModel->saveResetToken($user['id'], $token, $tokenExpiresAt);
+            }
+
+            $resetLink = base_url("reset-password?token={$token}");
+            $emailSent = $this->sendForgotPasswordEmail($email, $resetLink);
+
+            if (!$emailSent) {
+                return $this->response->setJSON([
+                    'success'  => false,
+                    'message'  => 'Failed to send password reset email.',
+                    'csrfHash' => csrf_hash()
+                ]);
+            }
+
+            return $this->response->setJSON([
+                'success'  => true,
+                'message'  => 'Password reset link has been sent to your registered email address.',
+                'csrfHash' => csrf_hash()
+            ]);
+
+        } catch (\Throwable $e) {
+            log_message('error', 'Forgot Password Error: ' . $e->getMessage());
+            return $this->response
+                ->setStatusCode(500)
+                ->setJSON([
+                    'success'  => false,
+                    'message'  => 'An error occurred while processing your request.',
+                    'csrfHash' => csrf_hash()
+                ]);
+        }
+    }
+
+    private function sendForgotPasswordEmail(string $recipient, string $resetLink): bool
+    {
+        try {
+            $email = \Config\Services::email();
+            $email->setTo($recipient);
+            $email->setFrom('no-reply@jams.gov.in', 'JAMS Portal');
+            $email->setSubject('Password Reset Request - JAMS');
+            $email->setMessage("Hello,<br><br>We received a request to reset your password. Click the link below to set a new password:<br><br><a href='{$resetLink}'>Forget Password</a><br><br>This link is valid for 1 hour.<br><br>Regards,<br>JAMS Portal");
+            return $email->send();
+        } catch (\Throwable $e) {
+            log_message('error', 'Forgot Password Email Error: ' . $e->getMessage());
+            return false;
+        }
+    }
+
     public function verifyOtp()
     {
         try {

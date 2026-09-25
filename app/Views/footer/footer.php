@@ -495,6 +495,95 @@ $(document).ready(function () {
         refreshLoginCaptcha();
     });
 
+
+    $('#showForgotPasswordBtn').on('click', function (e) {
+        e.preventDefault();
+        $('#loginForm').hide();
+        $('#otpForm').hide();
+        $('#forgotPasswordForm').fadeIn();
+        if ($('#modalTitle').length) {
+            $('#modalTitle').text('Forget Password');
+        }
+        if ($('#modalSubTitle').length) {
+            $('#modalSubTitle').text('Enter registered email to receive reset link');
+        }
+    });
+
+    // 2. Back to Login button click handler
+    $('.back-to-login').on('click', function (e) {
+        e.preventDefault();
+        $('#forgotPasswordForm').hide();
+        $('#otpForm').hide();
+        $('#loginForm').fadeIn();
+        if ($('#modalTitle').length) {
+            $('#modalTitle').text('Login to JAMS');
+        }
+        if ($('#modalSubTitle').length) {
+            $('#modalSubTitle').text('Welcome Back');
+        }
+    });
+
+    $('#forgotPasswordForm').on('submit', function (e) {
+        e.preventDefault();
+        const email = $.trim($('#forgot_email').val());
+
+        if (!email) {
+            showToast('warning', 'Please enter your registered email.');
+            return;
+        }
+
+        const csrf = getCSRFData();
+        if (!csrf) {
+            showToast('error', 'Security token missing. Please refresh.');
+            return;
+        }
+
+        const data = { email: email };
+        data[csrf.name] = csrf.value;
+
+        $('#forgotBtn').prop('disabled', true).html('<span class="spinner-border spinner-border-sm me-2"></span>Sending link...');
+
+        $.ajax({
+            url: "<?= base_url('forgot-password') ?>",
+            type: 'POST',
+            dataType: 'json',
+            data: data,
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest'
+            },
+            success: function (response) {
+                if (response.csrfHash) {
+                    updateCSRF(response.csrfHash);
+                }
+
+                if (response.success) {
+                    showToast('success', response.message || 'Reset link sent to your email.');
+                    $('.back-to-login').trigger('click');
+                    $('#forgot_email').val('');
+                } else {
+                    showToast('error', response.message || 'Failed to send reset link.');
+                }
+            },
+            error: function (xhr) {
+                if (xhr.status === 403) {
+                    showToast('error', 'Security token expired. Page will refresh.');
+                    setTimeout(function () {
+                        window.location.reload();
+                    }, 1000);
+                    return;
+                }
+                let msg = 'Something went wrong. Please try again.';
+                if (xhr.responseJSON && xhr.responseJSON.message) {
+                    msg = xhr.responseJSON.message;
+                }
+                showToast('error', msg);
+            },
+            complete: function () {
+                $('#forgotBtn').prop('disabled', false).html('<i class="bi bi-send-fill me-2"></i>Send Reset Link');
+            }
+        });
+    });
+
     window.toggleLoginPassword = function () {
         const passwordInput = document.getElementById('login_password');
         const eyeIcon = document.getElementById('loginEyeIcon');

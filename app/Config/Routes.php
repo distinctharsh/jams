@@ -28,6 +28,12 @@ $routes->get(
     'contact',
     'LoginController::contact'
 );
+
+$routes->post('forgot-password', 'LoginController::forgotPassword');
+$routes->get('reset-password/(:segment)', 'LoginController::resetPassword/$1');
+$routes->post('update-password', 'LoginController::updatePassword');
+
+
 $routes->get(
     'change-password',
     'ChangePassword::index'
