@@ -72,6 +72,10 @@ $routes->post('submit-request', 'RequestController::submitRequest', ['filter' =>
 $routes->get('view-request/(:num)', 'RequestController::viewRequest/$1', ['filter' => 'role:1,2,3,4,5,6,7,9']);
 $routes->get('get-request/(:num)', 'RequestController::getRequest/$1', ['filter' => 'role:1,2,3,4,5,6,7,9']);
 
+$routes->post('save-draft', 'RequestController::saveDraft');
+$routes->get('edit-request/(:num)', 'RequestController::editRequest/$1');
+$routes->post('update-request/(:num)', 'RequestController::updateRequest/$1');
+
 
 // View & upload-signed-pdf routes
 $routes->get('request-view/(:num)', 'RequestViewController::index/$1', ['filter' => 'role:1,2,3,4,5,6,7,9']);

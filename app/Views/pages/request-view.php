@@ -1724,8 +1724,49 @@ $csrfHash = $data['csrf_hash'] ?? csrf_hash();
         font-size: 13px;
     }
 }
+
+/* Completed items - GREEN */
+.timeline-item-completed .timeline-dot {
+    background: #16a34a;
+    border-color: #16a34a;
+    color: #fff;
+}
+
+.timeline-item-completed .timeline-line {
+    background: #16a34a;
+}
+
+.timeline-item-completed .timeline-title {
+    color: #166534;
+}
+
+/* Current item - highlighted */
+.timeline-item-current .timeline-dot {
+    background: #2563eb;
+    border-color: #2563eb;
+    color: #fff;
+    box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.2);
+}
+
+.timeline-item-current .timeline-title {
+    color: #1e40af;
+    font-weight: 700;
+}
+
+/* Current badge */
+.timeline-active-badge {
+    background: #2563eb;
+    color: #fff;
+    font-size: 11px;
+    padding: 2px 10px;
+    border-radius: 999px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
 </style>
-<style>#toast-container {
+<style>
+    #toast-container {
     position: fixed !important;
     top: 20px !important;
     right: 20px !important;
@@ -1842,7 +1883,9 @@ $csrfHash = $data['csrf_hash'] ?? csrf_hash();
                                 </div>
                                 <div class="bg-slate-50/70 border border-slate-200 rounded-lg px-4 py-3">
                                     <label class="block text-[11px] font-medium text-slate-500 mb-1">Authorised Contact</label>
-                                    <p class="text-sm font-semibold text-slate-800"><?= esc($application->contact_person ?? 'Ananya Rao') ?></p>
+                                    <p class="text-sm font-semibold text-slate-800">
+                                        <?= esc(session()->get('name') ?? session()->get('username') ?? 'N/A') ?>
+                                    </p>
                                 </div>
                                 <div class="bg-slate-50/70 border border-slate-200 rounded-lg px-4 py-3">
                                     <label class="block text-[11px] font-medium text-slate-500 mb-1">Status</label>
@@ -1899,7 +1942,7 @@ $csrfHash = $data['csrf_hash'] ?? csrf_hash();
                         <hr class="my-6 border-slate-200">
 
                         <!-- EXAMINATION DETAILS -->
-                        <div>
+                           <div>
                             <div class="flex items-center gap-2 mb-4">
                                 <div class="w-8 h-8 rounded-lg bg-orange-50 flex items-center justify-center">
                                     <i class="fas fa-graduation-cap text-[#e58500] text-sm"></i>
@@ -1942,8 +1985,7 @@ $csrfHash = $data['csrf_hash'] ?? csrf_hash();
                                                 <th class="px-4 py-3 text-left text-[11px] font-bold text-slate-600">Exam Name</th>
                                                 <th class="px-4 py-3 text-left text-[11px] font-bold text-slate-600">Exam Date</th>
                                                 <th class="px-4 py-3 text-left text-[11px] font-bold text-slate-600">Centre Name</th>
-                                                <th class="px-4 py-3 text-left text-[11px] font-bold text-slate-600">State/UT</th>
-                                                <th class="px-4 py-3 text-left text-[11px] font-bold text-slate-600">City/District</th>
+                                                <th class="px-4 py-3 text-left text-[11px] font-bold text-slate-600">Coordinator Details</th>
                                                 <th class="px-4 py-3 text-left text-[11px] font-bold text-slate-600">Centre Address</th>
                                             </tr>
                                         </thead>
@@ -1952,15 +1994,78 @@ $csrfHash = $data['csrf_hash'] ?? csrf_hash();
                                             <tr class="hover:bg-slate-50 transition">
                                                 <td class="px-4 py-3 align-top text-slate-700 font-medium"><?= $i++ ?></td>
                                                 <td class="px-4 py-3 align-top text-slate-800 font-semibold"><?= esc($exam['exam_name'] ?? '—') ?></td>
-                                                <td class="px-4 py-3 align-top text-slate-700 whitespace-nowrap"><?= !empty($exam['exam_date']) ? date('d M Y', strtotime($exam['exam_date'])) : '—' ?></td>
+                                                <td class="px-4 py-3 align-top text-slate-700 whitespace-nowrap font-bold">
+                                                    <?= !empty($exam['exam_date']) ? date('d M Y', strtotime($exam['exam_date'])) : '—' ?>
+                                                </td>
                                                 <td class="px-4 py-3 align-top text-slate-700"><?= esc($exam['centre_name'] ?? '—') ?></td>
-                                                <td class="px-4 py-3 align-top text-slate-700">
-                                                    <?= esc(getMasterValue('state', $exam['state_name'] ?? '', 'state_name') ?: '-') ?>
+
+                                                <!-- Coordinator Details column: name, email, mobile -->
+                                                <td class="px-4 py-3 align-top text-slate-700 leading-relaxed">
+                                                    <?php
+                                                        $coordName   = !empty($exam['coordinator_name'])      ? esc($exam['coordinator_name'])      : '';
+                                                        $coordMobile = !empty($exam['coordinator_mobile_no']) ? esc($exam['coordinator_mobile_no']) : '';
+                                                        $coordEmail  = !empty($exam['coordinator_email'])     ? esc($exam['coordinator_email'])     : '';
+                                                    ?>
+
+                                                    <?php if (!empty($coordName) || !empty($coordMobile) || !empty($coordEmail)): ?>
+                                                        <div class="flex flex-col gap-1.5 min-w-[180px]">
+
+                                                            <?php if (!empty($coordName)): ?>
+                                                                <div class="flex items-center gap-2">
+                                                                    <div class="w-6 h-6 rounded-full bg-[#e58500]/10 flex items-center justify-center shrink-0">
+                                                                        <i class="fas fa-user text-[#e58500] text-[10px]"></i>
+                                                                    </div>
+                                                                    <span class="text-xs font-bold text-[#1e4d7b]"><?= $coordName ?></span>
+                                                                </div>
+                                                            <?php endif; ?>
+
+                                                            <?php if (!empty($coordMobile)): ?>
+                                                                <div class="flex items-center gap-2">
+                                                                    <div class="w-6 h-6 rounded-full bg-emerald-50 flex items-center justify-center shrink-0">
+                                                                        <i class="fas fa-phone text-emerald-600 text-[10px]"></i>
+                                                                    </div>
+                                                                    <a href="tel:<?= $coordMobile ?>" class="text-xs text-slate-600 hover:text-emerald-600 transition">
+                                                                        <?= $coordMobile ?>
+                                                                    </a>
+                                                                </div>
+                                                            <?php endif; ?>
+
+                                                            <?php if (!empty($coordEmail)): ?>
+                                                                <div class="flex items-center gap-2">
+                                                                    <div class="w-6 h-6 rounded-full bg-blue-50 flex items-center justify-center shrink-0">
+                                                                        <i class="fas fa-envelope text-blue-500 text-[10px]"></i>
+                                                                    </div>
+                                                                    <a href="mailto:<?= $coordEmail ?>" class="text-xs text-slate-600 hover:text-blue-500 transition break-all">
+                                                                        <?= $coordEmail ?>
+                                                                    </a>
+                                                                </div>
+                                                            <?php endif; ?>
+
+                                                        </div>
+                                                    <?php else: ?>
+                                                        <span class="text-slate-400">—</span>
+                                                    <?php endif; ?>
                                                 </td>
-                                                <td class="px-4 py-3 align-top text-slate-700">
-                                                    <?= esc(getMasterValue('city', $exam['district_name'] ?? '', 'city_name') ?: '-') ?>
+
+                                                <!-- Centre Address column: centre_address + district(city) + state -->
+                                                <td class="px-4 py-3 align-top text-slate-700 leading-relaxed">
+                                                    <address class="not-italic text-slate-700">
+                                                    <?php
+                                                        $line1 = !empty($exam['centre_address']) ? esc($exam['centre_address']) : '';
+                                                        $districtName = !empty($exam['district_name']) ? getMasterValue('city', $exam['district_name'], 'city_name') : '';
+                                                        $stateName    = !empty($exam['state_name']) ? getMasterValue('state', $exam['state_name'], 'state_name') : '';
+                                                        $line2Parts = array_filter([$districtName, $stateName]);
+                                                        $line2 = !empty($line2Parts) ? esc(implode(', ', $line2Parts)) : '';
+
+                                                        $addressLines = array_filter([$line1, $line2]);
+                                                        if (!empty($addressLines)) {
+                                                            echo '<address class="not-italic text-slate-700">' . implode('<br>', $addressLines) . '</address>';
+                                                        } else {
+                                                            echo '—';
+                                                        }
+                                                    ?>
+                                                    </address>
                                                 </td>
-                                                <td class="px-4 py-3 align-top text-slate-700 leading-relaxed"><?= esc($exam['centre_address'] ?? '—') ?></td>
                                             </tr>
                                             <?php endforeach; ?>
                                         </tbody>
@@ -1970,7 +2075,7 @@ $csrfHash = $data['csrf_hash'] ?? csrf_hash();
                                 <div class="text-center text-slate-500 py-4 border border-slate-200 rounded-lg">No examination details found</div>
                             <?php endif; ?>
                         </div>
-
+                        
                         <hr class="my-6 border-slate-200">
 
                         <!-- VENDOR DETAILS -->
@@ -2032,7 +2137,9 @@ $csrfHash = $data['csrf_hash'] ?? csrf_hash();
                                         <div class="w-7 h-7 rounded-full bg-blue-50 flex items-center justify-center">
                                             <i class="fas fa-user text-[#1e4d7b] text-[10px]"></i>
                                         </div>
-                                        <p class="text-sm font-semibold text-slate-800"><?= esc($application->contact_person ?? 'Ananya Rao') ?></p>
+                                        <p class="text-sm font-semibold text-slate-800">
+                                            <?= esc(session()->get('name') ?? session()->get('username') ?? 'N/A') ?>
+                                        </p>
                                     </div>
                                 </div>
                                 <div class="bg-slate-50/70 border border-slate-200 rounded-lg px-4 py-3">
@@ -2041,7 +2148,9 @@ $csrfHash = $data['csrf_hash'] ?? csrf_hash();
                                         <div class="w-7 h-7 rounded-full bg-blue-50 flex items-center justify-center shrink-0">
                                             <i class="fas fa-envelope text-[#1e4d7b] text-[10px]"></i>
                                         </div>
-                                        <p class="text-sm font-semibold text-slate-800 truncate"><?= esc($application->email ?? 'ananya.rao@globaledu.in') ?></p>
+                                        <p class="text-sm font-semibold text-slate-800 truncate">
+                                            <?= esc(session()->get('email') ?? 'N/A') ?>
+                                        </p>
                                     </div>
                                 </div>
                                 <div class="bg-slate-50/70 border border-slate-200 rounded-lg px-4 py-3">
@@ -2050,7 +2159,18 @@ $csrfHash = $data['csrf_hash'] ?? csrf_hash();
                                         <div class="w-7 h-7 rounded-full bg-blue-50 flex items-center justify-center">
                                             <i class="fas fa-phone text-[#1e4d7b] text-[10px]"></i>
                                         </div>
-                                        <p class="text-sm font-semibold text-slate-800"><?= esc($application->phone ?? '+91 98765 43210') ?></p>
+                                        <p class="text-sm font-semibold text-slate-800">
+                                            <?php
+                                                $db = \Config\Database::connect();
+                                                $userId = session()->get('user_id') ?? session()->get('id');
+                                                $row = $db->table('user')
+                                                          ->select('mobile_no')
+                                                          ->where('id', $userId)
+                                                          ->get()
+                                                          ->getRow();
+                                                echo esc($row->mobile_no ?? 'N/A');
+                                            ?>
+                                        </p>
                                     </div>
                                 </div>
                             </div>
@@ -2118,13 +2238,16 @@ $csrfHash = $data['csrf_hash'] ?? csrf_hash();
                 </div>
             </div>
 
-                <!-- RIGHT COLUMN -->
+            <!-- RIGHT COLUMN -->
             <div class="space-y-4 lg:sticky lg:top-6">
-                <?php
+               <?php
                 $db = db_connect();
-
                 $appId = (int) ($application->id ?? $appId ?? 0);
                 $currentStatus = (int) ($application->current_status ?? 0);
+
+                if (!isset($statusId)) {
+                    $statusId = $currentStatus;
+                }
 
                 $statusMap = [
                     1  => 'Application Submitted',
@@ -2180,29 +2303,59 @@ $csrfHash = $data['csrf_hash'] ?? csrf_hash();
                     15 => 'PDF Generation',
                 ];
 
-                $sessionRoleIds = (string) (session()->get('role_ids') ?? '');
+                // ---------- SESSION ROLE HANDLING ----------
+                $sessionRoleIds = session()->get('role_ids') ?? '';
 
-                $userRoleIds = array_filter(
-                    array_map(
-                        'intval',
-                        explode(',', $sessionRoleIds)
-                    )
-                );
+                if (is_array($sessionRoleIds)) {
+                    $userRoleIds = array_values(array_filter(array_map('intval', $sessionRoleIds)));
+                } else {
+                    $userRoleIds = array_values(array_filter(array_map('intval', explode(',', (string) $sessionRoleIds))));
+                }
 
-                $isOnlyOrganizationUser = (
-                    count($userRoleIds) === 1 &&
-                    in_array(1, $userRoleIds, true)
-                );
+                $isOnlyOrganizationUser = (count($userRoleIds) === 1 && in_array(1, $userRoleIds, true));
 
-                $allowedOrgUserStatuses = [
-                    1,
-                    2,
-                    3,
-                    11,
-                    13,
-                    14
+                $allowedOrgUserStatuses = [1, 2, 3, 11, 13, 14];
+
+                // ---------- FETCH ROLES FROM mas_role ----------
+                $roleRows = $db->table('mas_role')
+                    ->select('id, name, code')
+                    ->where('isactive', 1)
+                    ->get()
+                    ->getResult();
+
+                $roleNames   = [];   // [role_id => name]
+                $roleCodeMap = [];   // [role_id => code]
+
+                foreach ($roleRows as $r) {
+                    $rid = (int) $r->id;
+                    $roleNames[$rid]   = trim((string) $r->name);
+                    $roleCodeMap[$rid] = strtoupper(trim((string) $r->code));
+                }
+
+                // code -> id
+                $codeToId = [];
+                foreach ($roleCodeMap as $rid => $code) {
+                    $codeToId[$code] = $rid;
+                }
+
+                // ---------- WORKFLOW ORDER (by CODE) ----------
+                // SO -> DH -> US -> JS -> SEC -> US
+                $workflowOrderByCode = [
+                    'SO'  => 'DH',
+                    'DH'  => 'US',
+                    'US'  => 'JS',
+                    'JS'  => 'SEC',
+                    'SEC' => 'US',
                 ];
 
+                $workflowOrder = [];
+                foreach ($workflowOrderByCode as $fromCode => $toCode) {
+                    if (isset($codeToId[$fromCode], $codeToId[$toCode])) {
+                        $workflowOrder[$codeToId[$fromCode]] = $codeToId[$toCode];
+                    }
+                }
+
+                // ---------- FETCH HISTORY ----------
                 $history = $db->table('application_history ah')
                     ->select('
                         ah.id,
@@ -2212,47 +2365,57 @@ $csrfHash = $data['csrf_hash'] ?? csrf_hash();
                         ah.assigned_to,
                         ah.remarks,
                         ah.created_at,
-
                         performer.name AS performer_name,
                         performer.email AS performer_email,
-
                         assignee.name AS assignee_name,
                         assignee.email AS assignee_email
                     ')
-                    ->join(
-                        'user performer',
-                        'performer.id = ah.performed_by',
-                        'left'
-                    )
-                    ->join(
-                        'user assignee',
-                        'assignee.id = ah.assigned_to',
-                        'left'
-                    )
+                    ->join('user performer', 'performer.id = ah.performed_by', 'left')
+                    ->join('user assignee', 'assignee.id = ah.assigned_to', 'left')
                     ->where('ah.app_id', $appId)
                     ->orderBy('ah.created_at', 'ASC')
                     ->orderBy('ah.id', 'ASC')
                     ->get()
                     ->getResult();
 
+                // ---------- FILTER FOR ORG USER ----------
                 if ($isOnlyOrganizationUser) {
-                    $history = array_values(
-                        array_filter(
-                            $history,
-                            function ($row) use ($allowedOrgUserStatuses) {
-                                $rowStatus = (int) ($row->status ?? 0);
-                                return in_array(
-                                    $rowStatus,
-                                    $allowedOrgUserStatuses,
-                                    true
-                                );
-                            }
-                        )
-                    );
+                    $history = array_values(array_filter($history, function ($row) use ($allowedOrgUserStatuses) {
+                        $rowStatus = (int) ($row->status ?? 0);
+                        return in_array($rowStatus, $allowedOrgUserStatuses, true);
+                    }));
                 }
 
-                $currentAssignedTo = 0;
+                // ---------- BULK FETCH ASSIGNEE ROLES ----------
+                $assigneeIds = [];
+                foreach ($history as $row) {
+                    $aid = (int) ($row->assigned_to ?? 0);
+                    if ($aid > 0) $assigneeIds[] = $aid;
+                }
+                $assigneeIds = array_values(array_unique($assigneeIds));
 
+                $assigneeRoleMap = [];   // [user_id => role_name]
+
+                if (!empty($assigneeIds)) {
+                    $mappingRows = $db->table('user_role_mapping urm')
+                        ->select('urm.user_id, urm.role_id, r.name AS role_name')
+                        ->join('mas_role r', 'r.id = urm.role_id', 'left')
+                        ->whereIn('urm.user_id', $assigneeIds)
+                        ->where('urm.isactive', 1)
+                        ->get()
+                        ->getResult();
+
+                    foreach ($mappingRows as $m) {
+                        $uid   = (int) $m->user_id;
+                        $rname = trim((string) ($m->role_name ?? ''));
+                        if ($rname !== '' && !isset($assigneeRoleMap[$uid])) {
+                            $assigneeRoleMap[$uid] = $rname;
+                        }
+                    }
+                }
+
+                // ---------- CURRENT ASSIGNEE ----------
+                $currentAssignedTo = 0;
                 $latestAssignment = $db->table('application_history')
                     ->select('assigned_to')
                     ->where('app_id', $appId)
@@ -2263,42 +2426,53 @@ $csrfHash = $data['csrf_hash'] ?? csrf_hash();
                     ->getRow();
 
                 if ($latestAssignment) {
-                    $currentAssignedTo = (int) (
-                        $latestAssignment->assigned_to ?? 0
-                    );
+                    $currentAssignedTo = (int) ($latestAssignment->assigned_to ?? 0);
                 }
 
-                $currentStatusLabel =
-                    $statusMap[$currentStatus]
-                    ?? 'Unknown Status';
+                // ---------- CURRENT ASSIGNEE KA ROLE ID ----------
+                $currentAssignedRoleId = 0;
 
-                $nextStage =
-                    $nextStageMap[$currentStatus]
-                    ?? '—';
+                if ($currentAssignedTo > 0) {
+                    $currentRoleRow = $db->table('user_role_mapping urm')
+                        ->select('urm.role_id')
+                        ->join('mas_role r', 'r.id = urm.role_id', 'left')
+                        ->where('urm.user_id', $currentAssignedTo)
+                        ->where('urm.isactive', 1)
+                        ->get()
+                        ->getRow();
 
-                if (
-                    $isOnlyOrganizationUser &&
-                    !in_array(
-                        $currentStatus,
-                        $allowedOrgUserStatuses,
-                        true
-                    )
-                ) {
-                    $nextStage = 'Under Process';
+                    if ($currentRoleRow) {
+                        $currentAssignedRoleId = (int) ($currentRoleRow->role_id ?? 0);
+                    }
                 }
+
+                // ---------- NEXT STAGE ----------
+                $nextStage = '—';
+
+                if (in_array($currentStatus, [12, 14], true)) {
+                    $nextStage = ($currentStatus === 12) ? 'Completed' : 'Closed';
+                } elseif ($currentStatus === 13) {
+                    $nextStage = 'Review / Resubmission';
+                } else {
+                    if ($currentAssignedRoleId > 0 && isset($workflowOrder[$currentAssignedRoleId])) {
+                        $nextRoleId = $workflowOrder[$currentAssignedRoleId];
+                        $nextStage  = 'Forward to ' . ($roleNames[$nextRoleId] ?? 'Next Authority');
+                    } else {
+                        $nextStage = $nextStageMap[$currentStatus] ?? '—';
+                    }
+                }
+
+                if ($isOnlyOrganizationUser && !in_array($currentStatus, $allowedOrgUserStatuses, true)) {
+                    $nextStage = 'Completed';
+                }
+
+                $currentStatusLabel = $statusMap[$currentStatus] ?? 'Unknown Status';
 
                 $formatTimelineDate = function ($date) {
-                    if (empty($date)) {
-                        return '';
-                    }
+                    if (empty($date)) return '';
                     $timestamp = strtotime($date);
-                    if (!$timestamp) {
-                        return '';
-                    }
-                    return date(
-                        'd M Y, H:i',
-                        $timestamp
-                    );
+                    if (!$timestamp) return '';
+                    return date('d M Y, H:i', $timestamp);
                 };
                 ?>
 
@@ -2306,12 +2480,8 @@ $csrfHash = $data['csrf_hash'] ?? csrf_hash();
 
                     <div class="timeline-header">
                         <div>
-                            <h3>
-                                Submission progress
-                            </h3>
-                            <p>
-                                Application activity and workflow history
-                            </p>
+                            <h3>Submission progress</h3>
+                            <p>Application activity and workflow history</p>
                         </div>
                     </div>
 
@@ -2320,150 +2490,62 @@ $csrfHash = $data['csrf_hash'] ?? csrf_hash();
                         <?php if (!empty($history)): ?>
 
                             <div class="timeline-list">
-
                                 <?php
                                 $historyCount = count($history);
+                                $lastIndex    = $historyCount - 1;
                                 ?>
 
                                 <?php foreach ($history as $index => $row): ?>
 
                                     <?php
-                                    $status = (int) (
-                                        $row->status ?? 0
-                                    );
+                                    $status      = (int) ($row->status ?? 0);
+                                    $performedBy = (int) ($row->performed_by ?? 0);
+                                    $assignedTo  = (int) ($row->assigned_to ?? 0);
 
-                                    $performedBy = (int) (
-                                        $row->performed_by ?? 0
-                                    );
+                                    $remarks = trim((string) ($row->remarks ?? ''));
+                                    $date    = $formatTimelineDate($row->created_at ?? null);
 
-                                    $assignedTo = (int) (
-                                        $row->assigned_to ?? 0
-                                    );
+                                    $performerName = trim((string) ($row->performer_name ?? ''));
+                                    if ($performerName === '') $performerName = 'System';
 
-                                    $remarks = trim(
-                                        (string) (
-                                            $row->remarks ?? ''
-                                        )
-                                    );
+                                    $assigneeName     = trim((string) ($row->assignee_name ?? ''));
+                                    $assigneeRoleName = $assigneeRoleMap[$assignedTo] ?? '';
 
-                                    $date = $formatTimelineDate(
-                                        $row->created_at ?? null
-                                    );
+                                    $isCurrent = ($index === $lastIndex);
 
-                                    $performerName = trim(
-                                        (string) (
-                                            $row->performer_name ?? ''
-                                        )
-                                    );
-
-                                    if ($performerName === '') {
-                                        $performerName = 'System';
-                                    }
-
-                                    $assigneeName = trim(
-                                        (string) (
-                                            $row->assignee_name ?? ''
-                                        )
-                                    );
-
-                                    $isCurrent = false;
-
-                                    if (
-                                        $currentAssignedTo > 0 &&
-                                        $assignedTo > 0
-                                    ) {
-                                        $isCurrent = (
-                                            $assignedTo ===
-                                            $currentAssignedTo
-                                        );
-                                    }
-
-                                    if ($currentAssignedTo <= 0) {
-                                        $isCurrent = (
-                                            $status ===
-                                            $currentStatus
-                                        );
-                                    }
-
-                                    if (
-                                        $isOnlyOrganizationUser &&
-                                        !in_array(
-                                            $currentStatus,
-                                            $allowedOrgUserStatuses,
-                                            true
-                                        )
-                                    ) {
+                                    if ($isOnlyOrganizationUser && !in_array($currentStatus, $allowedOrgUserStatuses, true)) {
                                         $isCurrent = false;
                                     }
 
-                                    if (
-                                        $assignedTo > 0 &&
-                                        $assigneeName !== ''
-                                    ) {
-                                        $title =
-                                            'Assigned to ' .
-                                            $assigneeName;
+                                    if ($assignedTo > 0 && $assigneeName !== '') {
+                                        $title = 'Assigned to ' . $assigneeName;
                                     } else {
-                                        $title =
-                                            $statusMap[$status]
-                                            ?? 'Application Updated';
+                                        $title = $statusMap[$status] ?? 'Application Updated';
                                     }
 
-                                    $stage =
-                                        $stageMap[$status]
-                                        ?? 'Application';
+                                    $stage = $stageMap[$status] ?? 'Application';
 
                                     switch ($status) {
-                                        case 1:
-                                            $icon = 'fa-plus';
-                                            break;
-                                        case 2:
-                                            $icon = 'fa-file-pdf';
-                                            break;
-                                        case 3:
-                                            $icon = 'fa-file-signature';
-                                            break;
+                                        case 1:  $icon = 'fa-plus';           break;
+                                        case 2:  $icon = 'fa-file-pdf';       break;
+                                        case 3:  $icon = 'fa-file-signature'; break;
                                         case 4:
                                         case 5:
                                         case 6:
                                         case 7:
-                                        case 8:
-                                            $icon = 'fa-user-check';
-                                            break;
-                                        case 9:
-                                            $icon = 'fa-check';
-                                            break;
-                                        case 10:
-                                            $icon = 'fa-file-alt';
-                                            break;
-                                        case 11:
-                                            $icon = 'fa-signature';
-                                            break;
-                                        case 12:
-                                            $icon = 'fa-check-double';
-                                            break;
-                                        case 13:
-                                            $icon = 'fa-undo';
-                                            break;
-                                        case 14:
-                                            $icon = 'fa-times';
-                                            break;
-                                        case 15:
-                                            $icon = 'fa-save';
-                                            break;
-                                        default:
-                                            $icon = 'fa-circle';
-                                            break;
+                                        case 8:  $icon = 'fa-user-check';     break;
+                                        case 9:  $icon = 'fa-check';          break;
+                                        case 10: $icon = 'fa-file-alt';       break;
+                                        case 11: $icon = 'fa-signature';      break;
+                                        case 12: $icon = 'fa-check-double';   break;
+                                        case 13: $icon = 'fa-undo';           break;
+                                        case 14: $icon = 'fa-times';          break;
+                                        case 15: $icon = 'fa-save';           break;
+                                        default: $icon = 'fa-circle';         break;
                                     }
 
-                                    $itemClass = $isCurrent
-                                        ? 'timeline-item-current'
-                                        : 'timeline-item-completed';
-
-                                    $isLastItem = (
-                                        $index ===
-                                        ($historyCount - 1)
-                                    );
+                                    $itemClass = $isCurrent ? 'timeline-item-current' : 'timeline-item-completed';
+                                    $isLastItem = ($index === $lastIndex);
                                     ?>
 
                                     <div class="timeline-item <?= esc($itemClass) ?>">
@@ -2473,10 +2555,10 @@ $csrfHash = $data['csrf_hash'] ?? csrf_hash();
                                         <?php endif; ?>
 
                                         <div class="timeline-dot">
-                                            <?php if (!$isCurrent): ?>
-                                                <i class="fas fa-check"></i>
-                                            <?php else: ?>
+                                            <?php if ($isCurrent): ?>
                                                 <i class="fas <?= esc($icon) ?>"></i>
+                                            <?php else: ?>
+                                                <i class="fas fa-check"></i>
                                             <?php endif; ?>
                                         </div>
 
@@ -2487,247 +2569,247 @@ $csrfHash = $data['csrf_hash'] ?? csrf_hash();
                                                     <?= esc($title) ?>
                                                 </div>
                                                 <?php if ($isCurrent): ?>
-                                                    <span class="timeline-active-badge">
-                                                        Current
-                                                    </span>
+                                                    <span class="timeline-active-badge">Current</span>
                                                 <?php endif; ?>
                                             </div>
 
                                             <div class="timeline-meta">
-                                                <span>
-                                                    <?= esc($performerName) ?>
-                                                </span>
-                                                <span class="timeline-separator">
-                                                    •
-                                                </span>
-                                                <span>
-                                                    <?= esc($stage) ?>
-                                                </span>
+                                                <span><?= esc($performerName) ?></span>
+                                                <span class="timeline-separator">•</span>
+                                                <span><?= esc($stage) ?></span>
                                                 <?php if ($date !== ''): ?>
-                                                    <span class="timeline-separator">
-                                                        •
-                                                    </span>
-                                                    <span>
-                                                        <?= esc($date) ?>
-                                                    </span>
+                                                    <span class="timeline-separator">•</span>
+                                                    <span><?= esc($date) ?></span>
                                                 <?php endif; ?>
                                             </div>
 
-                                             <?php if ($remarks !== ''): ?>
+                                            <?php if ($remarks !== ''): ?>
                                                 <div class="timeline-remarks">
                                                     <i class="fas fa-comment-alt"></i>
-                                                    <span>
-                                                        <?= esc($remarks) ?>
-                                                    </span>
+                                                    <span><?= esc($remarks) ?></span>
                                                 </div>
                                             <?php endif; ?>
 
-                                            <?php
-                                            if (
-                                                !$isOnlyOrganizationUser &&
-                                                $assignedTo > 0 &&
-                                                $assigneeName !== ''
-                                            ):
-                                            ?>
+                                            <?php if (!$isOnlyOrganizationUser && $assignedTo > 0 && $assigneeName !== ''): ?>
                                                 <div class="timeline-assignment">
                                                     <i class="fas fa-user-check"></i>
                                                     <span>
                                                         Assigned to
-                                                        <strong>
-                                                            <?= esc($assigneeName) ?>
-                                                        </strong>
+                                                        <strong><?= esc($assigneeName) ?></strong>
+                                                        <?php if ($assigneeRoleName !== ''): ?>
+                                                            <span class="timeline-role-badge">
+                                                                (<?= esc($assigneeRoleName) ?>)
+                                                            </span>
+                                                        <?php endif; ?>
                                                     </span>
                                                 </div>
                                             <?php endif; ?>
 
                                         </div>
-
                                     </div>
 
                                 <?php endforeach; ?>
                             </div>
+
                         <?php else: ?>
+
                             <div class="timeline-empty">
                                 <div class="timeline-empty-icon">
                                     <i class="fas fa-history"></i>
                                 </div>
                                 <div>
-                                    <strong>
-                                        No timeline activity
-                                    </strong>
-                                    <p>
-                                        No workflow history is available
-                                        for this application.
-                                    </p>
+                                    <strong>No timeline activity</strong>
+                                    <p>No workflow history is available for this application.</p>
                                 </div>
                             </div>
+
                         <?php endif; ?>
                     </div>
-                    <div class="timeline-footer">
-                        <span>
-                            Next stage:
-                        </span>
-                        <strong>
-                            <?= esc($nextStage) ?>
-                        </strong>
-                    </div>
+                    <!-- <div class="timeline-footer">
+                        <span>Next stage:</span>
+                        <strong><?= esc($nextStage) ?></strong>
+                    </div> -->
                 </div>
-
 
                 <!-- GENERATED APPLICATION PDF - Show only when status >= 2 -->
-              
-            <?php if ($statusId >= 2): ?>
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-5">
-                <!-- CARD 1: GENERATED APPLICATION PDF -->
-                <div class="gov-card mb-5 p-5">
-                    <h3 class="text-base font-bold text-slate-800 mb-4 flex items-center gap-2">
-                        <i class="far fa-file-alt text-[#1e4d7b]"></i>
-                        Generated Application PDF
-                    </h3>
+                <?php if ($statusId >= 2): ?>
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-5">
 
-                    <!-- Application Information -->
-                    <div class="border border-slate-200 bg-slate-50 rounded-lg p-3 mb-3">
-                        <p id="applicationNumber" class="text-xs font-bold text-slate-800">
-                            <?= esc($application->app_no ?? 'JPMS/2026/001057') ?>
-                        </p>
-                        <p id="applicationOrganisation" class="text-xs text-slate-500 mt-1">
-                            <?= esc($application->organisation ?? '—') ?>
-                        </p>
-                        <div class="mt-2">
-                            <span id="applicationStatus" class="inline-flex items-center px-2.5 py-1 rounded-md <?= ($statusId >= 3) ? 'bg-green-50 text-green-700' : 'bg-blue-50 text-[#1e4d7b]' ?> text-[10px] font-bold">
-                                <?= ($statusId >= 3) ? 'Signed PDF Uploaded' : 'PDF Generated' ?>
-                            </span>
-                        </div>
-                    </div>
-
-                    <!-- Actions -->
-                    <?php if ($statusId < 3): ?>
-                        <button type="button" onclick="downloadApplicationPreview(<?= (int) $application->id ?>)" class="w-full px-4 py-2.5 bg-[#1e4d7b] hover:bg-[#163a5d] text-white rounded-lg text-sm font-semibold transition flex items-center justify-center gap-2">
-                            <i class="fas fa-download"></i>
-                            Download PDF
-                        </button>
-
-                        <button type="button" onclick="document.getElementById('signedPdfInput').click()" class="w-full mt-2 px-4 py-2.5 bg-green-600 hover:bg-green-700 text-white rounded-lg text-sm font-semibold transition flex items-center justify-center gap-2">
-                            <i class="fas fa-pen"></i>
-                            Upload Signed PDF
-                        </button>
-
-                        <div id="signedPdfPreview" class="<?= ($signed_pdf) ? '' : 'hidden' ?> mt-3">
-                            <div class="flex items-center gap-2 p-3 bg-green-50 border border-green-200 rounded-lg">
-                                <div class="w-8 h-8 rounded-lg bg-white flex items-center justify-center shrink-0">
-                                    <i class="fas fa-file-pdf text-red-500"></i>
-                                </div>
-                                <div class="flex-1 min-w-0">
-                                    <p id="signedPdfFileName" class="text-xs font-semibold text-slate-700 truncate">
-                                        <?= $signed_pdf ? esc($signed_pdf->document_name) : '' ?>
+                        <!-- CARD 1: GENERATED APPLICATION PDF -->
+                        <div class="gov-card mb-5 p-5">
+                            
+                            <?php if ($statusId != 15): ?>
+                                <div class="border border-slate-200 bg-slate-50 rounded-lg p-3 mb-3">
+                                    <h3 class="text-base font-bold text-slate-800 mb-4 flex items-center gap-2">
+                                        <i class="far fa-file-alt text-[#1e4d7b]"></i>
+                                        Generated Application PDF
+                                    </h3>
+                                    <p id="applicationNumber" class="text-xs font-bold text-slate-800">
+                                        <?= esc($application->app_no ?? 'JPMS/2026/001057') ?>
                                     </p>
-                                    <p id="signedPdfFileSize" class="text-[10px] text-slate-500"></p>
+                                    <p id="applicationOrganisation" class="text-xs text-slate-500 mt-1">
+                                        <?= esc($application->organisation ?? '—') ?>
+                                    </p>
+                                    <div class="mt-2">
+                                        <span id="applicationStatus"
+                                              class="inline-flex items-center px-2.5 py-1 rounded-md
+                                                     <?= ($statusId >= 3)
+                                                         ? 'bg-green-50 text-green-700'
+                                                         : 'bg-blue-50 text-[#1e4d7b]' ?>
+                                                     text-[10px] font-bold">
+                                            <?= ($statusId >= 3) ? 'Signed PDF Uploaded' : 'PDF Generated' ?>
+                                        </span>
+                                    </div>
                                 </div>
-                                <button type="button" onclick="removeSignedPdf(event)" class="w-7 h-7 rounded-lg bg-red-50 text-red-600 hover:bg-red-100 flex items-center justify-center transition">
-                                    <i class="fas fa-times text-xs"></i>
+                            <?php else: ?>
+                                <div class="border border-amber-200 bg-amber-50 rounded-lg p-3 mb-3">
+                                    <h3 class="text-base font-bold text-slate-800 mb-4 flex items-center gap-2">
+                                        <i class="far fa-edit text-amber-600"></i>
+                                        Saved as Draft
+                                    </h3>
+                                    <p id="applicationNumber" class="text-xs font-bold text-slate-800">
+                                        <?= esc($application->app_no ?? 'JPMS/2026/001057') ?>
+                                    </p>
+                                    <p id="applicationOrganisation" class="text-xs text-slate-500 mt-1">
+                                        <?= esc($application->organisation ?? '—') ?>
+                                    </p>
+                                    <div class="mt-2">
+                                        <span id="applicationStatus"
+                                              class="inline-flex items-center px-2.5 py-1 rounded-md
+                                                     bg-amber-100 text-amber-700 text-[10px] font-bold">
+                                            <i class="far fa-save mr-1"></i>
+                                            Save as Draft
+                                        </span>
+                                    </div>
+                                </div>
+                            <?php endif; ?>
+
+                            <?php if ($statusId < 3): ?>
+                                <button type="button"
+                                        onclick="downloadApplicationPreview(<?= (int) $application->id ?>)"
+                                        class="w-full px-4 py-2.5 bg-[#1e4d7b] hover:bg-[#163a5d] text-white rounded-lg text-sm font-semibold transition flex items-center justify-center gap-2">
+                                    <i class="fas fa-download"></i>
+                                    Download PDF
                                 </button>
-                            </div>
+
+                                <button type="button"
+                                        onclick="document.getElementById('signedPdfInput').click()"
+                                        class="w-full mt-2 px-4 py-2.5 bg-green-600 hover:bg-green-700 text-white rounded-lg text-sm font-semibold transition flex items-center justify-center gap-2">
+                                    <i class="fas fa-pen"></i>
+                                    Upload Signed PDF
+                                </button>
+
+                                <div id="signedPdfPreview" class="<?= ($signed_pdf) ? '' : 'hidden' ?> mt-3">
+                                    <div class="flex items-center gap-2 p-3 bg-green-50 border border-green-200 rounded-lg">
+                                        <div class="w-8 h-8 rounded-lg bg-white flex items-center justify-center shrink-0">
+                                            <i class="fas fa-file-pdf text-red-500"></i>
+                                        </div>
+                                        <div class="flex-1 min-w-0">
+                                            <p id="signedPdfFileName" class="text-xs font-semibold text-slate-700 truncate">
+                                                <?= $signed_pdf ? esc($signed_pdf->document_name) : '' ?>
+                                            </p>
+                                            <p id="signedPdfFileSize" class="text-[10px] text-slate-500"></p>
+                                        </div>
+                                        <button type="button"
+                                                onclick="removeSignedPdf(event)"
+                                                class="w-7 h-7 rounded-lg bg-red-50 text-red-600 hover:bg-red-100 flex items-center justify-center transition">
+                                            <i class="fas fa-times text-xs"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            <?php else: ?>
+                                <button type="button"
+                                        onclick="document.getElementById('signedPdfInput').click()"
+                                        class="w-full mt-2 px-4 py-2.5 bg-amber-600 hover:bg-amber-700 text-white rounded-lg text-sm font-semibold transition flex items-center justify-center gap-2">
+                                    <i class="fas fa-upload"></i>
+                                    Re-Upload Signed PDF
+                                </button>
+                            <?php endif; ?>
+
+                            <input type="file"
+                                   id="signedPdfInput"
+                                   name="signed_pdf"
+                                   accept=".pdf,application/pdf"
+                                   class="hidden"
+                                   onchange="handleSignedPdf(this, <?= (int) $application->id ?>)">
                         </div>
-                    <?php else: ?>
-                        <button type="button" onclick="document.getElementById('signedPdfInput').click()" class="w-full mt-2 px-4 py-2.5 bg-amber-600 hover:bg-amber-700 text-white rounded-lg text-sm font-semibold transition flex items-center justify-center gap-2">
-                            <i class="fas fa-upload"></i>
-                            Re-Upload Signed PDF
-                        </button>
-                    <?php endif; ?>
 
-                    <input type="file" id="signedPdfInput" name="signed_pdf" accept=".pdf,application/pdf" class="hidden" onchange="handleSignedPdf(this, <?= (int) $application->id ?>)">
-                </div>
+                        <!-- CARD 2: PERMISSION LETTER -->
+                        <?php if (in_array((int) $application->current_status, [9, 10, 11, 12])): ?>
+                            <div class="gov-card p-5">
+                                <h3 class="text-base font-bold text-slate-800 mb-3 flex items-center gap-2">
+                                    <i class="far fa-file-pdf text-red-600"></i>
+                                    Permission Letter
+                                </h3>
 
-                <!-- CARD 2: PERMISSION LETTER -->
-                <?php if (in_array((int) $application->current_status, [9, 10, 11, 12])): ?>
-                    <div class="gov-card p-5">
-                        <h3 class="text-base font-bold text-slate-800 mb-3 flex items-center gap-2">
-                            <i class="far fa-file-pdf text-red-600"></i>
-                            Permission Letter
-                        </h3>
-                        <?php if ((int) $application->current_status === 12): ?>
-                            <!-- Status 12: Completed -->
-                            <div class="flex items-center justify-between px-4 py-3 bg-green-50 border border-green-200 rounded-xl">
-                                <div class="flex items-center gap-3">
-                                    <div class="w-10 h-10 rounded-lg bg-white flex items-center justify-center shrink-0">
-                                        <i class="fas fa-file-pdf text-red-600 text-xl"></i>
-                                    </div>
-                                    <div>
-                                        <p class="text-sm font-bold text-slate-700">
-                                            PERMISSION LETTER
-                                        </p>
-                                        <p class="text-[10px] text-slate-500">
-                                            Signed Permission Letter
-                                        </p>
-                                    </div>
-                                </div>
-                                <div class="flex items-center gap-2">
-                                    <a href="<?= base_url('view-document/' . $doc['id']) ?>"
-                                       target="_blank"
-                                       title="Preview PDF"
-                                       class="w-9 h-9 flex items-center justify-center bg-[#1e4d7b] hover:bg-[#163a5d] text-white rounded-lg shadow-sm transition">
-                                        <i class="fas fa-eye text-xs"></i>
-                                    </a>
-                                    <a href="<?= base_url('download-document/' . $doc['id']) ?>"
-                                       title="Download PDF"
-                                       class="w-9 h-9 flex items-center justify-center bg-green-600 hover:bg-green-700 text-white rounded-lg shadow-sm transition">
-                                        <i class="fas fa-download text-xs"></i>
-                                    </a>
-                                </div>
-                            </div>
-                        <?php else: ?>
-                            <!-- Status 9, 10, 11 -->
-                            <div class="border border-slate-200 bg-slate-50 rounded-lg p-3">
-                                <div class="flex items-center justify-between gap-3">
-                                    <div class="flex items-center gap-2">
-                                        <div class="w-9 h-9 rounded-lg bg-red-50 flex items-center justify-center">
-                                            <i class="fas fa-file-pdf text-red-600"></i>
+                                <?php if ((int) $application->current_status === 12): ?>
+                                    <div class="flex items-center justify-between px-4 py-3 bg-green-50 border border-green-200 rounded-xl">
+                                        <div class="flex items-center gap-3">
+                                            <div class="w-10 h-10 rounded-lg bg-white flex items-center justify-center shrink-0">
+                                                <i class="fas fa-file-pdf text-red-600 text-xl"></i>
+                                            </div>
+                                            <div>
+                                                <p class="text-sm font-bold text-slate-700">PERMISSION LETTER</p>
+                                                <p class="text-[10px] text-slate-500">Signed Permission Letter</p>
+                                            </div>
                                         </div>
-                                        <div>
-                                            <p class="text-xs font-bold text-slate-700">
-                                                Permission Letter
-                                            </p>
-                                            <p class="text-[10px] text-slate-500">
-                                                Upload signed PDF
-                                            </p>
+                                        <div class="flex items-center gap-2">
+                                            <a href="<?= base_url('view-document/' . $doc['id']) ?>"
+                                               target="_blank"
+                                               title="Preview PDF"
+                                               class="w-9 h-9 flex items-center justify-center bg-[#1e4d7b] hover:bg-[#163a5d] text-white rounded-lg shadow-sm transition">
+                                                <i class="fas fa-eye text-xs"></i>
+                                            </a>
+                                            <a href="<?= base_url('download-document/' . $doc['id']) ?>"
+                                               title="Download PDF"
+                                               class="w-9 h-9 flex items-center justify-center bg-green-600 hover:bg-green-700 text-white rounded-lg shadow-sm transition">
+                                                <i class="fas fa-download text-xs"></i>
+                                            </a>
                                         </div>
                                     </div>
-                                    <button type="button"
-                                            onclick="document.getElementById('permissionLetterInput').click()"
-                                            class="px-3 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg text-xs font-semibold transition flex items-center gap-2">
-                                        <i class="fas fa-file-signature"></i>
-                                        <?= ((int) $application->current_status === 9)
-                                            ? 'UPLOAD'
-                                            : 'RE-UPLOAD' ?>
-                                    </button>
-                                </div>
-                                <input type="file"
-                                       id="permissionLetterInput"
-                                       name="permission_letter"
-                                       accept=".pdf,application/pdf"
-                                       class="hidden"
-                                       onchange="handlePermissionLetter(this, <?= (int) $application->id ?>)">
+                                <?php else: ?>
+                                    <div class="border border-slate-200 bg-slate-50 rounded-lg p-3">
+                                        <div class="flex items-center justify-between gap-3">
+                                            <div class="flex items-center gap-2">
+                                                <div class="w-9 h-9 rounded-lg bg-red-50 flex items-center justify-center">
+                                                    <i class="fas fa-file-pdf text-red-600"></i>
+                                                </div>
+                                                <div>
+                                                    <p class="text-xs font-bold text-slate-700">Permission Letter</p>
+                                                    <p class="text-[10px] text-slate-500">Upload signed PDF</p>
+                                                </div>
+                                            </div>
+                                            <button type="button"
+                                                    onclick="document.getElementById('permissionLetterInput').click()"
+                                                    class="px-3 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg text-xs font-semibold transition flex items-center gap-2">
+                                                <i class="fas fa-file-signature"></i>
+                                                <?= ((int) $application->current_status === 9) ? 'UPLOAD' : 'RE-UPLOAD' ?>
+                                            </button>
+                                        </div>
+                                        <input type="file"
+                                               id="permissionLetterInput"
+                                               name="permission_letter"
+                                               accept=".pdf,application/pdf"
+                                               class="hidden"
+                                               onchange="handlePermissionLetter(this, <?= (int) $application->id ?>)">
+                                    </div>
+                                <?php endif; ?>
                             </div>
                         <?php endif; ?>
                     </div>
                 <?php endif; ?>
-
             </div>
-            <?php endif; ?>
 
-            </div>
+
 
             <?php
             $roleIds   = session()->get('role_ids');
             $roleNames = '';
-            $hasRole1  = false;   // <-- naya flag
-
+            $hasRole1  = false;
             if (! empty($roleIds)) {
                 $db  = db_connect();
                 $ids = array_filter(array_map('intval', explode(',', (string) $roleIds)));
-
                 if (! empty($ids)) {
-                    // check karo role id 1 hai ya nahi
                     $hasRole1 = in_array(1, $ids, true);
 
                     $rows = $db->table('mas_role')
@@ -2736,19 +2818,33 @@ $csrfHash = $data['csrf_hash'] ?? csrf_hash();
                         ->get()
                         ->getResultArray();
 
-                    $roleNames = strtolower(implode(',', array_column($rows, 'name')));
+                    $roleNames = strtolower(
+                        implode(',', array_column($rows, 'name'))
+                    );
                 }
             }
-
             $currentStatus = (int) $application->current_status;
             ?>
-
-            <?php if (! $hasRole1): ?>   <!-- <-- yahan hide ho jayega -->
-                <div class="actions-card lg:col-span-2 space-y-3">
+            <div class="actions-card lg:col-span-2 space-y-3">
+                <?php if ($hasRole1): ?>
+                    <?php if (! in_array($currentStatus, [3, 12], true)): ?>
+                        <div class="actions-header">
+                            <div class="actions-body">
+                                <a href="<?= base_url('edit-request/' . $application->id) ?>"
+                                   class="btn btn-sm text-white font-semibold"
+                                   style="background-color: rgb(229, 133, 0); border-color: rgb(229, 133, 0);"
+                                   onmouseover="this.style.backgroundColor='#c96f00'"
+                                   onmouseout="this.style.backgroundColor='#e58500'">
+                                    <i class="fas fa-undo-alt"></i>
+                                    Return / Edit
+                                </a>
+                            </div>
+                        </div>
+                    <?php endif; ?>
+                <?php else: ?>
                     <?php if ($currentStatus === 12): ?>
                         <div></div>
-                    <?php elseif (in_array($currentStatus, [9, 10, 11])): ?>
-                        <!-- Permission Letter Button -->
+                    <?php elseif (in_array($currentStatus, [9, 10, 11], true)): ?>
                         <button type="button"
                                 id="permission_downloadBtn"
                                 class="btn btn-sm btn-success d-block mx-auto permission-btn"
@@ -2756,13 +2852,9 @@ $csrfHash = $data['csrf_hash'] ?? csrf_hash();
                                 onclick="permission_downloadApplicationPreview(this.dataset.appId)">
                             <i class="fas fa-download"></i>
                             PERMISSION LETTER GENERATED
-                        </button> 
+                        </button>
                     <?php else: ?>
-                        <div class="actions-header">
-                            <h3>
-                                <i class="fas fa-bolt" style="margin-right: 0.5rem; color: #64748b; font-size: 0.85rem;"></i>
-                                Actions
-                            </h3>
+                            <div class="actions-header">
                             <div class="actions-body">
                                 <button type="button"
                                         class="btn btn-sm btn-primary"
@@ -2773,21 +2865,26 @@ $csrfHash = $data['csrf_hash'] ?? csrf_hash();
                                     <i class="fas fa-share"></i>
                                     Forward
                                 </button>
-                                <button type="button" class="btn btn-outline">
+                                <a href="<?= base_url('edit-request/' . $application->id) ?>"
+                                   class="btn btn-sm text-white font-semibold"
+                                   style="background-color: rgb(229, 133, 0); border-color: rgb(229, 133, 0);"
+                                   onmouseover="this.style.backgroundColor='#c96f00'"
+                                   onmouseout="this.style.backgroundColor='#e58500'">
                                     <i class="fas fa-undo-alt"></i>
-                                    Return
-                                </button>
-                                <button type="button" class="btn btn-destructive" onclick="openRejectModal()">
+                                    Return / Edit
+                                </a>
+                                <button type="button"
+                                        class="btn btn-destructive"
+                                        onclick="openRejectModal()">
                                     <i class="fas fa-times-circle"></i>
                                     Reject
                                 </button>
                             </div>
                         </div>
                     <?php endif; ?>
-                </div>
-            <?php endif; ?>
+                <?php endif; ?>
+            </div>
           
-
         </div>
     </div>
 </div>
@@ -3271,50 +3368,67 @@ function generateDeclarationPageHTML(app) {
    GENERATE APPLICATION PDF HTML - COMPLETE WITH FULL CSS
    ========================================================= */
 function generateApplicationPdfHTML(data) {
-    const app = data.application || {};
-    const examDetails = data.exam_details || [];
-    const vendors = data.vendors || [];
+    const app             = data.application  || {};
+    const examDetails     = data.exam_details || [];
+    const vendors         = data.vendors      || [];
     const centreListReady = app.centre_list_ready || 0;
 
-
-    
     // Format date
-    const createdDate = app.created_at ? new Date(app.created_at) : new Date();
+    const createdDate   = app.created_at ? new Date(app.created_at) : new Date();
     const formattedDate = createdDate.toLocaleDateString('en-GB', {
-        day: '2-digit',
+        day:   '2-digit',
         month: 'short',
-        year: 'numeric'
+        year:  'numeric'
     });
 
-    // Generate exam rows with centre details
+    // Generate exam rows with new columns: Coordinator Details & Centre Address (address, state, city)
     let examRows = '';
     if (examDetails.length > 0) {
         examDetails.forEach((exam, index) => {
-            // Check if centre details are available
-            const hasCentreDetails = (exam.centre_name && exam.centre_name !== '—' && exam.centre_name !== '') || 
-                                    (exam.centre_address && exam.centre_address !== '—' && exam.centre_address !== '');
-            
+            const hasCentreDetails =
+                (exam.centre_name    && exam.centre_name    !== '—' && exam.centre_name    !== '') ||
+                (exam.centre_address && exam.centre_address !== '—' && exam.centre_address !== '');
+
             if (centreListReady == 1 && hasCentreDetails) {
-                // Full details with centre information
+                // Build coordinator details string
+                const coordinatorName  = exam.coordinator_name  || '—';
+                const coordinatorEmail = exam.coordinator_email || '—';
+                const coordinatorPhone = exam.coordinator_mobile_no || '—';
+                const coordinatorHtml  = `
+                    <strong>${escapeHtml(coordinatorName)}</strong><br>
+                    ${escapeHtml(coordinatorEmail)}<br>
+                    ${escapeHtml(coordinatorPhone)}
+                `;
+
+                // Build centre address (address, state, city)
+                const centreAddr  = exam.centre_address || '—';
+                const stateName   = exam.state_name     || '—';
+                const districtName= exam.district_name  || '—';
+                const centreAddressHtml = `
+                    ${escapeHtml(centreAddr)}<br>
+                    <strong>State:</strong> ${escapeHtml(stateName)}<br>
+                    <strong>City:</strong> ${escapeHtml(districtName)}
+                `;
+
                 examRows += `
                     <tr>
-                        <td class="center" style="width:5%;">${index + 1}</td>
-                        <td class="left" style="width:18%;font-weight:600;">${escapeHtml(exam.exam_name || '—')}</td>
-                        <td class="center" style="width:12%;">${escapeHtml(exam.exam_date || '—')}</td>
-                        <td class="left" style="width:30%;">${escapeHtml(exam.centre_address || '—')}</td>
-                        <td class="center" style="width:15%;">${escapeHtml(exam.centre_name || '—')}</td>
-                        <td class="center" style="width:10%;">${escapeHtml(exam.state_name || '—')}</td>
-                        <td class="center" style="width:10%;">${escapeHtml(exam.district_name || '—')}</td>
+                        <td class="center" style="width:6%;">${index + 1}</td>
+                        <td class="left"   style="width:14%;font-weight:600;">${escapeHtml(exam.exam_name || '—')}</td>
+                        <td class="center" style="width:10%;">${escapeHtml(exam.exam_date || '—')}</td>
+                        <td class="left"   style="width:18%;">${escapeHtml(exam.centre_address || '—')}</td>
+                        <td class="center" style="width:12%;">${escapeHtml(exam.centre_name || '—')}</td>
+                        <td class="center" style="width:16%;font-size:10px;">${coordinatorHtml}</td>
+                        <td class="left"   style="width:26%;font-size:10px;">${centreAddressHtml}</td>
                     </tr>
                 `;
             } else {
-                // Minimal details without centre info
+                // Centre details not available — use colspan for the missing columns
                 examRows += `
                     <tr>
-                        <td class="center" style="width:7%;">${index + 1}</td>
-                        <td class="left" style="width:25%;font-weight:600;">${escapeHtml(exam.exam_name || '—')}</td>
-                        <td class="center" style="width:18%;">${escapeHtml(exam.exam_date || '—')}</td>
-                        <td class="center" style="width:50%;" colspan="4">
+                        <td class="center" style="width:4%;">${index + 1}</td>
+                        <td class="left"   style="width:14%;font-weight:600;">${escapeHtml(exam.exam_name || '—')}</td>
+                        <td class="center" style="width:10%;">${escapeHtml(exam.exam_date || '—')}</td>
+                        <td class="center" style="width:72%;" colspan="4">
                             <span style="color:#b45309;font-weight:600;">
                                 <i>Centre details not available at the time of submission</i>
                             </span>
@@ -3338,7 +3452,7 @@ function generateApplicationPdfHTML(data) {
             vendorRows += `
                 <tr>
                     <td class="center" style="width:8%;">${index + 1}</td>
-                    <td style="width:42%;font-weight:600;">${escapeHtml(vendor.vendor_name || '—')}</td>
+                    <td style="width:42%;font-weight:600;">${escapeHtml(vendor.vendor_name      || '—')}</td>
                     <td style="width:50%;">${escapeHtml(vendor.jammer_model_name || '—')}</td>
                 </tr>
             `;
@@ -3355,20 +3469,20 @@ function generateApplicationPdfHTML(data) {
     let examHeaders = '';
     if (centreListReady == 1) {
         examHeaders = `
-            <th class="center" style="width:5%;">S.No.</th>
-            <th class="left" style="width:18%;">Examination Name</th>
-            <th class="center" style="width:12%;">Examination Date</th>
-            <th class="left" style="width:30%;">Examination Address</th>
-            <th class="center" style="width:15%;">Centre Name</th>
-            <th class="center" style="width:10%;">State</th>
-            <th class="center" style="width:10%;">City/District</th>
+            <th class="center" style="width:6%;">S.No.</th>
+            <th class="left"   style="width:14%;">Examination Name</th>
+            <th class="center" style="width:10%;">Examination Date</th>
+            <th class="left"   style="width:18%;">Examination Address</th>
+            <th class="center" style="width:12%;">Centre Name</th>
+            <th class="center" style="width:16%;">Coordinator Details<br><span style="font-weight:400;font-size:9px;">(name, email, phone)</span></th>
+            <th class="center" style="width:26%;">Centre Address<br><span style="font-weight:400;font-size:9px;">(address, state, city)</span></th>
         `;
     } else {
         examHeaders = `
-            <th class="center" style="width:7%;">S.No.</th>
-            <th class="left" style="width:25%;">Examination Name</th>
-            <th class="center" style="width:18%;">Examination Date</th>
-            <th class="center" style="width:50%;" colspan="4">Centre Details</th>
+            <th class="center" style="width:4%;">S.No.</th>
+            <th class="left"   style="width:14%;">Examination Name</th>
+            <th class="center" style="width:10%;">Examination Date</th>
+            <th class="center" style="width:72%;" colspan="4">Centre Details</th>
         `;
     }
 
@@ -3376,14 +3490,18 @@ function generateApplicationPdfHTML(data) {
     let html = `
 <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { 
+    html, body {
+        margin: 0;
+        padding: 0;
+    }
+    body {
         font-family: 'Times New Roman', Arial, Helvetica, sans-serif;
         background: #ffffff;
         color: #0f172a;
-        padding: 20px;
+        padding: 0;
     }
-    @page { 
-        size: A4; 
+    @page {
+        size: A4;
         margin: 10mm;
         @bottom-center {
             content: "Page " counter(page);
@@ -3392,14 +3510,14 @@ function generateApplicationPdfHTML(data) {
         }
     }
     @media print { body { padding: 0; } }
-    
+
     .document {
         width: 100%;
         max-width: 210mm;
         margin: 0 auto;
         background: #ffffff;
     }
-    
+
     .tricolor {
         height: 5px;
         width: 100%;
@@ -3407,7 +3525,7 @@ function generateApplicationPdfHTML(data) {
         -webkit-print-color-adjust: exact;
         print-color-adjust: exact;
     }
-    
+
     .header { padding: 15px 28px 10px; }
     .gov-header { text-align: center; }
     .emblem {
@@ -3425,8 +3543,8 @@ function generateApplicationPdfHTML(data) {
         text-transform: uppercase;
     }
     .divider-main { margin-top: 12px; border-top: 2.5px solid #1e4d7b; }
-    .divider-sub { margin-top: 3px; border-top: 1px solid #cbd5e1; }
-    
+    .divider-sub  { margin-top: 3px;  border-top: 1px solid #cbd5e1; }
+
     .meta-wrapper { padding: 0 28px; }
     .meta {
         display: grid;
@@ -3438,7 +3556,7 @@ function generateApplicationPdfHTML(data) {
     }
     .meta-right { text-align: right; }
     .meta strong { font-weight: 700; }
-    
+
     .document-title { padding: 0 28px; }
     .title-box { text-align: center; margin-bottom: 18px; }
     .title {
@@ -3452,8 +3570,9 @@ function generateApplicationPdfHTML(data) {
         padding-bottom: 5px;
         color: #1e293b;
     }
-    
+
     .content { padding: 0 28px; }
+
     .intro {
         font-size: 12px;
         line-height: 1.8;
@@ -3461,10 +3580,10 @@ function generateApplicationPdfHTML(data) {
         margin: 0 0 18px;
         color: #1e293b;
     }
-    
+
     .section {
         margin-bottom: 22px;
-        page-break-inside: avoid;
+        page-break-inside: auto;
     }
     .section-heading {
         display: flex;
@@ -3474,6 +3593,7 @@ function generateApplicationPdfHTML(data) {
         padding-bottom: 6px;
         margin-bottom: 12px;
         page-break-after: avoid;
+        break-after: avoid-page;
     }
     .section-number {
         width: 26px;
@@ -3498,12 +3618,13 @@ function generateApplicationPdfHTML(data) {
         margin: 0;
         letter-spacing: 0.5px;
     }
-    
+
     table {
         width: 100%;
         border-collapse: collapse;
         font-size: 10.5px;
         table-layout: fixed;
+        page-break-inside: auto;
     }
     thead { display: table-header-group; }
     th {
@@ -3525,6 +3646,10 @@ function generateApplicationPdfHTML(data) {
         overflow-wrap: anywhere;
         font-size: 10.5px;
     }
+    tr {
+        page-break-inside: avoid;
+        break-inside: avoid;
+    }
     .label-cell {
         width: 30%;
         background: #f8fafc;
@@ -3538,8 +3663,8 @@ function generateApplicationPdfHTML(data) {
         font-weight: 600;
     }
     .center { text-align: center; }
-    .left { text-align: left; }
-    
+    .left   { text-align: left; }
+
     .declaration {
         font-size: 11px;
         line-height: 1.8;
@@ -3548,14 +3673,13 @@ function generateApplicationPdfHTML(data) {
         color: #1e293b;
     }
     .declaration + .declaration { margin-top: 8px; }
-    
+
     .declaration-signature-area {
         margin-top: 30px;
         padding-top: 10px;
         border-top: 1px dashed #94a3b8;
     }
-    
-    .signature-area { padding: 0 28px 25px; }
+
     .signature-grid {
         display: grid;
         grid-template-columns: 1fr 1fr;
@@ -3591,12 +3715,7 @@ function generateApplicationPdfHTML(data) {
         color: #64748b;
         margin-top: 4px;
     }
-    .signature-date {
-        font-size: 10px;
-        color: #475569;
-        margin-top: 8px;
-    }
-    
+
     .page-footer {
         text-align: center;
         font-size: 9px;
@@ -3605,8 +3724,7 @@ function generateApplicationPdfHTML(data) {
         padding-top: 10px;
         border-top: 1px solid #e2e8f0;
     }
-    
-    /* Centre not available notice */
+
     .centre-notice {
         background: #fef3c7;
         border: 1px solid #f59e0b;
@@ -3628,13 +3746,14 @@ function generateApplicationPdfHTML(data) {
         color: #78350f;
         font-weight: 600;
     }
-    
+
     @media print {
         .document { max-width: 100%; }
-        .section { page-break-inside: avoid; }
-        .section-heading { page-break-after: avoid; }
+        .section { page-break-inside: auto; }
+        .section-heading { page-break-after: avoid; break-after: avoid-page; }
         table { page-break-inside: auto; }
-        tr { page-break-inside: avoid; page-break-after: auto; }
+        thead { display: table-header-group; }
+        tr { page-break-inside: avoid; break-inside: avoid; }
         .tricolor, th, .section-number {
             -webkit-print-color-adjust: exact;
             print-color-adjust: exact;
@@ -3653,7 +3772,7 @@ function generateApplicationPdfHTML(data) {
     <!-- HEADER -->
     <div class="header">
         <div class="gov-header">
-            <img 
+            <img
                 src="${baseUrl}assets/image/Emblem_of_India.svg.webp"
                 class="emblem"
                 alt="Government of India Emblem"
@@ -3688,7 +3807,7 @@ function generateApplicationPdfHTML(data) {
     <div class="content">
         <!-- INTRO -->
         <p class="intro">
-            This application is submitted by the following organisation for seeking permission 
+            This application is submitted by the following organisation for seeking permission
             for deployment of jammers during the examination(s) mentioned below.
         </p>
 
@@ -3703,11 +3822,11 @@ function generateApplicationPdfHTML(data) {
                 <tbody>
                     <tr>
                         <td class="label-cell">Application Number</td>
-                        <td class="value-cell">${escapeHtml(app.app_no || 'JPMS/2026/001057')}</td>
+                        <td class="value-cell">${escapeHtml(app.app_no            || 'JPMS/2026/001057')}</td>
                     </tr>
                     <tr>
                         <td class="label-cell">Name of Organisation</td>
-                        <td class="value-cell">${escapeHtml(app.organisation || '—')}</td>
+                        <td class="value-cell">${escapeHtml(app.organisation      || '—')}</td>
                     </tr>
                     <tr>
                         <td class="label-cell">Type of Organisation</td>
@@ -3715,15 +3834,11 @@ function generateApplicationPdfHTML(data) {
                     </tr>
                     <tr>
                         <td class="label-cell">Contact Person</td>
-                        <td class="value-cell">${escapeHtml(app.contact_person || '—')}</td>
+                        <td class="value-cell">${escapeHtml(<?= json_encode(session()->get('name') ?? '') ?> || '—')}</td>
                     </tr>
                     <tr>
                         <td class="label-cell">Email</td>
-                        <td class="value-cell">${escapeHtml(app.email || '—')}</td>
-                    </tr>
-                    <tr>
-                        <td class="label-cell">Phone</td>
-                        <td class="value-cell">${escapeHtml(app.phone || '—')}</td>
+                        <td class="value-cell">${escapeHtml(<?= json_encode(session()->get('email') ?? '') ?> || '—')}</td>
                     </tr>
                 </tbody>
             </table>
@@ -3758,8 +3873,8 @@ function generateApplicationPdfHTML(data) {
                 <thead>
                     <tr>
                         <th class="center" style="width:8%;">S.No.</th>
-                        <th class="left" style="width:42%;">Vendor Name</th>
-                        <th class="left" style="width:50%;">Jammer Model</th>
+                        <th class="left"   style="width:42%;">Vendor Name</th>
+                        <th class="left"   style="width:50%;">Jammer Model</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -3770,8 +3885,8 @@ function generateApplicationPdfHTML(data) {
     </div>
 
     <!-- PAGE 2: DECLARATION WITH SIGNATURE -->
-    <div style="page-break-before:always;padding:0 28px;padding-top:20px;">
-        
+    <div style="padding:0 28px;padding-top:20px;">
+
         <!-- SECTION 4: DECLARATION -->
         <div class="section" style="margin-top:10px;">
             <div class="section-heading">
@@ -3782,7 +3897,7 @@ function generateApplicationPdfHTML(data) {
             <p class="declaration">
                 <strong>I/We hereby declare and undertake that:</strong>
             </p>
-            
+
             <p class="declaration" style="padding-left:20px;margin-top:6px;">
                 1. The information furnished in this application is true, complete and correct to the best of our knowledge and belief.
             </p>
@@ -3833,20 +3948,19 @@ function generateApplicationPdfHTML(data) {
                     </div>
                 </div>
             </div>
-            
+
             <div style="margin-top:20px;text-align:center;font-size:9.5px;color:#94a3b8;border-top:1px solid #e2e8f0;padding-top:12px;">
                 <span>This application is generated through the online portal. Verifiable with the application number.</span>
             </div>
         </div>
-        
+
         <div class="page-footer">Page 2</div>
     </div>
 </div>
     `;
 
     // If centre_list_ready == 0, add the Declaration Acknowledged page
-    if (centreListReady === 0) {
-
+    if (centreListReady == 0) {
         html += `
     <!-- PAGE 3: DECLARATION ACKNOWLEDGED -->
     <div style="page-break-before:always;">
@@ -3912,14 +4026,24 @@ function downloadApplicationPreview(appId) {
         dataType: 'json',
         success: function(response) {
             const pdfHTML = generateApplicationPdfHTML(response);
-            
+
+            // ✅ app_no response.application.app_no me hai
+            const appNo = (response.application && response.application.app_no)
+                       || response.app_no
+                       || appId
+                       || 'Application PDF';
+
             const printWindow = window.open('', '_blank', 'width=1000,height=800');
             if (!printWindow) {
                 alert('Please allow pop-ups to download the PDF.');
                 return;
             }
 
-            printWindow.document.write('<!DOCTYPE html>\n<html>\n<head>\n<meta charset="UTF-8">\n<title>Application PDF</title>\n</head>\n<body>\n' + pdfHTML + '\n</body>\n</html>');
+            printWindow.document.write(
+                '<!DOCTYPE html>\n<html>\n<head>\n<meta charset="UTF-8">\n<title>'
+                + appNo +
+                '</title>\n</head>\n<body>\n' + pdfHTML + '\n</body>\n</html>'
+            );
             printWindow.document.close();
 
             setTimeout(function() {
@@ -4743,109 +4867,473 @@ function permission_generateApplicationPdfHTML(response) {
     const examDetails = response.exam_details || [];
     const vendors = response.vendors || [];
 
-    // ---- Determine single vs multiple exam ----
-    const isSingleExam = application.is_single_exam !== undefined ? application.is_single_exam : 1;
-    const isSingle = isSingleExam == 1;
-
-    // ---- Extract dynamic values ----
     const orgName = application.organisation || '—';
-    const orgType = application.organisation_type || '';
+    const orgType = application.organisation_type || 'Examination Conducting Body';
     const contactPerson = application.contact_person || '—';
     const email = application.email || '—';
     const phone = application.phone || '—';
     const appNo = application.app_no || 'JPMS/2026/001057';
-    const referenceNo = application.reference_no || '11/37/2026-JAM';
+    const referenceNo = application.reference_no || appNo;
     const createdAt = application.created_at || new Date().toISOString().slice(0, 19).replace('T', ' ');
 
-    // ---- Vendor Names ----
     let vendorNames = 'M/s BEL or M/s ECIL';
+
     if (vendors && vendors.length > 0) {
         const names = vendors
             .map(v => v.vendor_name || ('Vendor #' + v.vendor_id))
             .filter((v, i, self) => self.indexOf(v) === i);
-        if (names.length) vendorNames = names.join(' and ');
+
+        if (names.length === 1) {
+            vendorNames = names[0];
+        } else if (names.length > 1) {
+            vendorNames = names.join(', ');
+        }
     }
 
-    // ---- Build exam location/date text ----
-    let examLocationDate = '';
+    const uniqueExamNames = [
+        ...new Set(
+            examDetails
+                .map(e => e.exam_name)
+                .filter(e => e && e !== '—')
+                .map(e => String(e).trim())
+        )
+    ];
+
+    const uniqueExamDates = [
+        ...new Set(
+            examDetails
+                .map(e => e.exam_date)
+                .filter(e => e && e !== '—')
+                .map(e => permission_formatDate(e))
+                .filter(e => e)
+        )
+    ];
+
+    const centreMap = new Map();
+
+    examDetails.forEach(e => {
+        const centreName = String(e.centre_name || '').trim();
+        const centreAddress = String(e.centre_address || '').trim();
+        const district = String(e.district || '').trim();
+        const state = String(e.state || '').trim();
+        const parts = [];
+
+        if (centreAddress && centreAddress !== '—') {
+            parts.push(centreAddress);
+        } else if (centreName && centreName !== '—') {
+            parts.push(centreName);
+        }
+
+        if (district && district !== '—') {
+            parts.push(district);
+        }
+
+        if (state && state !== '—') {
+            parts.push(state);
+        }
+
+        if (parts.length > 0) {
+            const fullCentreAddress = parts.join(', ');
+
+            if (!centreMap.has(fullCentreAddress)) {
+                centreMap.set(fullCentreAddress, fullCentreAddress);
+            }
+        }
+    });
+
+    const allCentreAddresses = [...centreMap.values()];
+
+    const uniqueCentres = [
+        ...new Set(
+            examDetails
+                .map(e => e.centre_name)
+                .filter(e => e && e !== '—')
+                .map(e => String(e).trim())
+        )
+    ];
+
+    const dateText = uniqueExamDates.length > 0 ? uniqueExamDates.join(', ') : '';
+
+    const examNameText = uniqueExamNames.length > 0 ? uniqueExamNames.join(', ') : '';
+
+    const centreAddressText = allCentreAddresses.length > 0 ? allCentreAddresses.join(', ') : '';
+
+    const isMulti =
+        uniqueExamDates.length > 1 ||
+        uniqueCentres.length > 1 ||
+        uniqueExamNames.length > 1;
+
     let periodText = '';
 
-    if (isSingle) {
-        if (examDetails.length > 0) {
-            const first = examDetails[0];
-            const centreAddress = first.centre_address || first.centre_name || '—';
-            const examDate = first.exam_date || '—';
-            examLocationDate = `in ${centreAddress} on ${examDate}`;
-        } else {
-            examLocationDate = 'in [Address of examination centre] on [Date(s) of examination]';
-        }
-    } else {
-        const year = new Date(createdAt).getFullYear() || 2026;
+    if (isMulti) {
+        const createdDate = new Date(createdAt);
+        const year = !isNaN(createdDate.getTime()) ? createdDate.getFullYear() : 2026;
         periodText = `during ${year}`;
     }
 
+    let examLocationDate = '';
+
+    const examPart = examNameText ? examNameText : '';
+    const locationPart = centreAddressText ? `in ${centreAddressText}` : '';
+    const datePart = dateText ? `on ${dateText}` : '';
+
+    examLocationDate = [
+        examPart,
+        locationPart,
+        datePart
+    ]
+        .filter(Boolean)
+        .join(' ');
+
     const emblemPath = permission_baseUrl + 'assets/image/Emblem_of_India.svg.webp';
 
-    // ---- Select Template ----
-    if (isSingle) {
-        return permission_generateSingleExamLetter({
-            emblemPath, appNo, createdAt, contactPerson, orgName, orgType, email, phone,
-            referenceNo, vendorNames, examLocationDate
-        });
-    } else {
-        return permission_generateMultipleExamLetter({
-            emblemPath, appNo, createdAt, contactPerson, orgName, orgType, email, phone,
-            referenceNo, vendorNames, periodText
-        });
-    }
-}
-
-/* =========================================================
-   PERMISSION LETTER - COMMON HELPERS
-   ========================================================= */
-
-/* =========================================================
-   PERMISSION LETTER - COMMON HELPERS
-   ========================================================= */
-
-function permission_escapeHtml(value) {
-    if (value === null || value === undefined) {
-        return '';
-    }
-
-    return String(value)
-        .replace(/&/g, '&amp;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;')
-        .replace(/"/g, '&quot;')
-        .replace(/'/g, '&#039;');
-}
-
-
-/* =========================================================
-   DATE FORMAT
-   ========================================================= */
-
-function permission_formatDate(dateValue) {
-
-    const date = dateValue
-        ? new Date(dateValue)
-        : new Date();
-
-    if (isNaN(date.getTime())) {
-        return '';
-    }
-
-    return date.toLocaleDateString('en-GB', {
-        day: '2-digit',
-        month: 'short',
-        year: 'numeric'
+    return permission_generateUnifiedLetter({
+        emblemPath,
+        appNo,
+        createdAt,
+        contactPerson,
+        orgName,
+        orgType,
+        email,
+        phone,
+        referenceNo,
+        vendorNames,
+        examLocationDate,
+        periodText,
+        isMulti,
+        examDetails,
+        uniqueExamNames,
+        uniqueExamDates,
+        uniqueCentres,
+        centreAddressText,
+        dateText,
+        examNameText
     });
 }
 
-/* =========================================================
-   PERMISSION LETTER - COMMON HELPERS
-   ========================================================= */
+function permission_generateUnifiedLetter(data) {
+    const formattedDate = permission_formatDate(new Date().toISOString());
+    const appNo = permission_escapeHtml(data.appNo || '');
+    const orgName = permission_escapeHtml(data.orgName || '');
+    const orgType = permission_escapeHtml(data.orgType || 'Examination Conducting Body');
+    const vendorNames = permission_escapeHtml(data.vendorNames || '');
+    const referenceNo = permission_escapeHtml(data.referenceNo || data.appNo || '');
+    const examLocationDate = permission_escapeHtml(data.examLocationDate || '');
+    const periodText = permission_escapeHtml(data.periodText || '');
+    const isMulti = data.isMulti || false;
+    const centreAddressText = permission_escapeHtml(data.centreAddressText || '');
+    const dateText = permission_escapeHtml(data.dateText || '');
+    const examNameText = permission_escapeHtml(data.examNameText || '');
+    const contactPerson = <?= json_encode(session()->get('name') ?? '') ?>;
+    const email = <?= json_encode(session()->get('email') ?? '') ?>;
+    const phone = <?= json_encode(session()->get('mobile_no') ?? '') ?>;
+
+    let subjectLine = '';
+
+    if (isMulti) {
+        subjectLine = `Permission for deployment of low powered jammers in the examinations to be conducted by <b>${orgName}</b>, <b>${periodText}</b>.`;
+    } else {
+        subjectLine = `Permission for deployment of low powered jammers in examination halls for the examination to be conducted by <b>${orgName}</b>.`;
+    }
+
+    let examinationDetailsText = '';
+
+    if (examLocationDate) {
+        examinationDetailsText = `<b>${examLocationDate}</b>`;
+    } else {
+        examinationDetailsText = 'the examination/recruitment test';
+    }
+
+    let para2Text = `
+        2. Approval of the Secretary (Security),
+        Cabinet Secretariat, is hereby conveyed for
+        deployment of low powered jammers, through
+        <b>${vendorNames}</b>,
+        for the examination to be conducted by
+        <b>${orgName}</b>
+        ${examinationDetailsText},
+        as per the details furnished in the letter
+        under reference, subject to the following:-
+    `;
+
+    let extraPara = '';
+
+    if (isMulti) {
+        extraPara = `
+            <p>
+                3. The approval is also subject to the condition
+                that list of examination centers, along with
+                their full address, and the number of jammers
+                to be installed in each center, will be provided
+                to this office by
+                <b>${orgName}</b>,
+                before the actual date of examination/deployment
+                of jammers.
+            </p>
+        `;
+    }
+
+    const para3Number = isMulti ? '4' : '3';
+    const para4Number = isMulti ? '5' : '4';
+    const para5Number = isMulti ? '6' : '5';
+
+    const copyExtraText = isMulti
+        ? ` Also, compliance by
+            <b>${orgName}</b>
+            with the condition at para 3 above may be
+            verified before deployment of jammers.`
+        : '';
+
+    return `
+        ${permission_commonStyles()}
+
+        <div class="permission-document">
+
+            <div class="official-header">
+                <div class="govt-title">
+                    File No. <b>${appNo}</b>
+                </div>
+                <div class="govt-title">
+                    Govt. of India
+                </div>
+                <div class="cabinet-title">
+                    Cabinet Secretariat
+                </div>
+                <div class="office-title">
+                    Office of the Secretary (Security)
+                </div>
+                <div class="office-address">
+                    Room No. 218, Seva Teerth,<br>
+                    Motilal Nehru Marg, New Delhi
+                </div>
+            </div>
+
+            <div class="reference-row">
+                <table>
+                    <tr>
+                        <td class="reference-file"></td>
+                        <td class="reference-date">
+                            Dated:
+                            <b>
+                                ${permission_escapeHtml(formattedDate)}
+                            </b>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+
+            <div class="to-section">
+                <div class="to-title">
+                    To
+                </div>
+                <div class="to-address">
+                    <div>
+                        <b>${contactPerson}</b>
+                    </div>
+                    <div>
+                        <b>${orgName}</b>
+                    </div>
+                    <div>
+                        <b>${orgType}</b>
+                    </div>
+                    ${
+                        email || phone
+                            ? `
+                                <div>
+                                    ${
+                                        email
+                                            ? `<b>${email}</b>`
+                                            : ''
+                                    }
+                                    ${
+                                        email && phone
+                                            ? ' | '
+                                            : ''
+                                    }
+                                    ${
+                                        phone
+                                            ? `<b>${phone}</b>`
+                                            : ''
+                                    }
+                                </div>
+                            `
+                            : ''
+                    }
+                </div>
+            </div>
+
+            <div class="subject-section">
+                <span class="subject-label">
+                    Subject:
+                </span>
+                ${subjectLine}
+            </div>
+
+            <div class="salutation">
+                Sir/Madam,
+            </div>
+
+            <div class="letter-body">
+                <p>
+                    I am directed to refer to your
+                    Letter Number:
+                    <b>${appNo}</b>,
+                    Dated:
+                    <b>${permission_escapeHtml(formattedDate)}</b>,
+                    on the subject mentioned above.
+                </p>
+
+                <p>
+                    ${para2Text}
+                </p>
+
+                <ol class="conditions" type="i">
+                    <li>
+                        The jammer models deployed will be as per
+                        approved model of
+                        <b>${vendorNames}</b>
+                        (details uploaded at
+                        www.cabsec.gov.in/circulars/policyofjammer).
+                    </li>
+                    <li>
+                        Adequate arrangements should be made for
+                        safe custody of the jammers during its
+                        deployment in examination centers.
+                        Each jammer deployed at the examination
+                        centers, as indicated in Annexures of the
+                        letter under reference, will be accounted
+                        for and any discrepancy in this regard
+                        will be reported immediately to the
+                        appropriate law enforcement agency and
+                        to the Office of Secretary (Security).
+                    </li>
+                    <li>
+                        While deploying the jammers it will be
+                        ensured by
+                        <b>${orgName}</b>
+                        that the jammers do not interfere with
+                        existing mobile communication network
+                        outside examination center.
+                    </li>
+                </ol>
+
+                ${extraPara}
+
+                <p>
+                    ${para3Number}.
+                    An effective coordination mechanism with
+                    <b>${vendorNames}</b>
+                    may be established well in advance for
+                    finalizing various details relating to the
+                    deployment of jammers.
+                </p>
+
+                <p>
+                    ${para4Number}.
+                    Performance of all jammers at each
+                    examination center may be verified before
+                    commencement of examination as effectiveness
+                    of the jammers depends on various factors
+                    like its power output, signal strength of BTS,
+                    traffic load on BTS at a given point of time,
+                    distance of jammer from the BTS, sensitivity
+                    of receiver, terrain, topography, line of sight
+                    etc.
+                </p>
+
+                <p>
+                    ${para5Number}.
+                    It may kindly be ensured that all WiFi and
+                    Bluetooth devices within the vicinity of
+                    examination halls are switched off during
+                    operation of the jammers.
+                </p>
+            </div>
+
+            <div class="signature-section">
+                <p class="signature-text">
+                    Yours faithfully,
+                </p>
+                <br>
+                <p class="signature-text">
+                    <div class="designation" style="margin-top:2px;">
+                        Name: _________________
+                    </div>
+                </p>
+                <p class="signature-text">
+                    Under Security (Security) Tel. No. 23093763
+                </p>
+                <p class="signature-text">
+                    Tel. No. 23093763
+                </p>
+            </div>
+
+            <div class="copy-noo-section">
+                <div class="copy-section">
+                    <div class="copy-title">
+                        Copy to:
+                    </div>
+                    <p>
+                        CMD,
+                        <b>${vendorNames}</b>
+                    </p>
+                    <p>
+                        It is requested that all provisions of
+                        jammer policy of GoI may be strictly
+                        followed while deploying the jammers.
+                        Copy of letter from
+                        <b>${orgName}</b>,
+                        referred at Para-1, enclosed.
+                        It should be ensured that in areas where
+                        5G roll out is complete, only jammers
+                        upgraded to handle upto 5G should be
+                        deployed.
+                        ${copyExtraText}
+                    </p>
+                </div>
+
+                <div class="noo-section">
+                    <div class="noo-title">
+                        N.O.O
+                    </div>
+                    <div class="noo-item">
+                        1.
+                        <div class="designation" style="margin-top:3px;">
+                            Name: _________________
+                        </div>
+                        Director, SPG.
+                    </div>
+                    <div class="noo-item">
+                        2.
+                        <div class="designation" style="margin-top:3px;">
+                            Name: _________________
+                        </div>
+                        [Special/Additional] Director, IB
+                    </div>
+                    <div class="noo-item">
+                        alongwith a copy of the letter as mentioned
+                        in Para-1 above.
+                    </div>
+                    <div class="noo-final">
+                        <div>
+                            <div class="designation" style="margin-top:3px;">
+                                Name: _________________
+                            </div>
+                        </div>
+                        <div>
+                            Under Security (Security)
+                        </div>
+                        <div>
+                            Tel. No. 23093763
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    `;
+}
+
 function permission_escapeHtml(value) {
     if (value === null || value === undefined) {
         return '';
@@ -4876,873 +5364,340 @@ function permission_formatDate(dateValue) {
 function permission_commonStyles() {
     return `
     <style>
-    * {
-        box-sizing: border-box;
-    }
+        * {
+            box-sizing: border-box;
+        }
 
-    html,
-    body {
-        margin: 0;
-        padding: 0;
-        background: #ffffff;
-    }
-
-    body {
-        font-family: "Times New Roman", Times, serif;
-        color: #000000;
-        font-size: 16px;
-        line-height: 1.55;
-    }
-
-    @page {
-        size: A4;
-        margin: 15mm 18mm 15mm 18mm;
-    }
-
-    .permission-document {
-        width: 100%;
-        max-width: 174mm;
-        margin: 0 auto;
-        background: #ffffff;
-    }
-
-    @media print {
         html,
         body {
-            width: 210mm;
-            min-height: 297mm;
             margin: 0;
             padding: 0;
             background: #ffffff;
         }
 
-        .permission-document {
-            width: 100%;
-            max-width: none;
-            margin: 0;
-            padding: 0;
-        }
-
-        .dynamic-fill {
-            background: transparent !important;
-            padding: 0 !important;
-            border-radius: 0 !important;
-        }
-
-        .page-break-before {
-            page-break-before: always !important;
-            break-before: page !important;
-        }
-
-        .copy-section,
-        .noo-section {
-            page-break-inside: avoid;
-            break-inside: avoid;
-        }
-
-        .copy-title,
-        .noo-title {
-            page-break-after: avoid;
-            break-after: avoid;
-        }
-    }
-
-    .official-header {
-        width: 100%;
-        text-align: center;
-        margin: 0;
-        padding: 0;
-    }
-
-    .official-emblem {
-        display: block;
-        width: auto;
-        height: 58px;
-        margin: 0 auto 7px auto;
-        object-fit: contain;
-    }
-
-    .govt-title {
-        font-size: 17px;
-        font-weight: bold;
-        line-height: 1.25;
-        margin: 0;
-    }
-
-    .cabinet-title {
-        font-size: 16px;
-        font-weight: bold;
-        line-height: 1.3;
-        margin-top: 2px;
-    }
-
-    .office-title {
-        font-size: 16px;
-        font-weight: bold;
-        line-height: 1.3;
-        margin-top: 2px;
-    }
-
-    .office-address {
-        font-size: 17px;
-        line-height: 1.4;
-        margin-top: 4px;
-        font-weight: normal;
-    }
-
-    .reference-row {
-        width: 100%;
-        margin-top: 18px;
-        font-size: 15px;
-        line-height: 1.45;
-    }
-
-    .reference-row table {
-        width: 100%;
-        border-collapse: collapse;
-    }
-
-    .reference-row td {
-        padding: 0;
-        vertical-align: top;
-    }
-
-    .reference-file {
-        width: 55%;
-        text-align: left;
-    }
-
-    .reference-date {
-        width: 45%;
-        text-align: right;
-    }
-
-    .to-section {
-        margin-top: 22px;
-        margin-bottom: 20px;
-        font-family: "Times New Roman", Times, serif;
-        font-size: 16px;
-        line-height: 1.5;
-    }
-
-    .to-title {
-        font-weight: bold;
-        margin-bottom: 8px;
-    }
-
-    .to-address {
-        margin-left: 28px;
-        font-weight: normal;
-    }
-
-    .to-address div {
-        margin: 0;
-        padding: 0;
-        line-height: 1.5;
-    }
-
-    .subject-section {
-        margin-top: 14px;
-        margin-bottom: 14px;
-        font-size: 17px;
-        font-weight: bold;
-        line-height: 1.5;
-        text-align: justify;
-    }
-
-    .subject-label {
-        font-size: 17px;
-        font-weight: bold;
-    }
-
-    .salutation {
-        margin-top: 12px;
-        margin-bottom: 8px;
-        font-size: 17px;
-        font-weight: normal;
-        line-height: 1.5;
-    }
-
-    .letter-body {
-        margin-top: 4px;
-        font-size: 16px;
-        line-height: 1.55;
-        text-align: justify;
-    }
-
-    .letter-body p {
-        margin: 0 0 12px 0;
-        padding: 0;
-        text-align: justify;
-    }
-
-    .conditions {
-        margin-top: 3px;
-        margin-bottom: 12px;
-        padding-left: 30px;
-        font-size: 16px;
-        line-height: 1.55;
-    }
-
-    .conditions li {
-        padding-left: 6px;
-        margin-bottom: 8px;
-        text-align: justify;
-    }
-
-    .signature-section {
-        margin-top: 28px;
-        width: 100%;
-        font-size: 17px;
-        line-height: 1.5;
-        text-align: right;
-        padding-right: 5px;
-    }
-
-    .signature-text {
-        margin: 0;
-        padding: 0;
-        font-size: 17px;
-        line-height: 1.5;
-    }
-
-    .page-break-before {
-        page-break-before: always;
-        break-before: page;
-    }
-
-    .copy-section {
-        margin-top: 5px;
-        font-size: 16px;
-        line-height: 1.55;
-        text-align: justify;
-    }
-
-    .copy-title {
-        font-weight: bold;
-        margin-bottom: 9px;
-        font-size: 17px;
-    }
-
-    .copy-section p {
-        margin: 0 0 12px 0;
-        padding: 0;
-        text-align: justify;
-    }
-
-    .noo-section {
-        margin-top: 20px;
-        font-size: 16px;
-        line-height: 1.5;
-    }
-
-    .noo-title {
-        font-weight: bold;
-        margin-bottom: 9px;
-        font-size: 17px;
-    }
-
-    .noo-item {
-        margin: 0 0 5px 0;
-        padding: 0;
-    }
-
-    .noo-final {
-        margin-top: 14px;
-        text-align: left;
-    }
-
-    .dynamic-fill {
-        background: #f0f7ff;
-        padding: 0 2px;
-        border-radius: 2px;
-    }
-
-    @media print {
         body {
+            font-family: "Times New Roman", Times, serif;
+            color: #000000;
             font-size: 16px;
             line-height: 1.55;
         }
 
+        @page {
+            size: A4;
+            margin: 15mm 18mm 15mm 18mm;
+        }
+
+        .permission-document {
+            width: 100%;
+            max-width: 174mm;
+            margin: 0 auto;
+            background: #ffffff;
+        }
+
+        @media print {
+            html,
+            body {
+                width: 210mm;
+                min-height: 297mm;
+                margin: 0;
+                padding: 0;
+                background: #ffffff;
+            }
+
+            .permission-document {
+                width: 100%;
+                max-width: none;
+                margin: 0;
+                padding: 0;
+            }
+
+            .signature-section {
+                page-break-inside: avoid;
+                break-inside: avoid;
+            }
+
+            .copy-noo-section {
+                page-break-inside: avoid;
+                break-inside: avoid;
+            }
+
+            .copy-section,
+            .noo-section {
+                page-break-inside: avoid;
+                break-inside: avoid;
+            }
+
+            .copy-title,
+            .noo-title {
+                page-break-after: avoid;
+                break-after: avoid;
+            }
+        }
+
+        .official-header {
+            width: 100%;
+            text-align: center;
+            margin: 0;
+            padding: 0;
+        }
+
         .official-emblem {
+            display: block;
+            width: auto;
             height: 58px;
+            margin: 0 auto 7px auto;
+            object-fit: contain;
+        }
+
+        .govt-title {
+            font-size: 17px;
+            font-weight: bold;
+            line-height: 1.25;
+            margin: 0;
+        }
+
+        .cabinet-title {
+            font-size: 16px;
+            font-weight: bold;
+            line-height: 1.3;
+            margin-top: 2px;
+        }
+
+        .office-title {
+            font-size: 16px;
+            font-weight: bold;
+            line-height: 1.3;
+            margin-top: 2px;
         }
 
         .office-address {
             font-size: 17px;
             line-height: 1.4;
+            margin-top: 4px;
+            font-weight: normal;
         }
 
-        .subject-section,
-        .subject-label {
-            font-size: 17px;
+        .reference-row {
+            width: 100%;
+            margin-top: 18px;
+            font-size: 15px;
+            line-height: 1.45;
+        }
+
+        .reference-row table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .reference-row td {
+            padding: 0;
+            vertical-align: top;
+        }
+
+        .reference-file {
+            width: 55%;
+            text-align: left;
+        }
+
+        .reference-date {
+            width: 45%;
+            text-align: right;
+        }
+
+        .to-section {
+            margin-top: 22px;
+            margin-bottom: 20px;
+            font-family: "Times New Roman", Times, serif;
+            font-size: 16px;
             line-height: 1.5;
         }
 
-        .salutation {
+        .to-title {
+            font-weight: bold;
+            margin-bottom: 8px;
+        }
+
+        .to-address {
+            margin-left: 28px;
+            font-weight: normal;
+        }
+
+        .to-address div {
+            margin: 0;
+            padding: 0;
+            line-height: 1.5;
+        }
+
+        .subject-section {
+            margin-top: 14px;
+            margin-bottom: 14px;
             font-size: 17px;
+            font-weight: bold;
+            line-height: 1.5;
+            text-align: justify;
+        }
+
+        .subject-label {
+            font-size: 17px;
+            font-weight: bold;
+        }
+
+        .salutation {
+            margin-top: 12px;
+            margin-bottom: 8px;
+            font-size: 17px;
+            font-weight: normal;
             line-height: 1.5;
         }
 
         .letter-body {
+            margin-top: 4px;
             font-size: 16px;
             line-height: 1.55;
+            text-align: justify;
+        }
+
+        .letter-body p {
+            margin: 0 0 10px 0;
+            padding: 0;
+            text-align: justify;
         }
 
         .conditions {
+            margin-top: 3px;
+            margin-bottom: 10px;
+            padding-left: 30px;
             font-size: 16px;
             line-height: 1.55;
         }
 
-        .signature-section,
+        .conditions li {
+            padding-left: 6px;
+            margin-bottom: 6px;
+            text-align: justify;
+        }
+
+        .signature-section {
+            margin-top: 18px;
+            width: 100%;
+            font-size: 17px;
+            line-height: 1.5;
+            text-align: right;
+            padding-right: 5px;
+            page-break-inside: avoid;
+            break-inside: avoid;
+        }
+
         .signature-text {
+            margin: 0;
+            padding: 0;
             font-size: 17px;
             line-height: 1.5;
         }
 
+        .copy-noo-section {
+            margin-top: 22px;
+            page-break-inside: avoid;
+            break-inside: avoid;
+        }
+
         .copy-section {
+            margin-top: 0;
             font-size: 16px;
             line-height: 1.55;
+            text-align: justify;
+        }
+
+        .copy-title {
+            font-weight: bold;
+            margin-bottom: 9px;
+            font-size: 17px;
+        }
+
+        .copy-section p {
+            margin: 0 0 10px 0;
+            padding: 0;
+            text-align: justify;
         }
 
         .noo-section {
+            margin-top: 18px;
             font-size: 16px;
             line-height: 1.5;
         }
-    }
+
+        .noo-title {
+            font-weight: bold;
+            margin-bottom: 9px;
+            font-size: 17px;
+        }
+
+        .noo-item {
+            margin: 0 0 5px 0;
+            padding: 0;
+        }
+
+        .noo-final {
+            margin-top: 14px;
+            text-align: left;
+        }
+
+        @media print {
+            body {
+                font-size: 16px;
+                line-height: 1.55;
+            }
+
+            .official-emblem {
+                height: 58px;
+            }
+
+            .office-address {
+                font-size: 17px;
+                line-height: 1.4;
+            }
+
+            .subject-section,
+            .subject-label {
+                font-size: 17px;
+                line-height: 1.5;
+            }
+
+            .salutation {
+                font-size: 17px;
+                line-height: 1.5;
+            }
+
+            .letter-body {
+                font-size: 16px;
+                line-height: 1.55;
+            }
+
+            .conditions {
+                font-size: 16px;
+                line-height: 1.55;
+            }
+
+            .signature-section,
+            .signature-text {
+                font-size: 17px;
+                line-height: 1.5;
+            }
+
+            .copy-section {
+                font-size: 16px;
+                line-height: 1.55;
+            }
+
+            .noo-section {
+                font-size: 16px;
+                line-height: 1.5;
+            }
+        }
     </style>
     `;
 }
 
-function permission_generateSingleExamLetter(data) {
-    const formattedDate = permission_formatDate(data.createdAt);
-    const appNo = permission_escapeHtml(data.appNo || '');
-    const contactPerson = permission_escapeHtml(data.contactPerson || '');
-    const orgName = permission_escapeHtml(data.orgName || '');
-    const orgType = permission_escapeHtml(data.orgType || 'Examination Conducting Body');
-    const email = permission_escapeHtml(data.email || '');
-    const phone = permission_escapeHtml(data.phone || '');
-    const vendorNames = permission_escapeHtml(data.vendorNames || '');
-    const referenceNo = permission_escapeHtml(data.referenceNo || data.appNo || '');
-    const examLocationDate = data.examLocationDate ? data.examLocationDate : '';
-
-    return `
-        ${permission_commonStyles()}
-
-        <div class="permission-document">
-            <div class="official-header">
-                <div class="govt-title">
-                    File No. ${appNo}
-                </div>
-                <div class="govt-title">
-                    Govt. of India
-                </div>
-                <div class="cabinet-title">
-                    Cabinet Secretariat
-                </div>
-                <div class="office-title">
-                    Office of the Secretary (Security)
-                </div>
-                <div class="office-address">
-                    Room No. 218, Seva Teerth,<br>
-                    Motilal Nehru Marg, New Delhi
-                </div>
-            </div>
-
-            <div class="reference-row">
-                <table>
-                    <tr>
-                        <td class="reference-file">
-                        </td>
-                        <td class="reference-date">
-                            Dated:
-                            ${permission_escapeHtml(formattedDate)}
-                        </td>
-                    </tr>
-                </table>
-            </div>
-
-            <div class="to-section">
-                <div class="to-title">
-                    To
-                </div>
-                <div class="to-address">
-                    <div>
-                        ${contactPerson}
-                    </div>
-                    <div>
-                        ${orgName}
-                    </div>
-                    <div>
-                        ${orgType}
-                    </div>
-                    ${
-                        email || phone
-                            ? `
-                                <div>
-                                    ${email}
-                                    ${email && phone ? ' | ' : ''}
-                                    ${phone}
-                                </div>
-                              `
-                            : ''
-                    }
-                </div>
-            </div>
-
-            <div class="subject-section">
-                <span class="subject-label">
-                    Subject:
-                </span>
-                Permission for deployment of low powered
-                jammers in examination halls for the examination
-                to be conducted by ${orgName}.
-            </div>
-
-            <div class="salutation">
-                Sir/Madam,
-            </div>
-
-            <div class="letter-body">
-                <p>
-                    I am directed to refer to your
-                    <span class="dynamic-fill">
-                        Letter Number: ${appNo}
-                    </span>,
-                    <span class="dynamic-fill">
-                        Dated:
-                        ${permission_escapeHtml(formattedDate)}
-                    </span>,
-                    on the subject mentioned above.
-                </p>
-
-                <p>
-                    2. Approval of the Secretary (Security),
-                    Cabinet Secretariat, is hereby conveyed for
-                    deployment of low powered jammers, through
-                    <span class="dynamic-fill">
-                        ${vendorNames}
-                    </span>,
-                    in the examination to be conducted by
-                    <span class="dynamic-fill">
-                        ${orgName}
-                    </span>
-                    ${examLocationDate},
-                    as per the details furnished in the letter
-                    under reference, subject to the following:
-                </p>
-
-                <ol class="conditions" type="i">
-                    <li>
-                        The jammer models deployed will be as per
-                        approved model of
-                        <span class="dynamic-fill">
-                            ${vendorNames}
-                        </span>
-                        (details uploaded at
-                        www.cabsec.gov.in/circulars/policyofjammer).
-                    </li>
-                    <li>
-                        Adequate arrangements should be made for
-                        safe custody of the jammers during its
-                        deployment in examination centers. Each
-                        jammer deployed at the examination centers,
-                        as indicated in Annexures of the letter under
-                        reference, will be accounted for and any
-                        discrepancy in this regard will be reported
-                        immediately to the appropriate law
-                        enforcement agency and to the Office of
-                        Secretary (Security).
-                    </li>
-                    <li>
-                        While deploying the jammers it will be
-                        ensured by
-                        <span class="dynamic-fill">
-                            ${orgName}
-                        </span>
-                        that the jammers do not interfere with
-                        existing mobile communication network
-                        outside examination center.
-                    </li>
-                </ol>
-
-                <p>
-                    3. An effective coordination mechanism with
-                    <span class="dynamic-fill">
-                        ${vendorNames}
-                    </span>
-                    may be established well in advance for
-                    finalizing various details relating to the
-                    deployment of jammers.
-                </p>
-
-                <p>
-                    4. Performance of all jammers at each
-                    examination center may be verified before
-                    commencement of examination as effectiveness
-                    of the jammers depends on various factors like
-                    its power output, signal strength of BTS,
-                    traffic load on BTS at a given point of time,
-                    distance of jammer from the BTS, sensitivity
-                    of receiver, terrain, topography, line of sight
-                    etc.
-                </p>
-
-                <p>
-                    5. It may kindly be ensured that all WiFi and
-                    Bluetooth devices within the vicinity of
-                    examination halls are switched off during
-                    operation of the jammers.
-                </p>
-            </div>
-
-            <div class="signature-section">
-                <p class="signature-text">
-                    Yours faithfully,
-                </p>
-                <br>
-                <p class="signature-text">
-                    <div class="designation" style="margin-top:3px;">Name: _________________</div>
-                </p>
-                <p class="signature-text">
-                    Under Security (Security)
-                </p>
-                <p class="signature-text">
-                    Tel. No. 23093763
-                </p>
-            </div>
-
-            <div class="page-break-before">
-                <div class="copy-section">
-                    <div class="copy-title">
-                        Copy to:
-                    </div>
-                    <p>
-                        CMD,
-                        <span class="dynamic-fill">
-                            ${vendorNames}
-                        </span>
-                    </p>
-                    <p>
-                        It is requested that all provisions of jammer
-                        policy of GoI may be strictly followed while
-                        deploying the jammers. Copy of letter from
-                        <span class="dynamic-fill">
-                            ${orgName}
-                        </span>,
-                        referred at Para-1, enclosed. It should be
-                        ensured that in areas where 5G roll out is
-                        complete, only jammers upgraded to handle
-                        upto 5G should be deployed.
-                    </p>
-                </div>
-
-                <div class="noo-section">
-                    <div class="noo-title">
-                        N.O.O
-                    </div>
-                    <div class="noo-item">
-                        1. <div class="designation" style="margin-top:3px;">Name: _________________</div> Director, SPG.
-                    </div>
-                    <div class="noo-item">
-                        2. <div class="designation" style="margin-top:3px;">Name: _________________</div> [Special/Additional] Director, IB
-                    </div>
-                    <div class="noo-item">
-                        alongwith a copy of the letter as mentioned
-                        in Para-1 above.
-                    </div>
-                    <div class="noo-final">
-                        <div>
-                            <div class="designation" style="margin-top:3px;">Name: _________________</div>
-                        </div>
-                        <div>
-                            Under Security (Security)
-                        </div>
-                        <div>
-                            Tel. No. 23093763
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    `;
-}
-
-function permission_generateMultipleExamLetter(data) {
-    const formattedDate = permission_formatDate(data.createdAt);
-    const appNo = permission_escapeHtml(data.appNo || '');
-    const contactPerson = permission_escapeHtml(data.contactPerson || '');
-    const orgName = permission_escapeHtml(data.orgName || '');
-    const orgType = permission_escapeHtml(data.orgType || 'Examination Conducting Body');
-    const email = permission_escapeHtml(data.email || '');
-    const phone = permission_escapeHtml(data.phone || '');
-    const vendorNames = permission_escapeHtml(data.vendorNames || '');
-    const referenceNo = permission_escapeHtml(data.referenceNo || data.appNo || '');
-    const periodText = permission_escapeHtml(data.periodText || 'during [period of time/year]');
-
-    return `
-        ${permission_commonStyles()}
-
-        <div class="permission-document">
-            <div class="official-header">
-                <div class="govt-title">
-                    File No. ${appNo}
-                </div>
-                <div class="govt-title">
-                    Govt. of India
-                </div>
-                <div class="cabinet-title">
-                    Cabinet Secretariat
-                </div>
-                <div class="office-title">
-                    Office of the Secretary (Security)
-                </div>
-                <div class="office-address">
-                    Room No. 218, Seva Teerth,<br>
-                    Motilal Nehru Marg, New Delhi
-                </div>
-            </div>
-
-            <div class="reference-row">
-                <table>
-                    <tr>
-                        <td class="reference-file">
-                        </td>
-                        <td class="reference-date">
-                            Dated:
-                            ${permission_escapeHtml(formattedDate)}
-                        </td>
-                    </tr>
-                </table>
-            </div>
-
-            <div class="to-section">
-                <div class="to-title">
-                    To
-                </div>
-                <div class="to-address">
-                    <div>
-                        ${contactPerson}
-                    </div>
-                    <div>
-                        ${orgName}
-                    </div>
-                    <div>
-                        ${orgType}
-                    </div>
-                    ${
-                        email || phone
-                            ? `
-                                <div>
-                                    ${email}
-                                    ${email && phone ? ' | ' : ''}
-                                    ${phone}
-                                </div>
-                              `
-                            : ''
-                    }
-                </div>
-            </div>
-
-            <div class="subject-section">
-                <span class="subject-label">
-                    Subject:
-                </span>
-                Permission for deployment of low powered
-                jammers in the examinations to be conducted by
-                ${orgName}, ${periodText}.
-            </div>
-
-            <div class="salutation">
-                Sir/Madam,
-            </div>
-
-            <div class="letter-body">
-                <p>
-                    I am directed to refer to your
-                    <span class="dynamic-fill">
-                        Letter Number: ${appNo}
-                    </span>,
-                    <span class="dynamic-fill">
-                        [Dated:
-                        ${permission_escapeHtml(formattedDate)}]
-                    </span>,
-                    on the subject mentioned above.
-                </p>
-
-                <p>
-                    2. Approval of the Secretary (Security),
-                    Cabinet Secretariat, is hereby conveyed for
-                    deployment of low powered jammers, through
-                    <span class="dynamic-fill">
-                        ${vendorNames}
-                    </span>,
-                    for various examinations/recruitment tests to
-                    be conducted by
-                    <span class="dynamic-fill">
-                        ${orgName}
-                    </span>
-                    ${periodText},
-                    as per the details furnished in the letter under
-                    reference, subject to the following:-
-                </p>
-
-                <ol class="conditions" type="i">
-                    <li>
-                        The jammer models deployed will be as per
-                        approved model of
-                        <span class="dynamic-fill">
-                            ${vendorNames}
-                        </span>
-                        (details uploaded at
-                        www.cabsec.gov.in/circulars/policyofjammer).
-                    </li>
-                    <li>
-                        Adequate arrangements should be made for
-                        safe custody of the jammers during its
-                        deployment in examination centers. Each
-                        jammer deployed at the examination centers,
-                        as indicated in Annexures of the letter under
-                        reference, will be accounted for and any
-                        discrepancy in this regard will be reported
-                        immediately to the appropriate law
-                        enforcement agency and to the Office of
-                        Secretary (Security).
-                    </li>
-                    <li>
-                        While deploying the jammers it will be
-                        ensured by
-                        <span class="dynamic-fill">
-                            ${orgName}
-                        </span>
-                        that the jammers do not interfere with
-                        existing mobile communication network
-                        outside examination center.
-                    </li>
-                </ol>
-
-                <p>
-                    3. The approval is also subject to the condition
-                    that list of examination centers, along with
-                    their full address, and the number of jammers
-                    to be installed in each center, will be provided
-                    to this office by
-                    <span class="dynamic-fill">
-                        ${orgName}
-                    </span>,
-                    before the actual date of examination/deployment
-                    of jammers.
-                </p>
-
-                <p>
-                    4. An effective coordination mechanism with
-                    <span class="dynamic-fill">
-                        ${vendorNames}
-                    </span>
-                    may be established well in advance for
-                    finalizing various details relating to the
-                    deployment of jammers.
-                </p>
-
-                <p>
-                    5. Performance of all jammers at each
-                    examination center may be verified before
-                    commencement of examination as effectiveness
-                    of the jammers depends on various factors like
-                    its power output, signal strength of BTS,
-                    traffic load on BTS at a given point of time,
-                    distance of jammer from the BTS, sensitivity
-                    of receiver, terrain, topography, line of sight
-                    etc.
-                </p>
-
-                <p>
-                    6. It may kindly be ensured that all WiFi and
-                    Bluetooth devices within the vicinity of
-                    examination halls are switched off during
-                    operation of the jammers.
-                </p>
-            </div>
-
-            <div class="signature-section">
-                <p class="signature-text">
-                    Yours faithfully,
-                </p>
-                <br>
-                <p class="signature-text">
-                    <div class="designation" style="margin-top:3px;">Name: _________________</div>
-                </p>
-                <p class="signature-text">
-                    Under Security (Security)
-                </p>
-                <p class="signature-text">
-                    Tel. No. 23093763
-                </p>
-            </div>
-
-            <div class="page-break-before">
-                <div class="copy-section">
-                    <div class="copy-title">
-                        Copy to:
-                    </div>
-                    <p>
-                        CMD,
-                        <span class="dynamic-fill">
-                            ${vendorNames}
-                        </span>
-                    </p>
-                    <p>
-                        It is requested that all provisions of jammer
-                        policy of GoI may be strictly followed while
-                        deploying the jammers. Copy of letter from
-                        <span class="dynamic-fill">
-                            ${orgName}
-                        </span>,
-                        referred at Para-1, enclosed. It should be
-                        ensured that in areas where 5G roll out is
-                        complete, only jammers upgraded to handle
-                        upto 5G should be deployed. Also, compliance by
-                        <span class="dynamic-fill">
-                            ${orgName}
-                        </span>
-                        with the condition at para 3 above may be
-                        verified before deployment of jammers.
-                    </p>
-                </div>
-
-                <div class="noo-section">
-                    <div class="noo-title">
-                        N.O.O
-                    </div>
-                    <div class="noo-item">
-                        1.<div class="designation" style="margin-top:3px;">Name: _________________</div> Director, SPG.
-                    </div>
-                    <div class="noo-item">
-                        2. <div class="designation" style="margin-top:3px;">Name: _________________</div> [Special/Additional] Director, IB
-                    </div>
-                    <div class="noo-item">
-                        alongwith a copy of the letter as mentioned
-                        in Para-1 above.
-                    </div>
-                    <div class="noo-final">
-                        <div>
-                            <div class="designation" style="margin-top:3px;">Name: _________________</div>
-                        </div>
-                        <div>
-                            Under Security (Security)
-                        </div>
-                        <div>
-                            Tel. No. 23093763
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    `;
-}
-/* =========================================================
-   PREVIEW APPLICATION PDF
-   ========================================================= */
 function permission_previewApplicationPdf(appId) {
     const modal = document.getElementById('permission_applicationPdfModal');
 
@@ -5756,18 +5711,18 @@ function permission_previewApplicationPdf(appId) {
         return;
     }
 
-    // Show loading state
     document.getElementById('permission_pdfContentLoader').innerHTML = `
         <div style="text-align:center;padding:5rem 0;">
             <i class="fas fa-spinner fa-spin" style="font-size:2.25rem;color:#1e4d7b;"></i>
-            <p style="margin-top:1rem;color:#475569;">Loading PDF preview...</p>
+            <p style="margin-top:1rem;color:#475569;">
+                Loading PDF preview...
+            </p>
         </div>
     `;
 
     modal.classList.remove('hidden');
     document.body.classList.add('overflow-hidden');
 
-    // AJAX Request
     $.ajax({
         url: permission_baseUrl + 'preview-application-pdf/' + appId,
         type: 'GET',
@@ -5778,25 +5733,25 @@ function permission_previewApplicationPdf(appId) {
         },
         error: function(xhr) {
             let errorMsg = 'Failed to load PDF preview';
+
             if (xhr.responseJSON && xhr.responseJSON.error) {
                 errorMsg = xhr.responseJSON.error;
             }
+
             document.getElementById('permission_pdfContentLoader').innerHTML = `
                 <div style="text-align:center;color:#b91c1c;padding:5rem 0;">
                     <i class="fas fa-exclamation-circle" style="font-size:2.25rem;"></i>
-                    <p style="margin-top:1rem;">${permission_escapeHtml(errorMsg)}</p>
+                    <p style="margin-top:1rem;">
+                        ${permission_escapeHtml(errorMsg)}
+                    </p>
                 </div>
             `;
         }
     });
 }
 
-/* =========================================================
-   DOWNLOAD APPLICATION AS PDF (Print Dialog based)
-   ========================================================= */
 function permission_downloadApplicationPreview(appId) {
     if (!appId) {
-        // Try to get from active button
         const btn = document.querySelector('.permission-btn');
         appId = btn ? btn.dataset.appId : null;
     }
@@ -5806,115 +5761,144 @@ function permission_downloadApplicationPreview(appId) {
         return;
     }
 
-    // Change button state
     const btn = document.getElementById('permission_downloadBtn');
     const originalHTML = btn ? btn.innerHTML : '';
+
     if (btn) {
         btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Generating...';
         btn.disabled = true;
     }
 
     $.ajax({
-        url: baseUrl + 'preview-application-pdf/' + appId,
+        url: baseUrl + 'permission-preview-application-pdf/' + appId,
         type: 'GET',
         dataType: 'json',
         success: function(response) {
             const pdfHTML = permission_generateApplicationPdfHTML(response);
-            
+
+            const appNo =
+                (response.application && response.application.app_no) ||
+                response.app_no ||
+                appId ||
+                'Permission Letter';
+
             const printWindow = window.open('', '_blank', 'width=1000,height=800');
+
             if (!printWindow) {
                 alert('Please allow pop-ups to download the PDF.');
-                if (btn) { btn.innerHTML = originalHTML; btn.disabled = false; }
+
+                if (btn) {
+                    btn.innerHTML = originalHTML;
+                    btn.disabled = false;
+                }
                 return;
             }
 
-            printWindow.document.write('<!DOCTYPE html>\n<html>\n<head>\n<meta charset="UTF-8">\n<title>Permission Letter</title>\n</head>\n<body>\n' + pdfHTML + '\n</body>\n</html>');
+            printWindow.document.write(
+                '<!DOCTYPE html>\n' +
+                '<html>\n' +
+                '<head>\n' +
+                '<meta charset="UTF-8">\n' +
+                '<title>PERMISSION LETTER-' + appNo + '</title>\n' +
+                '</head>\n' +
+                '<body>\n' +
+                pdfHTML +
+                '\n</body>\n</html>'
+            );
+
             printWindow.document.close();
 
             setTimeout(function() {
                 printWindow.focus();
                 printWindow.print();
-                setTimeout(function() { printWindow.close(); }, 1000);
-                
-                if (btn) { btn.innerHTML = originalHTML; btn.disabled = false; }
+
+                setTimeout(function() {
+                    printWindow.close();
+                }, 1000);
+
+                if (btn) {
+                    btn.innerHTML = originalHTML;
+                    btn.disabled = false;
+                }
             }, 500);
         },
         error: function(xhr) {
             let errorMsg = 'Failed to load application data';
+
             if (xhr.responseJSON && xhr.responseJSON.error) {
                 errorMsg = xhr.responseJSON.error;
             }
+
             alert('Error: ' + errorMsg);
-            if (btn) { btn.innerHTML = originalHTML; btn.disabled = false; }
+
+            if (btn) {
+                btn.innerHTML = originalHTML;
+                btn.disabled = false;
+            }
         }
     });
 }
 
-/* =========================================================
-   PRINT APPLICATION PREVIEW
-   ========================================================= */
 function permission_printApplicationPreview() {
     const content = document.getElementById('permission_pdfContentLoader');
+
     if (!content) {
         console.error('Application preview content not found.');
         return;
     }
 
-    const docElement = content.querySelector('.document');
+    const docElement = content.querySelector('.permission-document');
+
     if (!docElement) {
         alert('PDF content not found. Please try again.');
         return;
     }
 
     const printWindow = window.open('', '_blank', 'width=1000,height=800');
+
     if (!printWindow) {
         alert('Please allow pop-ups to print the application.');
         return;
     }
 
     const htmlContent = docElement.outerHTML;
-    
-    printWindow.document.write('<!DOCTYPE html>\n<html>\n<head>\n<meta charset="UTF-8">\n<title>Permission Letter</title>\n</head>\n<body>\n' + htmlContent + '\n</body>\n</html>');
+
+    printWindow.document.write(
+        '<!DOCTYPE html>\n' +
+        '<html>\n' +
+        '<head>\n' +
+        '<meta charset="UTF-8">\n' +
+        '<title>Permission Letter</title>\n' +
+        '</head>\n' +
+        '<body>\n' +
+        htmlContent +
+        '\n</body>\n</html>'
+    );
+
     printWindow.document.close();
 
     setTimeout(function() {
         printWindow.focus();
         printWindow.print();
-        setTimeout(function() { printWindow.close(); }, 500);
+
+        setTimeout(function() {
+            printWindow.close();
+        }, 500);
     }, 700);
 }
 
-/* =========================================================
-   ESCAPE HTML
-   ========================================================= */
-function permission_escapeHtml(value) {
-    if (value === null || value === undefined) return '';
-    return String(value)
-        .replace(/&/g, '&amp;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;')
-        .replace(/"/g, '&quot;')
-        .replace(/'/g, '&#039;');
-}
-
-/* =========================================================
-   CLOSE APPLICATION PREVIEW MODAL
-   ========================================================= */
 function permission_closeApplicationPdfPreview() {
     const modal = document.getElementById('permission_applicationPdfModal');
+
     if (modal) {
         modal.classList.add('hidden');
         document.body.classList.remove('overflow-hidden');
     }
 }
 
-/* =========================================================
-   EVENT LISTENERS
-   ========================================================= */
 document.addEventListener('DOMContentLoaded', function() {
     const modal = document.getElementById('permission_applicationPdfModal');
-    
-    // Close modal on outside click
+
     if (modal) {
         modal.addEventListener('click', function(e) {
             if (e.target === modal) {
@@ -5923,7 +5907,6 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // Close with Escape key
     document.addEventListener('keydown', function(e) {
         if (e.key === 'Escape' && modal && !modal.classList.contains('hidden')) {
             permission_closeApplicationPdfPreview();

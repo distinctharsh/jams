@@ -30,10 +30,8 @@ class RequestViewController extends BaseController
                 ->getRow();
 
             if (!$latestApp) {
-                return redirect()->to('/dashboard')
-                    ->with('error', 'No application found.');
+                return redirect()->to('/dashboard')->with('error', 'No application found.');
             }
-
             $appId = $latestApp->id;
         }
 
@@ -45,18 +43,17 @@ class RequestViewController extends BaseController
             ->getRow();
 
         if (!$application) {
-            return redirect()->to('/dashboard')
-                ->with('error', 'Application not found.');
+            return redirect()->to('/dashboard')->with('error', 'Application not found.');
         }
 
         // Get examination dates
         $examDates = $db->table('application_date_mapping')
             ->where('app_id', $appId)
-            ->orderBy('id', 'ASC')
+            ->orderBy('exam_date', 'ASC')
             ->get()
             ->getResultArray();
 
-        // Get centres
+        // Get centres (insertion order)
         $centres = $db->table('application_centre_mapping')
             ->where('app_id', $appId)
             ->orderBy('id', 'ASC')
@@ -69,13 +66,12 @@ class RequestViewController extends BaseController
             ->get()
             ->getResultArray();
 
-        // Get vendor names and jammer model names
+        // Vendor names + jammer model names
         foreach ($vendors as &$vendor) {
             $vendorData = $db->table('mas_vendor')
                 ->where('id', $vendor['vendor_id'])
                 ->where('isactive', 1)
-                ->get()
-                ->getRow();
+                ->get()->getRow();
 
             $vendor['vendor_name'] = $vendorData
                 ? $vendorData->vendor_name
@@ -84,35 +80,30 @@ class RequestViewController extends BaseController
             $jammerData = $db->table('mas_model')
                 ->where('id', $vendor['jammer_id'])
                 ->where('isactive', 1)
-                ->get()
-                ->getRow();
+                ->get()->getRow();
 
             $vendor['jammer_model_name'] = $jammerData
                 ? $jammerData->name
                 : 'Model #' . $vendor['jammer_id'];
         }
-
         unset($vendor);
 
-        // Get documents
+        // Documents
         $documents = $db->table('application_document_master')
             ->where('app_id', $appId)
-            ->get()
-            ->getResultArray();
+            ->get()->getResultArray();
 
-        // Get latest history record
+        // Latest history
         $latestHistory = $db->table('application_history')
             ->where('app_id', $appId)
             ->orderBy('id', 'DESC')
-            ->get()
-            ->getRow();
+            ->get()->getRow();
 
         $currentStatusId = (int) ($latestHistory->status ?? 1);
 
         $status = $db->table('mas_application_action')
             ->where('id', $currentStatusId)
-            ->get()
-            ->getRow();
+            ->get()->getRow();
 
         if (!$status) {
             $status = (object) [
@@ -123,15 +114,14 @@ class RequestViewController extends BaseController
 
         $currentStatusName = $status->name ?? 'SUBMITTED';
 
-        // Check if signed PDF is uploaded
+        // Signed PDF
         $signedPdf = $db->table('application_document_master')
             ->where('app_id', $appId)
             ->where('document_type', 3)
             ->orderBy('id', 'DESC')
-            ->get()
-            ->getRow();
+            ->get()->getRow();
 
-        // Calculate form completeness
+        // Completeness
         $completeness = $this->calculateCompleteness(
             $application,
             $examDates,
@@ -139,137 +129,133 @@ class RequestViewController extends BaseController
             $vendors
         );
 
-        // Process centres
+        // ---------- PROCESS STATE / DISTRICT NAMES ----------
         foreach ($centres as &$centre) {
             $centre['state_name'] = '';
-
             if (!empty($centre['state'])) {
                 try {
-                    $tables = $db->listTables();
-                    if (in_array('states', $tables)) {
-                        $stateData = $db->table('states')
-                            ->where('id', $centre['state'])
-                            ->get()
-                            ->getRow();
+                    if (in_array('states', $db->listTables())) {
+                        $stateData = $db->table('states')->where('id', $centre['state'])->get()->getRow();
                         $centre['state_name'] = $stateData ? $stateData->state_name : '';
                     }
-                } catch (\Exception $e) {
-                    $centre['state_name'] = '';
-                }
+                } catch (\Exception $e) {}
             }
 
             $centre['district_name'] = '';
-
             if (!empty($centre['district'])) {
                 try {
-                    $tables = $db->listTables();
-                    if (in_array('districts', $tables)) {
-                        $districtData = $db->table('districts')
-                            ->where('id', $centre['district'])
-                            ->get()
-                            ->getRow();
+                    if (in_array('districts', $db->listTables())) {
+                        $districtData = $db->table('districts')->where('id', $centre['district'])->get()->getRow();
                         $centre['district_name'] = $districtData ? $districtData->city_name : '';
                     }
-                } catch (\Exception $e) {
-                    $centre['district_name'] = '';
-                }
+                } catch (\Exception $e) {}
             }
         }
-
         unset($centre);
 
-        // Combine exam dates and centres
+        // ---------- BUILD examDetails (DATE × ITS CENTRES ONLY) ----------
         $examDetails = [];
 
-        if (!empty($examDates)) {
-            foreach ($examDates as $exam) {
-                if (!empty($centres)) {
-                    foreach ($centres as $centre) {
-                        $examDetails[] = [
-                            'exam_name'          => $exam['exam_name'] ?? '—',
-                            'exam_date'          => !empty($exam['exam_date'])
-                                ? $exam['exam_date']
-                                : null,
-                            'centre_name'        => $centre['centre_name'] ?? '—',
-                            'centre_address'     => $centre['centre_address'] ?? '—',
-                            'state_name'         => $centre['state'] ?? '',
-                            'district_name'      => $centre['district'] ?? '',
-                            'coordinator_name'   => $centre['coorrdinator_name'] ?? '—',
-                            'coordinator_mobile' => $centre['coordinator_mobile_no'] ?? '—'
-                        ];
-                    }
-                } else {
+        $totalDates   = count($examDates);
+        $totalCentres = count($centres);
+
+        // Even-split centres across dates (same rule as editRequest)
+        $centresChunks = [];
+        if ($totalDates === 1) {
+            $centresChunks = [$centres];
+        } elseif ($totalDates > 1) {
+            $perDate = (int) ceil($totalCentres / $totalDates);
+            $centresChunks = array_chunk($centres, max(1, $perDate));
+        }
+
+        foreach ($examDates as $di => $exam) {
+            $dateCentres = $centresChunks[$di] ?? [];
+
+            if (!empty($dateCentres)) {
+                foreach ($dateCentres as $centre) {
                     $examDetails[] = [
-                        'exam_name'          => $exam['exam_name'] ?? '—',
-                        'exam_date'          => !empty($exam['exam_date'])
-                            ? $exam['exam_date']
-                            : null,
-                        'centre_name'        => '—',
-                        'centre_address'     => '—',
-                        'state_name'         => '',
-                        'district_name'      => '',
-                        'coordinator_name'   => '—',
-                        'coordinator_mobile' => '—'
+                        'exam_name'             => $exam['exam_name'] ?? '—',
+                        'exam_date'             => !empty($exam['exam_date']) ? $exam['exam_date'] : null,
+                        'centre_name'           => $centre['centre_name'] ?? '—',
+                        'centre_address'        => $centre['centre_address'] ?? '—',
+                        'state_name'            => $centre['state'] ?? '',
+                        'district_name'         => $centre['district'] ?? '',
+                        'coordinator_name'      => $centre['coorrdinator_name'] ?? '—',
+                        'coordinator_email'     => $centre['coordinator_email'] ?? '—',
+                        'coordinator_mobile_no' => $centre['coordinator_mobile_no'] ?? '—',
                     ];
                 }
-            }
-        } else {
-            foreach ($centres as $centre) {
+            } else {
                 $examDetails[] = [
-                    'exam_name'          => $centre['centre_name'] ?? '—',
-                    'exam_date'          => null,
-                    'centre_name'        => $centre['centre_name'] ?? '—',
-                    'centre_address'     => $centre['centre_address'] ?? '—',
-                    'state_name'         => $centre['state_name'] ?? '',
-                    'district_name'      => $centre['district_name'] ?? '',
-                    'coordinator_name'   => $centre['coorrdinator_name'] ?? '—',
-                    'coordinator_mobile' => $centre['coordinator_mobile_no'] ?? '—'
+                    'exam_name'             => $exam['exam_name'] ?? '—',
+                    'exam_date'             => !empty($exam['exam_date']) ? $exam['exam_date'] : null,
+                    'centre_name'           => '—',
+                    'centre_address'        => '—',
+                    'state_name'            => '',
+                    'district_name'         => '',
+                    'coordinator_name'      => '—',
+                    'coordinator_mobile_no' => '—',
+                    'coordinator_email'     => '—',
                 ];
             }
         }
 
-        // Get CSRF token name and hash for the view
+        // Edge case: no dates but centres exist
+        if (empty($examDates) && !empty($centres)) {
+            foreach ($centres as $centre) {
+                $examDetails[] = [
+                    'exam_name'             => $centre['centre_name'] ?? '—',
+                    'exam_date'             => null,
+                    'centre_name'           => $centre['centre_name'] ?? '—',
+                    'centre_address'        => $centre['centre_address'] ?? '—',
+                    'state_name'            => $centre['state_name'] ?? '',
+                    'district_name'         => $centre['district_name'] ?? '',
+                    'coordinator_name'      => $centre['coorrdinator_name'] ?? '—',
+                    'coordinator_email'     => $centre['coordinator_email'] ?? '—',
+                    'coordinator_mobile_no' => $centre['coordinator_mobile_no'] ?? '—',
+                ];
+            }
+        }
+
+        // CSRF
         $csrfTokenName = csrf_token();
         $csrfHash = csrf_hash();
 
         // View data
         $data = [
             'application'        => $application,
-            'exam_dates'        => $examDates,
+            'exam_dates'         => $examDates,
             'centres'            => $centres,
-            'exam_details'      => $examDetails,
+            'exam_details'       => $examDetails,
             'vendors'            => $vendors,
-            'documents'         => $documents,
-            'status'            => $status,
-            'currentStatusId'   => $currentStatusId,
-            'currentStatusName' => $currentStatusName,
-            'latestHistory'     => $latestHistory,
-            'signed_pdf'        => $signedPdf,
-            'completeness'      => $completeness,
-            'app_id'            => $appId,
-            'organisation_name' => $application->organisation,
-            'application_number'=> $application->app_no,
-            'application_data'  => [
-                'app_no' => $application->app_no ?? 'JPMS/2026/001057',
-                'organisation' => $application->organisation ?? '—',
+            'documents'          => $documents,
+            'status'             => $status,
+            'currentStatusId'    => $currentStatusId,
+            'currentStatusName'  => $currentStatusName,
+            'latestHistory'      => $latestHistory,
+            'signed_pdf'         => $signedPdf,
+            'completeness'       => $completeness,
+            'app_id'             => $appId,
+            'organisation_name'  => $application->organisation,
+            'application_number' => $application->app_no,
+            'application_data'   => [
+                'app_no'            => $application->app_no ?? 'JPMS/2026/001057',
+                'organisation'      => $application->organisation ?? '—',
                 'organisation_type' => $application->organisation_type ?? '—',
-                'contact_person' => $application->contact_person ?? '—',
-                'email' => $application->email ?? '—',
-                'phone' => $application->phone ?? '—',
-                'reference_no' => $application->reference_no ?? '11/37/2026-JAM',
-                'created_at' => $application->created_at ?? date('Y-m-d H:i:s'),
-                'exam_details' => $examDetails,
-                'vendors' => $vendors,
-                'status_name' => $status->name ?? 'SUBMITTED',
-                'status_id' => $currentStatusId
+                'contact_person'    => $application->contact_person ?? '—',
+                'email'             => $application->email ?? '—',
+                'phone'             => $application->phone ?? '—',
+                'reference_no'      => $application->reference_no ?? '11/37/2026-JAM',
+                'created_at'        => $application->created_at ?? date('Y-m-d H:i:s'),
+                'exam_details'      => $examDetails,
+                'vendors'           => $vendors,
+                'status_name'       => $status->name ?? 'SUBMITTED',
+                'status_id'         => $currentStatusId
             ],
-            // CSRF tokens for the view
-            'csrf_token_name' => $csrfTokenName,
-            'csrf_hash' => $csrfHash
+            'csrf_token_name'    => $csrfTokenName,
+            'csrf_hash'          => $csrfHash
         ];
-
         $data['officers'] = $this->getForwardOfficers();
-
         return view('pages/request-view', $data);
     }
 
@@ -466,10 +452,23 @@ class RequestViewController extends BaseController
             'created_at'   => date('Y-m-d H:i:s')
         ]);
 
+        $usOfficer = $db->table('user_role_mapping urm')
+            ->select('u.id')
+            ->join('user u', 'u.id = urm.user_id')
+            ->where('urm.role_id', 4)
+            ->where('urm.isactive', 1)
+            ->where('u.isactive', 1)
+            ->orderBy('urm.id', 'ASC')
+            ->get()
+            ->getRow();
+
+        $assignedTo = $usOfficer->id ?? null;
+
         $db->table('application_history')->insert([
             'app_id'       => $appId,
             'status'       => 6,
             'performed_by' => $userId,
+            'assigned_to'  => $assignedTo,
             'remarks'      => 'Sent to US.',
             'created_at'   => date('Y-m-d H:i:s')
         ]);
@@ -540,9 +539,7 @@ class RequestViewController extends BaseController
         if (!$userId) {
             return $this->response
                 ->setStatusCode(403)
-                ->setJSON([
-                    'error' => 'Unauthorized'
-                ]);
+                ->setJSON(['error' => 'Unauthorized']);
         }
 
         $application = $db->table('application')
@@ -554,14 +551,12 @@ class RequestViewController extends BaseController
         if (!$application) {
             return $this->response
                 ->setStatusCode(404)
-                ->setJSON([
-                    'error' => 'Application not found'
-                ]);
+                ->setJSON(['error' => 'Application not found']);
         }
 
         $examDates = $db->table('application_date_mapping')
             ->where('app_id', $appId)
-            ->orderBy('id', 'ASC')
+            ->orderBy('exam_date', 'ASC')
             ->get()
             ->getResultArray();
 
@@ -577,7 +572,6 @@ class RequestViewController extends BaseController
             ->getResultArray();
 
         foreach ($vendors as &$vendor) {
-
             $vendorData = $db->table('mas_vendor')
                 ->where('id', $vendor['vendor_id'])
                 ->where('isactive', 1)
@@ -598,11 +592,9 @@ class RequestViewController extends BaseController
                 ? $jammerData->name
                 : 'Model #' . ($vendor['jammer_id'] ?? '');
         }
-
         unset($vendor);
 
         foreach ($centres as &$centre) {
-
             $centre['state_name'] = getMasterValue(
                 'state',
                 $centre['state'] ?? '',
@@ -615,7 +607,6 @@ class RequestViewController extends BaseController
                 'city_name'
             ) ?: '-';
         }
-
         unset($centre);
 
         $latestHistory = $db->table('application_history')
@@ -631,92 +622,282 @@ class RequestViewController extends BaseController
             ->get()
             ->getRow();
 
-        $statusName = $status
-            ? $status->name
-            : 'SUBMITTED';
+        $statusName = $status ? $status->name : 'SUBMITTED';
 
+        // ---------- BUILD examDetails (DATE × ITS CENTRES ONLY) ----------
         $examDetails = [];
 
-        if (!empty($examDates)) {
+        $totalDates   = count($examDates);
+        $totalCentres = count($centres);
 
-            foreach ($examDates as $exam) {
+        // Even-split centres across dates (same rule as editRequest + index)
+        $centresChunks = [];
+        if ($totalDates === 1) {
+            $centresChunks = [$centres];
+        } elseif ($totalDates > 1) {
+            $perDate = (int) ceil($totalCentres / $totalDates);
+            $centresChunks = array_chunk($centres, max(1, $perDate));
+        }
 
-                if (!empty($centres)) {
+        foreach ($examDates as $di => $exam) {
+            $dateCentres = $centresChunks[$di] ?? [];
 
-                    foreach ($centres as $centre) {
-
-                        $examDetails[] = [
-                            'exam_name' => $exam['exam_name'] ?? '—',
-                            'exam_date' => !empty($exam['exam_date'])
-                                ? date('d M Y', strtotime($exam['exam_date']))
-                                : '—',
-                            'centre_name' => $centre['centre_name'] ?? '—',
-                            'centre_address' => $centre['centre_address'] ?? '—',
-                            'state_name' => $centre['state_name'] ?? '-',
-                            'district_name' => $centre['district_name'] ?? '-',
-                            'coordinator_name' => $centre['coorrdinator_name'] ?? '—',
-                            'coordinator_mobile' => $centre['coordinator_mobile_no'] ?? '—'
-                        ];
-                    }
-
-                } else {
-
+            if (!empty($dateCentres)) {
+                foreach ($dateCentres as $centre) {
                     $examDetails[] = [
-                        'exam_name' => $exam['exam_name'] ?? '—',
-                        'exam_date' => !empty($exam['exam_date'])
+                        'exam_name'             => $exam['exam_name'] ?? '—',
+                        'exam_date'             => !empty($exam['exam_date'])
                             ? date('d M Y', strtotime($exam['exam_date']))
                             : '—',
-                        'centre_name' => '—',
-                        'centre_address' => '—',
-                        'state_name' => '-',
-                        'district_name' => '-',
-                        'coordinator_name' => '—',
-                        'coordinator_mobile' => '—'
+                        'centre_name'           => $centre['centre_name'] ?? '—',
+                        'centre_address'        => $centre['centre_address'] ?? '—',
+                        'state_name'            => $centre['state_name'] ?? '-',
+                        'district_name'         => $centre['district_name'] ?? '-',
+                        'coordinator_name'      => $centre['coorrdinator_name'] ?? '—',
+                        'coordinator_email'     => $centre['coordinator_email'] ?? '—',
+                        'coordinator_mobile_no' => $centre['coordinator_mobile_no'] ?? '—',
                     ];
                 }
-            }
-
-        } else {
-
-            foreach ($centres as $centre) {
-
+            } else {
                 $examDetails[] = [
-                    'exam_name' => $centre['centre_name'] ?? '—',
-                    'exam_date' => '—',
-                    'centre_name' => $centre['centre_name'] ?? '—',
-                    'centre_address' => $centre['centre_address'] ?? '—',
-                    'state_name' => $centre['state_name'] ?? '-',
-                    'district_name' => $centre['district_name'] ?? '-',
-                    'coordinator_name' => $centre['coorrdinator_name'] ?? '—',
-                    'coordinator_mobile' => $centre['coordinator_mobile_no'] ?? '—'
+                    'exam_name'             => $exam['exam_name'] ?? '—',
+                    'exam_date'             => !empty($exam['exam_date'])
+                        ? date('d M Y', strtotime($exam['exam_date']))
+                        : '—',
+                    'centre_name'           => '—',
+                    'centre_address'        => '—',
+                    'state_name'            => '-',
+                    'district_name'         => '-',
+                    'coordinator_name'      => '—',
+                    'coordinator_email'     => '—',
+                    'coordinator_mobile_no' => '—',
+                ];
+            }
+        }
+
+        // Edge case: no dates but centres exist
+        if (empty($examDates) && !empty($centres)) {
+            foreach ($centres as $centre) {
+                $examDetails[] = [
+                    'exam_name'             => $centre['centre_name'] ?? '—',
+                    'exam_date'             => '—',
+                    'centre_name'           => $centre['centre_name'] ?? '—',
+                    'centre_address'        => $centre['centre_address'] ?? '—',
+                    'state_name'            => $centre['state_name'] ?? '-',
+                    'district_name'         => $centre['district_name'] ?? '-',
+                    'coordinator_name'      => $centre['coorrdinator_name'] ?? '—',
+                    'coordinator_email'     => $centre['coordinator_email'] ?? '—',
+                    'coordinator_mobile_no' => $centre['coordinator_mobile_no'] ?? '—',
                 ];
             }
         }
 
         return $this->response->setJSON([
-
             'application' => [
-                'app_no' => $application->app_no ?? 'JPMS/2026/001057',
-                'organisation' => $application->organisation ?? '—',
+                'app_no'            => $application->app_no ?? 'JPMS/2026/001057',
+                'organisation'      => $application->organisation ?? '—',
                 'organisation_type' => $application->organisation_type ?? '—',
-                'contact_person' => $application->contact_person ?? '—',
-                'email' => $application->email ?? '—',
-                'phone' => $application->phone ?? '—',
+                'contact_person'    => $application->contact_person ?? '—',
+                'email'             => $application->email ?? '—',
+                'phone'             => $application->phone ?? '—',
                 'centre_list_ready' => $application->centre_list_ready,
-                'reference_no' => $application->reference_no ?? '11/37/2026-JAM',
-                'created_at' => $application->created_at ?? date('Y-m-d H:i:s')
+                'reference_no'      => $application->reference_no ?? '11/37/2026-JAM',
+                'created_at'        => $application->created_at ?? date('Y-m-d H:i:s'),
             ],
 
             'exam_details' => $examDetails,
-
-            'vendors' => $vendors,
-
-            'status_name' => $statusName,
-
-            'status_id' => $currentStatusId
+            'vendors'      => $vendors,
+            'status_name'  => $statusName,
+            'status_id'    => $currentStatusId,
         ]);
     }
 
+
+/**
+ * =========================================================
+ * PREVIEW APPLICATION - Returns JSON data for dynamic PDF
+ * =========================================================
+ */
+    public function permission_previewApplicationPdf($appId)
+    {
+        $db = \Config\Database::connect();
+        $userId = session()->get('user_id');
+
+        if (!$userId) {
+            return $this->response
+                ->setStatusCode(403)
+                ->setJSON(['error' => 'Unauthorized']);
+        }
+
+        $application = $db->table('application')
+            ->where('id', $appId)
+            ->where('user_id', $userId)
+            ->get()
+            ->getRow();
+
+        if (!$application) {
+            return $this->response
+                ->setStatusCode(404)
+                ->setJSON(['error' => 'Application not found']);
+        }
+
+        $examDates = $db->table('application_date_mapping')
+            ->where('app_id', $appId)
+            ->orderBy('exam_date', 'ASC')
+            ->get()
+            ->getResultArray();
+
+        $centres = $db->table('application_centre_mapping')
+            ->where('app_id', $appId)
+            ->orderBy('id', 'ASC')
+            ->get()
+            ->getResultArray();
+
+        $vendors = $db->table('application_vendor_mapping')
+            ->where('app_id', $appId)
+            ->get()
+            ->getResultArray();
+
+        foreach ($vendors as &$vendor) {
+            $vendorData = $db->table('mas_vendor')
+                ->where('id', $vendor['vendor_id'])
+                ->where('isactive', 1)
+                ->get()
+                ->getRow();
+
+            $vendor['vendor_name'] = $vendorData
+                ? $vendorData->vendor_name
+                : 'Vendor #' . ($vendor['vendor_id'] ?? '');
+
+            $jammerData = $db->table('mas_model')
+                ->where('id', $vendor['jammer_id'])
+                ->where('isactive', 1)
+                ->get()
+                ->getRow();
+
+            $vendor['jammer_model_name'] = $jammerData
+                ? $jammerData->name
+                : 'Model #' . ($vendor['jammer_id'] ?? '');
+        }
+        unset($vendor);
+
+        foreach ($centres as &$centre) {
+            $centre['state_name'] = getMasterValue(
+                'state',
+                $centre['state'] ?? '',
+                'state_name'
+            ) ?: '-';
+
+            $centre['district_name'] = getMasterValue(
+                'city',
+                $centre['district'] ?? '',
+                'city_name'
+            ) ?: '-';
+        }
+        unset($centre);
+
+        $latestHistory = $db->table('application_history')
+            ->where('app_id', $appId)
+            ->orderBy('id', 'DESC')
+            ->get()
+            ->getRow();
+
+        $currentStatusId = (int) ($latestHistory->status ?? 1);
+
+        $status = $db->table('mas_application_action')
+            ->where('id', $currentStatusId)
+            ->get()
+            ->getRow();
+
+        $statusName = $status ? $status->name : 'SUBMITTED';
+
+        // ---------- BUILD examDetails (DATE × ITS CENTRES ONLY) ----------
+        $examDetails = [];
+
+        $totalDates   = count($examDates);
+        $totalCentres = count($centres);
+
+        // Even-split centres across dates (same rule as editRequest + index)
+        $centresChunks = [];
+        if ($totalDates === 1) {
+            $centresChunks = [$centres];
+        } elseif ($totalDates > 1) {
+            $perDate = (int) ceil($totalCentres / $totalDates);
+            $centresChunks = array_chunk($centres, max(1, $perDate));
+        }
+
+        foreach ($examDates as $di => $exam) {
+            $dateCentres = $centresChunks[$di] ?? [];
+
+            if (!empty($dateCentres)) {
+                foreach ($dateCentres as $centre) {
+                    $examDetails[] = [
+                        'exam_name'             => $exam['exam_name'] ?? '—',
+                        'exam_date'             => !empty($exam['exam_date'])
+                            ? date('d M Y', strtotime($exam['exam_date']))
+                            : '—',
+                        'centre_name'           => $centre['centre_name'] ?? '—',
+                        'centre_address'        => $centre['centre_address'] ?? '—',
+                        'state_name'            => $centre['state_name'] ?? '-',
+                        'district_name'         => $centre['district_name'] ?? '-',
+                        'coordinator_name'      => $centre['coorrdinator_name'] ?? '—',
+                        'coordinator_email'     => $centre['coordinator_email'] ?? '—',
+                        'coordinator_mobile_no' => $centre['coordinator_mobile_no'] ?? '—',
+                    ];
+                }
+            } else {
+                $examDetails[] = [
+                    'exam_name'             => $exam['exam_name'] ?? '—',
+                    'exam_date'             => !empty($exam['exam_date'])
+                        ? date('d M Y', strtotime($exam['exam_date']))
+                        : '—',
+                    'centre_name'           => '—',
+                    'centre_address'        => '—',
+                    'state_name'            => '-',
+                    'district_name'         => '-',
+                    'coordinator_name'      => '—',
+                    'coordinator_email'     => '—',
+                    'coordinator_mobile_no' => '—',
+                ];
+            }
+        }
+
+        // Edge case: no dates but centres exist
+        if (empty($examDates) && !empty($centres)) {
+            foreach ($centres as $centre) {
+                $examDetails[] = [
+                    'exam_name'             => $centre['centre_name'] ?? '—',
+                    'exam_date'             => '—',
+                    'centre_name'           => $centre['centre_name'] ?? '—',
+                    'centre_address'        => $centre['centre_address'] ?? '—',
+                    'state_name'            => $centre['state_name'] ?? '-',
+                    'district_name'         => $centre['district_name'] ?? '-',
+                    'coordinator_name'      => $centre['coorrdinator_name'] ?? '—',
+                    'coordinator_email'     => $centre['coordinator_email'] ?? '—',
+                    'coordinator_mobile_no' => $centre['coordinator_mobile_no'] ?? '—',
+                ];
+            }
+        }
+
+        return $this->response->setJSON([
+            'application' => [
+                'app_no'            => $application->app_no ?? 'JPMS/2026/001057',
+                'organisation'      => $application->organisation ?? '—',
+                'organisation_type' => $application->organisation_type ?? '—',
+                'contact_person'    => $application->contact_person ?? '—',
+                'email'             => $application->email ?? '—',
+                'phone'             => $application->phone ?? '—',
+                'centre_list_ready' => $application->centre_list_ready,
+                'reference_no'      => $application->reference_no ?? '11/37/2026-JAM',
+                'created_at'        => $application->created_at ?? date('Y-m-d H:i:s'),
+            ],
+
+            'exam_details' => $examDetails,
+            'vendors'      => $vendors,
+            'status_name'  => $statusName,
+            'status_id'    => $currentStatusId,
+        ]);
+    }
 /**
  * =========================================================
  * GET SECURE DOCUMENT FILE PATH
@@ -1062,7 +1243,6 @@ class RequestViewController extends BaseController
         unset($officer);
         return $officers;
     }
-
 
     public function reject()
     {

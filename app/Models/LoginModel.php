@@ -17,8 +17,8 @@ class LoginModel extends Model
         'mfa_required',
         'login_otp',
         'otp_expires_at',
-        'reset_token',
-        'reset_expires_at'
+        'reset_token',      
+        'reset_expires_at',
     ];
 
     public function findUserByEmail(string $email): ?array

@@ -353,6 +353,11 @@ ob_start();
 
 }
 
+.center-pi{
+    display: flex;
+    justify-content: space-between;
+}
+
 
 </style>
 
@@ -413,30 +418,50 @@ ob_start();
     </div>
 
     <div class="lg:col-span-2 space-y-6">   
-        <form id="permissionForm" action="/submit-request" method="POST" class="space-y-6" enctype="multipart/form-data">
-            <!-- CSRF Token -->
+    <?php
+    $isEditMode = $isEditMode ?? false;
+    $editData   = $editData   ?? null;
+    $formAction = $isEditMode
+        ? base_url('update-request/' . $editData['app_id'])
+        : base_url('submit-request');
+    ?>
+    <form id="permissionForm"
+          action="<?= $formAction ?>"
+          method="POST"
+          class="space-y-6"
+          enctype="multipart/form-data"
+          data-edit-mode="<?= $isEditMode ? '1' : '0' ?>"
+          data-app-id="<?= $isEditMode ? $editData['app_id'] : '' ?>">
             <?= csrf_field() ?>
+            <?php if ($isEditMode): ?>
+                <input type="hidden" name="app_id" value="<?= $editData['app_id'] ?>">
+            <?php endif; ?>
+
             <div class="gov-card p-6">
                 <div class="flex items-center justify-between border-b border-slate-200 pb-4 mb-6">
                     <div class="flex items-center gap-3">
                         <i class="fas fa-file-signature text-[#e58500] text-2xl"></i>
                         <div>
-                            <h2 class="text-xl font-bold text-[#1e4d7b]">New Permission Application</h2>
-                            <p class="text-xs text-slate-500 font-medium">Form JPMS-1 · Application for deployment of signal jammers</p>
+                            <h2 class="text-xl font-bold text-[#1e4d7b]">
+                                <?= $isEditMode ? 'Edit Permission Application' : 'New Permission Application' ?>
+                            </h2>
+                            <p class="text-xs text-slate-500 font-medium">
+                                <?php if ($isEditMode): ?>
+                                    Editing Application No: <strong><?= esc($editData['app_no']) ?></strong>
+                                <?php else: ?>
+                                    Form JPMS-1 · Application for deployment of signal jammers
+                                <?php endif; ?>
+                            </p>
                         </div>
                     </div>
                 </div>
 
-                <!-- =========================================================
-                 Organisation Details
-                 ========================================================== -->
+                <!-- Organisation Details -->
                 <div class="space-y-4">
                     <h3 class="text-base font-bold text-[#1e4d7b] flex items-center gap-2 border-b border-slate-100 pb-2">
                         <i class="fas fa-building"></i> Organisation Details
                     </h3>
-
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <!-- NAME OF ORGANISATION -->
                         <div>
                             <label class="block text-sm font-semibold text-slate-700 mb-1.5">Name of organisation</label>
                             <select name="organisation_name" id="organisation_name" class="organisation-select w-full" required>
@@ -453,10 +478,7 @@ ob_start();
                                 <?php endif; ?>
                             </select>
                             <input type="hidden" name="organization_id" id="organization_id" value="<?= esc($organization_id ?? '') ?>">
-                            <p class="text-xs text-slate-500 mt-1">Select from the list or type your organisation name manually.</p>
                         </div>
-
-                        <!-- TYPE OF ORGANISATION -->
                         <div>
                             <label class="block text-sm font-semibold text-slate-700 mb-1.5">Type of organisation</label>
                             <select name="organisation_type" id="organisation_type" class="organisation-select w-full" required>
@@ -473,25 +495,18 @@ ob_start();
                                 <?php endif; ?>
                             </select>
                             <input type="hidden" name="org_type" id="org_type" value="<?= esc($org_type ?? '') ?>">
-                            <p class="text-xs text-slate-500 mt-1">Select from the list or type your organisation type manually.</p>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- =========================================================
-             EXAMINATION DETAILS
-             ========================================================== -->
+            <!-- EXAMINATION DETAILS -->
             <div class="gov-card p-6">
                 <div class="space-y-5">
-
-                    <!-- Heading -->
                     <h3 class="text-base font-bold text-[#1e4d7b] flex items-center gap-2 border-b border-slate-100 pb-2">
-                        <i class="fas fa-graduation-cap"></i>
-                        Examination Details
+                        <i class="fas fa-graduation-cap"></i> Examination Details
                     </h3>
 
-                    <!-- SINGLE / MULTIPLE -->
                     <div>
                         <label class="block text-sm font-semibold text-slate-700 mb-2">
                             Whether request for deployment of jammers is for a single examination?
@@ -508,150 +523,74 @@ ob_start();
                         </div>
                     </div>
 
-                    <!-- SINGLE EXAMINATION -->
+                    <!-- SINGLE EXAMINATION (YES) -->
                     <div id="single-exam-container">
-                        <div class="centre-details grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="centre-details mt-4">
                             <div>
                                 <label class="block text-sm font-semibold text-slate-700 mb-1.5">Name of examination</label>
-                                <input type="text" name="single_exam_name" class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#1e4d7b] transition text-sm" placeholder="Enter examination name">
+                                <input type="text" name="single_exam_name"
+                                    class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#1e4d7b] transition text-sm"
+                                    placeholder="Enter examination name">
                             </div>
-                            <div>
-                                <label class="block text-sm font-semibold text-slate-700 mb-1.5">Date of examination</label>
-                                <div class="relative">
-                                    <input type="text" name="single_exam_date" id="singleExamDateText" placeholder="dd/mm/yyyy" maxlength="10" class="date-text w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#1e4d7b] transition text-sm pr-10">
-                                    <input type="date" id="singleExamDatePicker" class="date-picker absolute right-2 top-1/2 -translate-y-1/2 opacity-0 w-8 h-8 cursor-pointer z-10">
+                        </div>
+
+                        <div class="centre-details mt-4">
+                            <div id="singleCentreNotAvailableWrapper" class="flex items-center justify-between mb-4 pb-3 border-b border-slate-200">
+                                <label class="inline-flex items-center gap-2.5 cursor-pointer select-none">
+                                    <input type="checkbox" name="single_centre_not_available_flag"
+                                        class="single-centre-not-available centre-not-available w-4 h-4 text-[#1e4d7b] rounded border-slate-300 focus:ring-[#1e4d7b]">
+                                    <span class="text-xs font-semibold text-slate-700">Centre Information Not Available</span>
+                                </label>
+                            </div>
+
+                            <label class="block text-sm font-semibold text-slate-700 mb-2">Whether the request is for a single date of examination ?</label>
+                            <div class="flex items-center gap-6 mb-3">
+                                <label class="inline-flex items-center cursor-pointer">
+                                    <input type="radio" name="exam_date_type" value="single" id="examDateSingle"
+                                        class="w-4 h-4 text-[#1e4d7b] border-slate-300 focus:ring-[#1e4d7b]" checked>
+                                    <span class="ml-2 text-sm text-slate-700">Yes</span>
+                                </label>
+                                <label class="inline-flex items-center cursor-pointer">
+                                    <input type="radio" name="exam_date_type" value="multiple" id="examDateMultiple"
+                                        class="w-4 h-4 text-[#1e4d7b] border-slate-300 focus:ring-[#1e4d7b]">
+                                    <span class="ml-2 text-sm text-slate-700">No</span>
+                                </label>
+                            </div>
+
+                            <div id="singleDateSection">
+                                <div class="relative w-full md:w-1/2">
+                                    <input type="text" name="single_exam_date" id="singleExamDateText" placeholder="dd/mm/yyyy"
+                                        maxlength="10" autocomplete="off"
+                                        class="date-text w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#1e4d7b] transition text-sm pr-10">
+                                    <input type="date" id="singleExamDatePicker"
+                                        class="date-picker absolute right-2 top-1/2 -translate-y-1/2 opacity-0 w-8 h-8 cursor-pointer z-10">
                                     <i class="fas fa-calendar-alt absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none"></i>
                                 </div>
+
+                                <div class="mt-5" id="singleDateCentreWrapper">
+                                    <div class="flex items-center justify-between mb-2">
+                                        <label class="block text-sm font-semibold text-slate-700">Centre of examination</label>
+                                        <button type="button" id="addSingleDateCentre"
+                                            class="inline-flex items-center gap-1.5 px-3 py-2 bg-white border border-[#1e4d7b] text-[#1e4d7b] text-xs font-semibold rounded-lg transition">
+                                            <i class="fas fa-plus"></i> Add Centre
+                                        </button>
+                                    </div>
+                                    <div id="single-date-centres-container"></div>
+                                </div>
                             </div>
-                        </div>
 
-                        <!-- SINGLE CENTRES -->
-                        <div class="mt-5">
-                            <div id="single-centres-container">
-
-                                <!-- Checkbox and Add Centre button -->
-                                <div class="flex items-center justify-between mb-4 pb-3 border-b border-slate-200">
-                                    <label class="inline-flex items-center gap-2.5 cursor-pointer select-none">
-                                        <input
-                                            type="checkbox"
-                                            name="single_centre_not_available[]"
-                                            class="centre-not-available w-4 h-4 text-[#1e4d7b]
-                                                   rounded border-slate-300
-                                                   focus:ring-[#1e4d7b]"
-                                        >
-                                        <span class="text-xs font-semibold text-slate-700">
-                                            Centre Information Not Available
-                                        </span>
-                                    </label>
-
-                                    <button
-                                        type="button"
-                                        id="addSingleCentre"
-                                        class="inline-flex items-center gap-1.5 px-3 py-2
-                                               bg-[#1e4d7b] hover:bg-[#163a5c]
-                                               text-white text-xs font-semibold rounded-lg transition">
-                                        <i class="fas fa-plus"></i>
-                                        Add Centre
+                            <div id="multipleDateSection" class="hidden">
+                                <div id="multipleDateContainer" class="space-y-3"></div>
+                                <div class="mt-4 flex justify-end">
+                                    <button type="button" id="addSingleMultipleDate"
+                                        class="px-3 py-2 rounded-lg bg-[#1e4d7b] text-white text-sm font-semibold hover:bg-[#123b60] transition whitespace-nowrap">
+                                        <i class="fas fa-plus mr-1"></i> Add Date
                                     </button>
                                 </div>
-
-                                <!-- Centre items container -->
-                                <div id="single-centres-list">
-                                    <div class="centre-item border border-slate-200 rounded-xl p-4 bg-slate-50">
-
-                                        <div class="mb-4">
-                                            <label class="block text-sm font-semibold text-slate-700">
-                                                Centre of examination
-                                            </label>
-                                        </div>
-
-                                        <div class="centre-details grid grid-cols-1 md:grid-cols-2 gap-4">
-
-                                            <!-- Centre Name -->
-                                            <div>
-                                                <label class="block text-sm font-medium text-slate-700 mb-1.5">
-                                                    Name of centre
-                                                </label>
-
-                                                <input
-                                                    type="text"
-                                                    name="single_centre_name[]"
-                                                    class="w-full px-4 py-2 border border-slate-300 rounded-lg
-                                                           focus:outline-none focus:ring-2 focus:ring-[#1e4d7b]
-                                                           focus:border-[#1e4d7b]"
-                                                    placeholder="Enter centre name"
-                                                >
-                                            </div>
-
-                                            <!-- Coordinates -->
-                                            <div>
-                                                <label class="block text-sm font-medium text-slate-700 mb-1.5">
-                                                    Coordinates
-                                                </label>
-
-                                                <input
-                                                    type="text"
-                                                    name="single_centre_coordinates[]"
-                                                    class="w-full px-4 py-2 border border-slate-300 rounded-lg
-                                                           focus:outline-none focus:ring-2 focus:ring-[#1e4d7b]
-                                                           focus:border-[#1e4d7b]"
-                                                    placeholder="Enter coordinates"
-                                                >
-                                            </div>
-
-                                            <!-- State -->
-                                            <div>
-                                                <label class="block text-sm font-medium text-slate-700 mb-1.5">
-                                                    State
-                                                </label>
-
-                                                <select
-                                                    name="single_centre_state[]"
-                                                    class="single-centre-state w-full"
-                                                >
-                                                    <option value="">Select State</option>
-                                                </select>
-                                            </div>
-
-                                            <!-- District -->
-                                            <div>
-                                                <label class="block text-sm font-medium text-slate-700 mb-1.5">
-                                                    District / City
-                                                </label>
-
-                                                <select
-                                                    name="single_centre_district[]"
-                                                    class="single-centre-district w-full"
-                                                    disabled
-                                                >
-                                                    <option value="">Select District / City</option>
-                                                </select>
-                                            </div>
-
-                                            <!-- Address -->
-                                            <div class="md:col-span-2">
-                                                <label class="block text-sm font-medium text-slate-700 mb-1.5">
-                                                    Address
-                                                </label>
-
-                                                <textarea
-                                                    name="single_centre_address[]"
-                                                    rows="3"
-                                                    class="w-full px-4 py-2 border border-slate-300 rounded-lg
-                                                           focus:outline-none focus:ring-2 focus:ring-[#1e4d7b]
-                                                           focus:border-[#1e4d7b] resize-none"
-                                                    placeholder="Enter complete address"
-                                                ></textarea>
-                                            </div>
-
-                                        </div>
-                                    </div>
-                                </div>
-
                             </div>
                         </div>
-                        <!-- EXCEL UPLOAD -->
-                        <div class="mt-5">
+
+                        <div class="mt-5" id="singleExamExcelSection">
                             <label class="block text-sm font-semibold text-slate-700 mb-1.5">Upload Excel sheet of examinations / centres</label>
                             <div class="flex items-center gap-2">
                                 <label class="flex-1 cursor-pointer flex items-center justify-center px-4 py-2.5 border border-dashed border-slate-300 bg-slate-50 hover:bg-slate-100 rounded-lg transition text-slate-600 text-sm font-medium">
@@ -664,19 +603,21 @@ ob_start();
                             <p class="text-[11px] text-slate-400 mt-1">Supported formats: XLSX, XLS, CSV</p>
                         </div>
                     </div>
-                    <!-- MULTIPLE EXAMINATIONS -->
+
+                    <!-- MULTIPLE EXAMINATIONS (NO) -->
                     <div id="multiple-exam-container" class="hidden">
                         <div class="flex items-center justify-between mb-3">
                             <div>
                                 <h4 class="text-sm font-bold text-[#1e4d7b]">Multiple Examination Details</h4>
                                 <p class="text-xs text-slate-400 mt-0.5">Add examination and centre details separately.</p>
                             </div>
-                            <button type="button" id="addExam" class="inline-flex items-center gap-1.5 px-3 py-2 bg-[#1e4d7b] hover:bg-[#163a5c] text-white text-xs font-semibold rounded-lg transition">
+                            <button type="button" id="addExam"
+                                class="inline-flex items-center gap-1.5 px-3 py-2 bg-[#1e4d7b] hover:bg-[#163a5c] text-white text-xs font-semibold rounded-lg transition">
                                 <i class="fas fa-plus"></i>Add Examination
                             </button>
                         </div>
                         <div id="multiple-exams-list"></div>
-                        <!-- Multiple Excel -->
+
                         <div class="mt-5">
                             <label class="block text-sm font-semibold text-slate-700 mb-1.5">Upload Excel sheet of examinations / centres</label>
                             <div class="flex items-center gap-2">
@@ -693,191 +634,124 @@ ob_start();
                 </div>
             </div>
 
-            <!-- =========================================================
-                Vendor Details
-            ========================================================== -->
+            <!-- VENDOR DETAILS -->
             <div class="gov-card p-6">
                 <div class="space-y-4">
-
-                    <!-- Header -->
                     <div class="flex items-center justify-between border-b border-slate-100 pb-2">
                         <h3 class="text-base font-bold text-[#1e4d7b] flex items-center gap-2">
-                            <i class="fas fa-microchip"></i>
-                            Vendor Details
+                            <i class="fas fa-microchip"></i> Vendor Details
                         </h3>
-                        <button type="button"
-                                onclick="addVendor()"
-                                class="inline-flex items-center gap-2 px-4 py-2 bg-[#1e4d7b] hover:bg-[#163a5c] text-white text-sm font-semibold rounded-lg transition">
-                            <i class="fas fa-plus"></i>
-                            Add Vendor
+                        <button type="button" onclick="addVendor()"
+                            class="inline-flex items-center gap-2 px-4 py-2 bg-[#1e4d7b] hover:bg-[#163a5c] text-white text-sm font-semibold rounded-lg transition">
+                            <i class="fas fa-plus"></i> Add Vendor
                         </button>
                     </div>
-
-                    <!-- Vendor Container -->
                     <div id="vendorContainer">
-
-                        <!-- First Vendor -->
                         <div class="vendor-item border border-slate-200 rounded-xl p-4 mb-4 bg-slate-50">
-
                             <div class="flex items-center justify-between mb-4">
-                                <h4 class="font-semibold text-[#1e4d7b]">
-                                    <i class="fas fa-building mr-1"></i>
-                                    Vendor 1
-                                </h4>
-                                <button type="button"
-                                        onclick="removeVendor(this)"
-                                        class="hidden text-red-500 hover:text-red-700 text-sm font-semibold">
-                                    <i class="fas fa-trash-alt mr-1"></i>
-                                    Remove
+                                <h4 class="font-semibold text-[#1e4d7b]"><i class="fas fa-building mr-1"></i> Vendor 1</h4>
+                                <button type="button" onclick="removeVendor(this)"
+                                    class="hidden text-red-500 hover:text-red-700 text-sm font-semibold">
+                                    <i class="fas fa-trash-alt mr-1"></i> Remove
                                 </button>
                             </div>
-
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-
-                                <!-- Vendor -->
                                 <div>
-                                    <label class="block text-sm font-semibold text-slate-700 mb-1.5">
-                                        Name of vendor
-                                    </label>
+                                    <label class="block text-sm font-semibold text-slate-700 mb-1.5">Name of vendor</label>
                                     <select name="vendor_id[]"
-                                            class="vendor-select w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#1e4d7b] transition text-sm bg-white"
-                                            required>
+                                        class="vendor-select w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#1e4d7b] transition text-sm bg-white"
+                                        required>
                                         <option value="">Select vendor</option>
                                     </select>
                                 </div>
-
-                                <!-- Jammer Model (Single Select) -->
                                 <div>
-                                    <label class="block text-sm font-semibold text-slate-700 mb-1.5">
-                                        Jammer model
-                                    </label>
+                                    <label class="block text-sm font-semibold text-slate-700 mb-1.5">Jammer model</label>
                                     <select name="jammer_model_ids[]"
-                                            class="model-select w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#1e4d7b] transition text-sm bg-white">
+                                        class="model-select w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#1e4d7b] transition text-sm bg-white">
                                         <option value="">Select jammer model</option>
                                     </select>
                                 </div>
-
                             </div>
-
-                            <!-- Technical Specification -->
                             <div class="mt-4">
-                                <label class="block text-sm font-semibold text-slate-700 mb-1.5">
-                                    Technical specifications of jammers
-                                </label>
+                                <label class="block text-sm font-semibold text-slate-700 mb-1.5">Technical specifications of jammers</label>
                                 <div class="flex items-center gap-2">
                                     <label class="flex-1 cursor-pointer flex items-center justify-center px-4 py-2 border border-dashed border-slate-300 bg-white hover:bg-slate-100 rounded-lg transition text-slate-600 text-sm font-medium">
                                         <i class="fas fa-file-pdf text-[#e58500] mr-2"></i>
                                         <span>Choose file</span>
-                                        <input type="file"
-                                               name="technical_specifications[]"
-                                               accept=".pdf"
-                                               class="hidden tech-file-input"
-                                               onchange="showFileName(this)">
+                                        <input type="file" name="technical_specifications[]" accept=".pdf"
+                                            class="hidden tech-file-input" onchange="showFileName(this)">
                                     </label>
                                     <span class="file-name text-xs text-slate-400">No file selected</span>
                                 </div>
                             </div>
-
                         </div>
-
                     </div>
                 </div>
             </div>
 
-            <!-- =========================================================
-                Contact Details
-            ========================================================== -->
-            <div class="gov-card p-6">
-                <div class="space-y-4">
-                    <h3 class="text-base font-bold text-[#1e4d7b] flex items-center gap-2 border-b border-slate-100 pb-2">
-                        <i class="fas fa-user-tie"></i> Contact Details
-                    </h3>
-
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div>
-                            <label class="block text-sm font-semibold text-slate-700 mb-1.5">Contact person</label>
-                            <input type="text" name="contact_person" class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#1e4d7b] transition text-sm" placeholder="Full name" required>
-                        </div>
-                        <div>
-                            <label class="block text-sm font-semibold text-slate-700 mb-1.5">Email</label>
-                            <input type="email" name="contact_email" class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#1e4d7b] transition text-sm" placeholder="email@example.com" required>
-                        </div>
-                    </div>
-
-                    <div>
-                        <label class="block text-sm font-semibold text-slate-700 mb-1.5">Phone</label>
-                        <input type="tel" name="contact_phone" class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#1e4d7b] transition text-sm" placeholder="+91 XXXXX XXXXX" required>
-                    </div>
-                </div>
-            </div>
-
-            <!-- =========================================================
-               Declarations
-             ========================================================== -->
+            <!-- DECLARATIONS -->
             <div class="gov-card p-6 space-y-6">
                 <div class="space-y-2">
                     <h3 class="text-base font-bold text-[#1e4d7b] mb-3 flex items-center gap-2 border-b border-slate-100 pb-2">
                         <i class="fas fa-file-contract"></i> Declarations
                     </h3>
-                    <div class="space-y-2 bg-slate-50 p-4 rounded-lg border border-slate-200">
+                    <div class="space-y-3 bg-slate-50 p-4 rounded-lg border border-slate-200">
                         <label class="flex items-start gap-2 cursor-pointer">
-                            <input type="checkbox"
-                                   name="declarations[]"
-                                   value="security"
-                                   class="mt-1 w-4 h-4 text-[#1e4d7b] rounded border-slate-300 focus:ring-[#1e4d7b]">
+                            <input type="checkbox" name="declarations[]" value="security"
+                                class="mt-1 w-4 h-4 text-[#1e4d7b] rounded border-slate-300 focus:ring-[#1e4d7b]">
                             <span class="text-xs text-slate-700 font-medium leading-relaxed">
-                                Adequate arrangements shall be made for the safe custody of the
-                                jammers during their deployment at the examination centres.
+                                <strong>i.</strong> Adequate arrangements should be made for safe custody of the jammers during its deployment in examination centers.
                             </span>
                         </label>
                         <label class="flex items-start gap-2 cursor-pointer">
-                            <input type="checkbox"
-                                   name="declarations[]"
-                                   value="accountability"
-                                   class="mt-1 w-4 h-4 text-[#1e4d7b] rounded border-slate-300 focus:ring-[#1e4d7b]">
+                            <input type="checkbox" name="declarations[]" value="accountability"
+                                class="mt-1 w-4 h-4 text-[#1e4d7b] rounded border-slate-300 focus:ring-[#1e4d7b]">
                             <span class="text-xs text-slate-700 font-medium leading-relaxed">
-                                Each jammer deployed at the examination centres, as indicated in
-                                the relevant annexures, shall be duly accounted for and any
-                                discrepancy shall be reported immediately to the appropriate
-                                law enforcement agency and the Office of Secretary (Security).
+                                <strong>ii.</strong> Each jammer deployed at the examination centers, as indicated in Annexures of the letter under reference, will be accounted for and any discrepancy in this regard will be reported immediately to the appropriate law enforcement agency and to the Office of Secretary (Security).
                             </span>
                         </label>
                         <label class="flex items-start gap-2 cursor-pointer">
-                            <input type="checkbox"
-                                   name="declarations[]"
-                                   value="non_interference"
-                                   class="mt-1 w-4 h-4 text-[#1e4d7b] rounded border-slate-300 focus:ring-[#1e4d7b]">
+                            <input type="checkbox" name="declarations[]" value="non_interference"
+                                class="mt-1 w-4 h-4 text-[#1e4d7b] rounded border-slate-300 focus:ring-[#1e4d7b]">
                             <span class="text-xs text-slate-700 font-medium leading-relaxed">
-                                While deploying the jammers, it shall be ensured by
-                                <strong>[Name of examination conducting body]</strong>
-                                that the jammers do not interfere with the existing mobile
-                                communication network outside the examination centre.
+                                <strong>iii.</strong> While deploying the jammers it will be ensured by <strong>[Name of examination conducting body]</strong> that the jammers do not interfere with existing mobile communication network outside examination center.
                             </span>
                         </label>
                     </div>
                 </div>
 
-                <!-- =========================================================
-                Submit Request
-                ========================================================== -->
                 <div class="flex items-center gap-3 pt-2">
                     <button type="submit"
-                            class="btn-orange w-40 h-11 rounded-lg font-semibold text-white shadow-sm opacity-50 cursor-not-allowed transition flex items-center justify-center gap-2"
-                            id="submitBtn"
-                            onclick="submitRequest()"
-                            disabled>
+                        class="btn-orange w-40 h-11 rounded-lg font-semibold text-white shadow-sm opacity-50 cursor-not-allowed transition flex items-center justify-center gap-2"
+                        id="submitBtn" disabled>
                         <i class="fas fa-paper-plane"></i>
-                        Submit Request
+                        <span id="submitBtnText"><?= $isEditMode ? 'Update Request' : 'Submit Request' ?></span>
                     </button>
+                    <?php if (!$isEditMode): ?>
+                        <button type="button" 
+                                onclick="saveAsDraft()"
+                                class="w-40 h-11 border border-amber-300 rounded-lg text-amber-700 font-semibold hover:bg-amber-50 transition flex items-center justify-center gap-2">
+                            <i class="fas fa-file-pen"></i> Save as Draft
+                        </button>
+                    <?php endif; ?>
                     <button type="reset"
-                            class="w-40 h-11 border border-slate-300 rounded-lg text-slate-700 font-semibold hover:bg-slate-50 transition flex items-center justify-center gap-2">
-                        <i class="fas fa-undo"></i>
-                        Reset
+                        class="w-40 h-11 border border-slate-300 rounded-lg text-slate-700 font-semibold hover:bg-slate-50 transition flex items-center justify-center gap-2">
+                        <i class="fas fa-undo"></i> Reset
                     </button>
                 </div>
             </div>
-
-        </form>
+         </form>
+        <?php if ($isEditMode): ?>
+            <script>
+                window.IS_EDIT_MODE = true;
+                window.EDIT_MODE_DATA = <?= json_encode($editData, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) ?>;
+                window.BASE_URL = '<?= base_url() ?>';
+            </script>
+        <?php else: ?>
+            <script>
+                window.IS_EDIT_MODE = false;
+            </script>
+        <?php endif; ?>
     </div>
 
     <div class="space-y-6 py-6">
@@ -964,68 +838,29 @@ ob_start();
     const baseUrl = "<?= base_url() ?>";
 </script>
 <script>
-    function toggleExamFields(isSingle) {
-        const singleContainer = document.getElementById('single-exam-container');
-        const multipleContainer = document.getElementById('multiple-exam-container');
-        
-        if (isSingle) {
-            singleContainer.classList.remove('hidden');
-            multipleContainer.classList.add('hidden');
-        } else {
-            singleContainer.classList.add('hidden');
-            multipleContainer.classList.remove('hidden');
-        }
-    }
-
-    function formatDateInput(input) {
-        let val = input.value.replace(/\D/g, '');
-        if (val.length > 8) val = val.substring(0, 8);
-        if (val.length >= 5) {
-            input.value = val.substring(0, 2) + '/' + val.substring(2, 4) + '/' + val.substring(4);
-        } else if (val.length >= 3) {
-            input.value = val.substring(0, 2) + '/' + val.substring(2);
-        } else {
-            input.value = val;
-        }
-    }
-
-    function syncPickerToText(picker) {
-        if (!picker.value) return;
-        const [year, month, day] = picker.value.split('-');
-        document.getElementById('examDateText').value = `${day}/${month}/${year}`;
-    }
-
-</script>
-<script>
 $(document).ready(function () {
+
     // ============================================================
-    // ENABLE/DISABLE SUBMIT BUTTON BASED ON CHECKBOXES
+    // SUBMIT BUTTON TOGGLE
     // ============================================================
     function toggleSubmitButton() {
-        const checkboxes = $('input[name="declarations[]"]');
-        const checkedCount = checkboxes.filter(':checked').length;
-        const submitButton = $('#submitBtn');
-        
+        const checkedCount = $('input[name="declarations[]"]:checked').length;
+        const $btn = $('#submitBtn');
         if (checkedCount === 3) {
-            submitButton.prop('disabled', false);
-            submitButton.removeClass('opacity-50 cursor-not-allowed');
-            submitButton.addClass('hover:opacity-90');
+            $btn.prop('disabled', false);
+            $btn.removeClass('opacity-50 cursor-not-allowed').addClass('hover:opacity-90');
         } else {
-            submitButton.prop('disabled', true);
-            submitButton.addClass('opacity-50 cursor-not-allowed');
-            submitButton.removeClass('hover:opacity-90');
+            $btn.prop('disabled', true);
+            $btn.addClass('opacity-50 cursor-not-allowed').removeClass('hover:opacity-90');
         }
     }
-
     toggleSubmitButton();
-    $(document).on('change', 'input[name="declarations[]"]', function() {
-        toggleSubmitButton();
-    });
+    $(document).on('change', 'input[name="declarations[]"]', toggleSubmitButton);
 
     // ============================================================
-    // SINGLE / MULTIPLE EXAM TOGGLE
+    // MAIN SINGLE / MULTIPLE EXAM TOGGLE
     // ============================================================
-    $('input[name="single_exam"]').on('change', function() {
+    $('input[name="single_exam"]').on('change', function () {
         if ($(this).val() === 'yes') {
             $('#single-exam-container').removeClass('hidden');
             $('#multiple-exam-container').addClass('hidden');
@@ -1036,256 +871,204 @@ $(document).ready(function () {
             $('#multiple-exam-container').removeClass('hidden');
             disableSection('#single-exam-container');
             enableSection('#multiple-exam-container');
-            if ($('#multiple-exams-list .exam-item').length === 0) {
-                addExamination();
-            }
+            if ($('#multiple-exams-list .exam-item').length === 0) addExamination();
         }
     });
 
-    function enableSection(selector) {
-        $(selector).find('input, textarea, select').prop('disabled', false);
-        $(selector).find('button').prop('disabled', false);
+    function enableSection(sel) { $(sel).find('input, textarea, select, button').prop('disabled', false); }
+    function disableSection(sel) { $(sel).find('input, textarea, select, button').prop('disabled', true); }
+
+    // ============================================================
+    // CSRF HELPERS
+    // ============================================================
+    function getCSRFToken() { return $('input[name="csrf_test_name"]').val() || ''; }
+    function updateCSRF(res) { if (res && res.csrf_hash) $('input[name="csrf_test_name"]').val(res.csrf_hash); }
+
+    // ============================================================
+    // ✅ UNIVERSAL FILE INPUT DISPLAY HANDLER
+    // ============================================================
+    $(document).on('change', 'input[type="file"]', function () {
+        const input = this;
+        const $input = $(this);
+
+        let $display = $input.closest('.flex, .mt-4, .mt-3, .mt-2')
+                              .find('.excel-file-name, .file-name')
+                              .first();
+        if (!$display.length) {
+            $display = $input.closest('label').next('span');
+        }
+        if (!$display.length) {
+            $display = $input.closest('label').parent().find('span').last();
+        }
+        if (!$display.length) {
+            console.warn('File display span not found for input:', input.name);
+            return;
+        }
+
+        if (input.files && input.files.length > 0) {
+            const fileName = input.files.length > 1
+                ? input.files.length + ' files selected'
+                : input.files[0].name;
+            $display
+                .text(fileName)
+                .removeClass('text-slate-400 text-green-600')
+                .addClass('text-emerald-600 font-medium');
+        } else {
+            $display
+                .text('No file selected')
+                .removeClass('text-emerald-600 text-green-600 font-medium')
+                .addClass('text-slate-400');
+        }
+    });
+
+    // ============================================================
+    // DATE FORMATTER (dd/mm/yyyy)
+    // ============================================================
+    $(document).on('input', '.date-text, .multiple-date-text, .single-multi-date-text', function () {
+        let v = $(this).val().replace(/\D/g, '');
+        if (v.length > 8) v = v.substring(0, 8);
+        if (v.length >= 5) v = v.substring(0, 2) + '/' + v.substring(2, 4) + '/' + v.substring(4);
+        else if (v.length >= 3) v = v.substring(0, 2) + '/' + v.substring(2);
+        $(this).val(v);
+    });
+
+    $(document).on('change', '.date-picker', function () {
+        const v = $(this).val();
+        if (!v) return;
+        const p = v.split('-');
+        if (p.length === 3) {
+            $(this).closest('.relative').find('.date-text').val(p[2] + '/' + p[1] + '/' + p[0]);
+        }
+    });
+
+    $(document).on('change', '.single-multi-date-picker, .multiple-date-picker', function () {
+        const v = $(this).val();
+        if (!v) return;
+        const p = v.split('-');
+        if (p.length === 3) {
+            $(this).closest('.relative').find('.single-multi-date-text, .multiple-date-text').val(p[2] + '/' + p[1] + '/' + p[0]);
+        }
+    });
+
+    // ============================================================
+    // SELECT2 - STATE / DISTRICT
+    // ============================================================
+    function initStateSelect2(el) {
+        const $el = $(el);
+        if (!$el.length) return;
+        if ($el.hasClass('select2-hidden-accessible')) $el.select2('destroy');
+        $el.select2({ width: '100%', placeholder: 'Select State / UT', allowClear: true });
     }
-
-    function disableSection(selector) {
-        $(selector).find('input, textarea, select').prop('disabled', true);
-        $(selector).find('button').prop('disabled', true);
-    }
-
-    // ============================================================
-    // DATE PICKER FUNCTIONS
-    // ============================================================
-    $(document).on('input', '.date-text', function() {
-        let value = $(this).val().replace(/\D/g, '');
-        if (value.length > 2) {
-            value = value.substring(0, 2) + '/' + value.substring(2);
-        }
-        if (value.length > 5) {
-            value = value.substring(0, 5) + '/' + value.substring(5, 9);
-        }
-        $(this).val(value);
-    });
-
-    $(document).on('change', '.date-picker', function() {
-        let date = $(this).val();
-        if (!date) return;
-        let parts = date.split('-');
-        if (parts.length === 3) {
-            let formatted = parts[2] + '/' + parts[1] + '/' + parts[0];
-            $(this).closest('.relative').find('.date-text').val(formatted);
-        }
-    });
-
-    $(document).on('blur', '.date-text', function() {
-        let value = $(this).val();
-        if (!/^\d{2}\/\d{2}\/\d{4}$/.test(value)) return;
-        let parts = value.split('/');
-        let dateValue = parts[2] + '-' + parts[1] + '-' + parts[0];
-        $(this).closest('.relative').find('.date-picker').val(dateValue);
-    });
-
-    // ============================================================
-    // STATE & DISTRICT FUNCTIONS
-    // ============================================================
-    function initStateSelect2(element) {
-        let $element = $(element);
-        if (!$element.length) return;
-        if ($element.hasClass('select2-hidden-accessible')) {
-            $element.select2('destroy');
-        }
-        $element.select2({
-            width: '100%',
-            placeholder: 'Select State / UT',
-            allowClear: true
-        });
-    }
-
-    function initDistrictSelect2(element) {
-        let $element = $(element);
-        if (!$element.length) return;
-        if ($element.hasClass('select2-hidden-accessible')) {
-            $element.select2('destroy');
-        }
-        $element.select2({
-            width: '100%',
-            placeholder: 'Select District / City',
-            allowClear: true
-        });
+    function initDistrictSelect2(el) {
+        const $el = $(el);
+        if (!$el.length) return;
+        if ($el.hasClass('select2-hidden-accessible')) $el.select2('destroy');
+        $el.select2({ width: '100%', placeholder: 'Select District / City', allowClear: true });
     }
 
     function loadIndianStatesForElement(stateSelect, selectedState = '') {
-        let $stateSelect = $(stateSelect);
-        if (!$stateSelect.length) return;
-
+        const $s = $(stateSelect);
+        if (!$s.length) return;
         $.ajax({
             url: baseUrl + '/location/get-states',
             type: 'GET',
             dataType: 'json',
-            success: function(response) {
-                $stateSelect.empty();
-                $stateSelect.append('<option value="">Select State / UT</option>');
-
+            success: function (response) {
+                $s.empty().append('<option value="">Select State / UT</option>');
                 if (response.status && response.data && response.data.length) {
-                    $.each(response.data, function(index, state) {
-                        $stateSelect.append($('<option>', {
-                            value: state.id,
-                            text: state.state_name,
-                            selected: String(state.id) === String(selectedState)
+                    $.each(response.data, function (i, st) {
+                        $s.append($('<option>', {
+                            value: st.id, text: st.state_name,
+                            selected: String(st.id) === String(selectedState)
                         }));
                     });
                 }
-
-                initStateSelect2($stateSelect);
-
-                if (selectedState) {
-                    let $centre = $stateSelect.closest('.centre-item, .exam-centre');
-                    let $districtSelect = $centre.find('.single-centre-district, .multiple-centre-district').first();
-
-                    if ($districtSelect.length) {
-                        loadDistricts(selectedState, $districtSelect);
-                    }
-                }
+                initStateSelect2($s);
             },
-            error: function(xhr) {
-                console.error('State loading error:', xhr.responseText);
-                $stateSelect.empty();
-                $stateSelect.append('<option value="">Unable to load states</option>');
-                initStateSelect2($stateSelect);
+            error: function () {
+                $s.empty().append('<option value="">Unable to load states</option>');
+                initStateSelect2($s);
             }
         });
     }
 
     function loadDistricts(stateId, districtElement) {
-        let csrfToken = getCSRFToken();
-
         $.ajax({
             url: baseUrl + '/location/get-cities',
-            type: "POST",
-            dataType: "json",
-            data: {
-                state_id: stateId,
-                csrf_test_name: csrfToken
-            },
-            success: function(response) {
+            type: 'POST',
+            dataType: 'json',
+            data: { state_id: stateId, csrf_test_name: getCSRFToken() },
+            success: function (response) {
                 updateCSRF(response);
-
-                let $district = $(districtElement);
-                $district.empty();
-                $district.append('<option value="">Select District / City</option>');
-
-                if (response.status === true && Array.isArray(response.data) && response.data.length > 0) {
-                    $.each(response.data, function(index, district) {
-                        $district.append(
-                            $('<option>', {
-                                value: district.id,
-                                text: district.city_name
-                            })
-                        );
+                const $d = $(districtElement);
+                $d.empty().append('<option value="">Select District / City</option>');
+                if (response.status && Array.isArray(response.data) && response.data.length) {
+                    $.each(response.data, function (i, dist) {
+                        $d.append($('<option>', { value: dist.id, text: dist.city_name }));
                     });
-                    $district.prop('disabled', false);
                 } else {
-                    $district.append('<option value="">No District / City Found</option>');
-                    $district.prop('disabled', false);
+                    $d.append('<option value="">No District / City Found</option>');
                 }
-
-                initDistrictSelect2($district);
-                $district.trigger('change');
+                $d.prop('disabled', false);
+                initDistrictSelect2($d);
+                $d.trigger('change');
             },
-            error: function(xhr) {
-                console.error('District loading error:', xhr.status, xhr.responseText);
-                let $district = $(districtElement);
-                $district.empty();
-                $district.append('<option value="">Unable to load District / City</option>');
-                $district.prop('disabled', true);
-                initDistrictSelect2($district);
+            error: function () {
+                const $d = $(districtElement);
+                $d.empty().append('<option value="">Unable to load District / City</option>').prop('disabled', true);
+                initDistrictSelect2($d);
             }
         });
     }
 
-    // ============================================================
-    // STATE CHANGE HANDLER
-    // ============================================================
-    $(document).on('change', '.single-centre-state, .multiple-centre-state', function() {
-        let stateId = $(this).val();
-        let $centre = $(this).closest('.centre-item, .exam-centre');
-        let $districtSelect = $centre.find('.single-centre-district, .multiple-centre-district').first();
-        if (!$districtSelect.length) return;
-        
-        $districtSelect.val(null);
-        $districtSelect.empty();
-        $districtSelect.append('<option value="">Select District / City</option>');
-        $districtSelect.prop('disabled', true);
-        initDistrictSelect2($districtSelect);
-        
-        if (stateId) {
-            loadDistricts(stateId, $districtSelect);
-        }
+    $(document).on('change', '.single-centre-state, .multiple-centre-state, .single-multi-centre-state', function () {
+        const stateId = $(this).val();
+        const $c = $(this).closest('.centre-item, .exam-centre, .single-multi-centre');
+        const $d = $c.find('.single-centre-district, .multiple-centre-district, .single-multi-centre-district').first();
+        if (!$d.length) return;
+        $d.val(null).empty().append('<option value="">Select District / City</option>').prop('disabled', true);
+        initDistrictSelect2($d);
+        if (stateId) loadDistricts(stateId, $d);
     });
 
     // ============================================================
-    // CENTRE NOT AVAILABLE - MODAL HANDLER (NEW)
+    // CENTRE NOT AVAILABLE MODAL
     // ============================================================
     let modalTriggerCheckbox = null;
 
-    // Show modal when checkbox is clicked
-    $(document).on('change', '.centre-not-available', function(e) {
-        const $checkbox = $(this);
-        const isChecked = $checkbox.is(':checked');
-        
-        // Reset modal state
-        $('#modalDeclarationCheck').prop('checked', false);
-        $('#modalSubmitBtn').prop('disabled', true);
-        
-        if (isChecked) {
-            // Prevent default checkbox behavior temporarily
-            e.preventDefault();
-            
-            // Store reference to the checkbox that triggered this
-            modalTriggerCheckbox = $checkbox;
-            
-            // Store the exam/centre context
-            const $container = $checkbox.closest('#single-centres-container, .exam-item');
-            if ($container.length) {
-                if ($container.attr('id') === 'single-centres-container') {
-                    modalTriggerCheckbox.data('context', 'single');
-                } else {
-                    modalTriggerCheckbox.data('context', 'multiple');
-                    modalTriggerCheckbox.data('exam-id', $container.data('exam-id'));
-                }
-            }
-            
-            // Show the modal
-            $('#centreNotAvailableModal').removeClass('hidden');
-            $('#centreNotAvailableModal').css('display', 'flex');
-            
+    $(document).on('change', '.centre-not-available', function (e) {
+        const $cb = $(this);
+        if ($cb.is(':checked')) {
+            $cb.prop('checked', false);
+            modalTriggerCheckbox = $cb;
+            $('#modalDeclarationCheck').prop('checked', false);
+            $('#modalSubmitBtn').prop('disabled', true)
+                .addClass('opacity-50 cursor-not-allowed');
+            $('#centreNotAvailableModal').removeClass('hidden').css('display', 'flex');
         } else {
-            // If unchecked, show centres normally (no modal needed)
-            handleCentreVisibility($checkbox, false);
+            handleCentreVisibility($cb, false);
         }
     });
 
-    // Modal checkbox - enable/disable submit button
-    $(document).on('change', '#modalDeclarationCheck', function() {
-        $('#modalSubmitBtn').prop('disabled', !$(this).is(':checked'));
+    $(document).on('change', '#modalDeclarationCheck', function () {
+        const checked = $(this).is(':checked');
+        const $btn = $('#modalSubmitBtn');
+        if (checked) {
+            $btn.prop('disabled', false).removeClass('opacity-50 cursor-not-allowed');
+        } else {
+            $btn.prop('disabled', true).addClass('opacity-50 cursor-not-allowed');
+        }
     });
 
-    // Modal Submit button
-    $(document).on('click', '#modalSubmitBtn', function() {
+    $(document).on('click', '#modalSubmitBtn', function () {
         if (!modalTriggerCheckbox) return;
-        
-        // Check the checkbox (since we prevented it earlier)
-        modalTriggerCheckbox.prop('checked', true);
-        
-        // Apply the visibility changes
-        handleCentreVisibility(modalTriggerCheckbox, true);
-        
-        // Close modal
+        const $cb = modalTriggerCheckbox;
+        $cb.prop('checked', true);
+        handleCentreVisibility($cb, true);
         closeModal();
     });
 
-    // Modal Cancel button
-    $(document).on('click', '#modalCancelBtn', function() {
-        // Uncheck the checkbox
+    $(document).on('click', '#modalCancelBtn', function () {
         if (modalTriggerCheckbox) {
             modalTriggerCheckbox.prop('checked', false);
             modalTriggerCheckbox = null;
@@ -1293,117 +1076,81 @@ $(document).ready(function () {
         closeModal();
     });
 
-    // Close modal on overlay click
-    $(document).on('click', '#centreNotAvailableModal .fixed.inset-0', function(e) {
-        if (e.target === this || e.target.closest('.fixed.inset-0')) {
-            if (modalTriggerCheckbox) {
-                modalTriggerCheckbox.prop('checked', false);
-                modalTriggerCheckbox = null;
-            }
-            closeModal();
-        }
-    });
-
     function closeModal() {
-        $('#centreNotAvailableModal').addClass('hidden');
-        $('#centreNotAvailableModal').css('display', '');
+        $('#centreNotAvailableModal').addClass('hidden').css('display', '');
         $('#modalDeclarationCheck').prop('checked', false);
-        $('#modalSubmitBtn').prop('disabled', true);
+        $('#modalSubmitBtn').prop('disabled', true).addClass('opacity-50 cursor-not-allowed');
         modalTriggerCheckbox = null;
     }
 
-    function handleCentreVisibility($checkbox, isChecked) {
-        // For single exam
-        if ($checkbox.closest('#single-centres-container').length) {
-            const $container = $('#single-centres-container');
-            const $centreItems = $container.find('.centre-item');
-            const $addBtn = $('#addSingleCentre');
-            
-            if (isChecked) {
-                $centreItems.slideUp(300);
-                $addBtn.hide();
-                $centreItems.find('input, select, textarea').prop('disabled', true).val('');
-                $centreItems.find('.single-centre-state, .single-centre-district').each(function() {
-                    $(this).val(null).trigger('change');
-                    if ($(this).hasClass('single-centre-state')) {
-                        initStateSelect2($(this));
-                    } else {
-                        initDistrictSelect2($(this));
-                    }
-                });
+    // ============================================================
+    // HANDLE CENTRE VISIBILITY
+    // ✅ FIX: "Add Date" button (#addSingleMultipleDate) always visible
+    // ============================================================
+    function handleCentreVisibility($cb, isChecked) {
+        if ($cb.hasClass('single-centre-not-available')) {
+            const dateType = $('input[name="exam_date_type"]:checked').val();
+            if (dateType === 'single') {
+                const $wrapper = $('#singleDateCentreWrapper');
+                if (isChecked) {
+                    $wrapper.slideUp(300);
+                    $wrapper.find('input, select, textarea').prop('disabled', true);
+                    $('#addSingleDateCentre').hide();
+                } else {
+                    $wrapper.slideDown(300);
+                    $wrapper.find('input, select, textarea').prop('disabled', false);
+                    $('#addSingleDateCentre').show();
+                }
             } else {
-                $centreItems.slideDown(300);
-                $addBtn.show();
-                $centreItems.find('input, select, textarea').prop('disabled', false);
-                $centreItems.find('.single-centre-state').each(function() {
-                    initStateSelect2($(this));
-                    if ($(this).val()) {
-                        const $city = $(this).closest('.centre-item').find('.single-centre-district');
-                        loadDistricts($(this).val(), $city);
-                    }
-                });
-                $centreItems.find('.single-centre-district').each(function() {
-                    initDistrictSelect2($(this));
-                });
+                const $groups = $('#multipleDateContainer .date-centre-group');
+                if (isChecked) {
+                    $groups.find('.centre-block-for-date').slideUp(300);
+                    $groups.find('.centre-block-for-date input, .centre-block-for-date select, .centre-block-for-date textarea').prop('disabled', true);
+                    // ✅ REMOVED: $('#addSingleMultipleDate').hide();
+                } else {
+                    $groups.find('.centre-block-for-date').slideDown(300);
+                    $groups.find('.centre-block-for-date input, .centre-block-for-date select, .centre-block-for-date textarea').prop('disabled', false);
+                    // ✅ REMOVED: $('#addSingleMultipleDate').show();
+                }
             }
+            return;
         }
-        
-        // For multiple exam
-        if ($checkbox.closest('.exam-item').length) {
-            const $examItem = $checkbox.closest('.exam-item');
-            const $centreItems = $examItem.find('.exam-centre');
-            const $addBtn = $examItem.find('.add-exam-centre');
-            
+
+        if ($cb.closest('.exam-item').length) {
+            const $exam = $cb.closest('.exam-item');
+            const $items = $exam.find('.exam-centre');
+            const $add = $exam.find('.add-exam-centre');
             if (isChecked) {
-                $centreItems.slideUp(300);
-                $addBtn.hide();
-                $centreItems.find('input, select, textarea').prop('disabled', true).val('');
-                $centreItems.find('.multiple-centre-state, .multiple-centre-district').each(function() {
-                    $(this).val(null).trigger('change');
-                    if ($(this).hasClass('multiple-centre-state')) {
-                        initStateSelect2($(this));
-                    } else {
-                        initDistrictSelect2($(this));
-                    }
-                });
+                $items.slideUp(300); $add.hide();
+                $items.find('input, select, textarea').prop('disabled', true);
             } else {
-                $centreItems.slideDown(300);
-                $addBtn.show();
-                $centreItems.find('input, select, textarea').prop('disabled', false);
-                $centreItems.find('.multiple-centre-state').each(function() {
-                    initStateSelect2($(this));
-                    if ($(this).val()) {
-                        const $city = $(this).closest('.exam-centre').find('.multiple-centre-district');
-                        loadDistricts($(this).val(), $city);
-                    }
-                });
-                $centreItems.find('.multiple-centre-district').each(function() {
-                    initDistrictSelect2($(this));
-                });
+                // ✅ Only show "Add Centre" if date type is single
+                const dateType = $exam.find('input.multiple-exam-date-type:checked').val();
+                $items.slideDown(300);
+                if (dateType === 'single') $add.show(); else $add.hide();
+                $items.find('input, select, textarea').prop('disabled', false);
             }
         }
     }
 
     // ============================================================
-    // SINGLE CENTRE FUNCTIONS
+    // SINGLE EXAM (YES) — SINGLE DATE CENTRE BLOCK
     // ============================================================
-    $('#addSingleCentre').on('click', function() {
-        let html = `
-            <div class="centre-item border border-slate-200 rounded-xl p-4 bg-slate-50 mt-3">
+    function getSingleDateCentreHTML(centreNo) {
+        return `
+            <div class="centre-item border border-slate-200 rounded-xl p-4 bg-slate-50 mt-3" data-single-centre-no="${centreNo}">
                 <div class="flex justify-between items-center mb-4">
-                    <span class="text-xs font-bold text-[#1e4d7b]">Additional Centre</span>
-                    <button type="button" class="remove-centre text-red-500 hover:text-red-700 text-xs font-semibold transition">
-                        <i class="fas fa-trash-alt mr-1"></i> Remove
-                    </button>
+                    <span class="text-xs font-bold text-[#1e4d7b]">Centre ${centreNo}</span>
+                    ${centreNo > 1 ? `<button type="button" class="remove-single-date-centre text-red-500 hover:text-red-700 text-xs font-semibold transition"><i class="fas fa-trash-alt mr-1"></i> Remove</button>` : ''}
                 </div>
                 <div class="centre-details grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
                         <label class="block text-xs font-semibold text-slate-700 mb-1.5">Centre Name</label>
-                        <input type="text" name="single_centre_name[]" class="centre-name w-full px-3 py-2 border border-slate-300 rounded-lg bg-white text-sm focus:outline-none focus:ring-2 focus:ring-[#1e4d7b]" placeholder="Enter centre name">
+                        <input type="text" name="single_centre_name[]" class="centre-name w-full px-3 py-2 border border-slate-300 rounded-lg bg-white text-sm" placeholder="Enter centre name">
                     </div>
                     <div>
                         <label class="block text-xs font-semibold text-slate-700 mb-1.5">Centre Coordinates</label>
-                        <input type="text" name="single_centre_coordinates[]" class="centre-coordinates w-full px-3 py-2 border border-slate-300 rounded-lg bg-white text-sm focus:outline-none focus:ring-2 focus:ring-[#1e4d7b]" placeholder="e.g. 28.6139, 77.2090">
+                        <input type="text" name="single_centre_coordinates[]" class="centre-coordinates w-full px-3 py-2 border border-slate-300 rounded-lg bg-white text-sm" placeholder="e.g. 28.6139, 77.2090">
                     </div>
                     <div>
                         <label class="block text-xs font-semibold text-slate-700 mb-1.5">State</label>
@@ -1417,43 +1164,245 @@ $(document).ready(function () {
                             <option value="">Select District / City</option>
                         </select>
                     </div>
-                    <div class="md:col-span-2 centre-address-wrapper">
+                    <div class="center-pi md:col-span-2 grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div class="w-full">
+                            <label class="block text-xs font-semibold text-slate-600 mb-1">Contact Person</label>
+                            <input type="text" name="contact_person[]" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm" placeholder="Full name">
+                        </div>
+                        <div class="w-full">
+                            <label class="block text-xs font-semibold text-slate-600 mb-1">Email</label>
+                            <input type="email" name="contact_email[]" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm" placeholder="email@example.com">
+                        </div>
+                        <div class="w-full">
+                            <label class="block text-xs font-semibold text-slate-600 mb-1">Phone</label>
+                            <input type="tel" name="contact_phone[]" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm" placeholder="+91 XXXXX XXXXX">
+                        </div>
+                    </div>
+                    <div class="md:col-span-2">
                         <label class="block text-xs font-semibold text-slate-700 mb-1.5">Centre Address</label>
                         <textarea name="single_centre_address[]" rows="2" class="centre-address w-full px-3 py-2 border border-slate-300 rounded-lg bg-white text-sm" placeholder="Enter complete centre address..."></textarea>
                     </div>
                 </div>
-            </div>
-        `;
-        $('#single-centres-list').append(html);
-        let $newCentre = $('#single-centres-list .centre-item:last-child');
-        let $stateSelect = $newCentre.find('.single-centre-state');
-        let $districtSelect = $newCentre.find('.single-centre-district');
-        loadIndianStatesForElement($stateSelect);
-        initDistrictSelect2($districtSelect);
+            </div>`;
+    }
+
+    function initSingleDateCentreBlock() {
+        const $container = $('#single-date-centres-container');
+        if (!$container.length) return;
+        if ($container.find('.centre-item').length === 0) {
+            $container.append(getSingleDateCentreHTML(1));
+            const $new = $container.find('.centre-item').last();
+            loadIndianStatesForElement($new.find('.single-centre-state'));
+            initDistrictSelect2($new.find('.single-centre-district'));
+        }
+    }
+
+    $(document).on('click', '#addSingleDateCentre', function () {
+        const $container = $('#single-date-centres-container');
+        const centreNo = $container.find('.centre-item').length + 1;
+        $container.append(getSingleDateCentreHTML(centreNo));
+        const $new = $container.find('.centre-item').last();
+        loadIndianStatesForElement($new.find('.single-centre-state'));
+        initDistrictSelect2($new.find('.single-centre-district'));
     });
 
-    $(document).on('click', '#single-centres-list .remove-centre', function() {
+    $(document).on('click', '.remove-single-date-centre', function () {
         $(this).closest('.centre-item').remove();
+        $('#single-date-centres-container .centre-item').each(function (i) {
+            const n = i + 1;
+            $(this).attr('data-single-centre-no', n);
+            $(this).find('span.text-xs.font-bold').text('Centre ' + n);
+        });
     });
 
     // ============================================================
-    // MULTIPLE EXAM FUNCTIONS
+    // SINGLE EXAM (YES) — MULTIPLE DATES
+    // ============================================================
+    function getSingleMultiCentreHTML(centreNo) {
+        return `
+            <div class="single-multi-centre border border-slate-200 rounded-lg p-4 bg-white mb-3">
+                <div class="flex items-center justify-between mb-4">
+                    <span class="text-xs font-bold text-slate-600">Centre ${centreNo}</span>
+                    ${centreNo > 1 ? `<button type="button" class="remove-single-multi-centre text-red-500 hover:text-red-700 text-xs font-semibold"><i class="fas fa-trash-alt mr-1"></i> Remove</button>` : ''}
+                </div>
+                <div class="centre-details grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-700 mb-1.5">Centre Name</label>
+                        <input type="text" name="single_multi_centre_name[]" class="centre-name w-full px-3 py-2 border border-slate-300 rounded-lg bg-white text-sm" placeholder="Enter centre name">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-700 mb-1.5">Centre Coordinates</label>
+                        <input type="text" name="single_multi_centre_coordinates[]" class="centre-coordinates w-full px-3 py-2 border border-slate-300 rounded-lg bg-white text-sm" placeholder="e.g. 28.6139, 77.2090">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-700 mb-1.5">State / UT</label>
+                        <select name="single_multi_centre_state[]" class="single-multi-centre-state w-full px-3 py-2 border border-slate-300 rounded-lg bg-white text-sm">
+                            <option value="">Select State / UT</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-700 mb-1.5">City / District</label>
+                        <select name="single_multi_centre_district[]" class="single-multi-centre-district w-full px-3 py-2 border border-slate-300 rounded-lg bg-white text-sm" disabled>
+                            <option value="">Select District / City</option>
+                        </select>
+                    </div>
+                    <div class="md:col-span-2 grid grid-cols-1 md:grid-cols-3 gap-3">
+                        <div class="w-full">
+                            <label class="block text-xs font-semibold text-slate-600 mb-1">Contact Person</label>
+                            <input type="text" name="single_multi_contact_person[]"
+                                   class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm"
+                                   placeholder="Full name">
+                        </div>
+                        <div class="w-full">
+                            <label class="block text-xs font-semibold text-slate-600 mb-1">Email</label>
+                            <input type="email" name="single_multi_contact_email[]"
+                                   class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm"
+                                   placeholder="email@example.com">
+                        </div>
+                        <div class="w-full">
+                            <label class="block text-xs font-semibold text-slate-600 mb-1">Phone</label>
+                            <input type="tel" name="single_multi_contact_phone[]"
+                                   class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm"
+                                   placeholder="+91 XXXXX XXXXX">
+                        </div>
+                    </div>
+                    <div class="md:col-span-2">
+                        <label class="block text-xs font-semibold text-slate-700 mb-1.5">Centre Address</label>
+                        <textarea name="single_multi_centre_address[]" rows="2" class="centre-address w-full px-3 py-2 border border-slate-300 rounded-lg bg-white text-sm" placeholder="Enter complete centre address..."></textarea>
+                    </div>
+                  </div>
+            </div>`;
+    }
+
+    // ✅ FIX: Newly added date rows also honour "Centre Information Not Available"
+    function addSingleMultipleDateRow() {
+        const $container = $('#multipleDateContainer');
+        const rowId = 'sm-' + Date.now() + '-' + Math.floor(Math.random() * 1000);
+
+        const group = document.createElement('div');
+        group.className = 'date-centre-group border border-slate-200 rounded-xl p-4 bg-slate-50/50 mb-4 bg-slate-50';
+        group.setAttribute('data-group-id', rowId);
+
+        group.innerHTML = `
+            <div class="exam-date-row flex items-center gap-2 mb-3">
+                <div class="relative w-full md:w-1/2">
+                   <label class="block text-xs font-bold text-slate-600 mb-1">Date of examination</label>
+                    <input type="text" name="single_multi_exam_dates[]" placeholder="dd/mm/yyyy" maxlength="10" autocomplete="off"
+                        class="single-multi-date-text w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#1e4d7b] transition text-sm pr-10">
+                   <input type="date" class="single-multi-date-picker absolute right-2 top-1/2 mt-3 -translate-y-1/2 opacity-0 w-8 h-8 z-10">
+                    <i class="fas fa-calendar-alt absolute right-3 top-1/2 mt-3 -translate-y-1/2 text-slate-400 cursor-pointer z-20"></i>
+                </div>
+                <button type="button" class="remove-single-multi-date px-3 py-2 mt-4 rounded-lg bg-red-600 text-white text-sm font-semibold hover:bg-red-700 transition whitespace-nowrap">
+                    <i class="fas fa-trash-alt mr-1"></i> Remove Date
+                </button>
+            </div>
+            <div class="centre-block-for-date" data-centre-block-for="${rowId}">
+                <div class="flex items-center justify-between mb-2">
+                    <label class="block text-xs font-bold text-slate-600">Centre of examination</label>
+                    <button type="button" class="add-single-multi-centre inline-flex items-center gap-1 px-2.5 py-1.5 bg-white border border-[#1e4d7b] text-[#1e4d7b] text-xs font-semibold rounded-lg transition" data-row-id="${rowId}">
+                        <i class="fas fa-plus"></i> Add Centre
+                    </button>
+                </div>
+                <div class="single-multi-centres-container">
+                    ${getSingleMultiCentreHTML(1)}
+                </div>
+            </div>`;
+
+        $container.append(group);
+
+        const $newCentre = $(group).find('.single-multi-centre').first();
+        loadIndianStatesForElement($newCentre.find('.single-multi-centre-state'));
+        initDistrictSelect2($newCentre.find('.single-multi-centre-district'));
+
+        // ✅ If "Centre Information Not Available" is already checked,
+        //    hide the centre block for this newly added row as well.
+        if ($('.single-centre-not-available').is(':checked')) {
+            $(group).find('.centre-block-for-date').hide();
+            $(group).find('.centre-block-for-date input, .centre-block-for-date select, .centre-block-for-date textarea').prop('disabled', true);
+        }
+    }
+
+    function initSingleMultipleDateBlock() {
+        const $container = $('#multipleDateContainer');
+        if (!$container.length) return;
+        if ($container.find('.date-centre-group').length === 0) {
+            addSingleMultipleDateRow();
+        }
+    }
+
+    $(document).on('click', '#addSingleMultipleDate', function () {
+        addSingleMultipleDateRow();
+    });
+
+    $(document).on('click', '.remove-single-multi-date', function () {
+        $(this).closest('.date-centre-group').remove();
+    });
+
+    $(document).on('click', '.add-single-multi-centre', function () {
+        const $block = $(this).closest('.centre-block-for-date');
+        const $container = $block.find('.single-multi-centres-container');
+        const centreNo = $container.find('.single-multi-centre').length + 1;
+        $container.append(getSingleMultiCentreHTML(centreNo));
+        const $new = $container.find('.single-multi-centre').last();
+        loadIndianStatesForElement($new.find('.single-multi-centre-state'));
+        initDistrictSelect2($new.find('.single-multi-centre-district'));
+    });
+
+    $(document).on('click', '.remove-single-multi-centre', function () {
+        const $container = $(this).closest('.single-multi-centres-container');
+        $(this).closest('.single-multi-centre').remove();
+        $container.find('.single-multi-centre').each(function (i) {
+            const n = i + 1;
+            $(this).find('span.text-xs.font-bold').text('Centre ' + n);
+        });
+    });
+
+    // ============================================================
+    // SINGLE EXAM DATE TYPE TOGGLE
+    // ============================================================
+    $('#examDateSingle').on('change', function () {
+        if ($(this).is(':checked')) {
+            $('#singleDateSection').removeClass('hidden');
+            $('#multipleDateSection').addClass('hidden');
+            $('#singleExamExcelSection').removeClass('hidden');
+
+            if ($('.single-centre-not-available').is(':checked')) {
+                $('#singleDateCentreWrapper').hide();
+                $('#singleDateCentreWrapper input, #singleDateCentreWrapper select, #singleDateCentreWrapper textarea').prop('disabled', true);
+                $('#addSingleDateCentre').hide();
+            }
+        }
+    });
+
+    $('#examDateMultiple').on('change', function () {
+        if ($(this).is(':checked')) {
+            $('#singleDateSection').addClass('hidden');
+            $('#multipleDateSection').removeClass('hidden');
+            $('#singleExamExcelSection').addClass('hidden');
+            if ($('#multipleDateContainer .date-centre-group').length === 0) {
+                addSingleMultipleDateRow();
+            }
+
+            if ($('.single-centre-not-available').is(':checked')) {
+                $('#multipleDateContainer .centre-block-for-date').hide();
+                $('#multipleDateContainer .centre-block-for-date input, #multipleDateContainer .centre-block-for-date select, #multipleDateContainer .centre-block-for-date textarea').prop('disabled', true);
+                // ✅ REMOVED: $('#addSingleMultipleDate').hide();
+            }
+        }
+    });
+
+    // ============================================================
+    // MULTIPLE EXAM (NO) – BUILD
     // ============================================================
     let examCounter = 0;
-
-    $('#addExam').on('click', function() {
-        addExamination();
-    });
+    $('#addExam').on('click', addExamination);
 
     function getCentreHTML(examId, centreNo) {
         return `
             <div class="exam-centre border border-slate-200 rounded-lg p-4 bg-white mb-3">
                 <div class="flex items-center justify-between mb-4">
                     <span class="text-xs font-bold text-slate-600">Centre ${centreNo}</span>
-                    ${centreNo > 1 ? `
-                    <button type="button" class="remove-exam-centre text-red-500 hover:text-red-700 text-xs font-semibold">
-                        <i class="fas fa-trash-alt mr-1"></i> Remove
-                    </button>` : ''}
+                    ${centreNo > 1 ? `<button type="button" class="remove-exam-centre text-red-500 hover:text-red-700 text-xs font-semibold"><i class="fas fa-trash-alt mr-1"></i> Remove</button>` : ''}
                 </div>
                 <div class="centre-details grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
@@ -1476,31 +1425,40 @@ $(document).ready(function () {
                             <option value="">Select District / City</option>
                         </select>
                     </div>
+                    <div class="md:col-span-2 grid grid-cols-1 md:grid-cols-3 gap-3">
+                        <div class="w-full">
+                            <label class="block text-xs font-semibold text-slate-600 mb-1">Contact Person</label>
+                            <input type="text" name="contact_person[${examId}][]" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm" placeholder="Full name">
+                        </div>
+                        <div class="w-full">
+                            <label class="block text-xs font-semibold text-slate-600 mb-1">Email</label>
+                            <input type="email" name="contact_email[${examId}][]" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm" placeholder="email@example.com">
+                        </div>
+                        <div class="w-full">
+                            <label class="block text-xs font-semibold text-slate-600 mb-1">Phone</label>
+                            <input type="tel" name="contact_phone[${examId}][]" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm" placeholder="+91 XXXXX XXXXX">
+                        </div>
+                    </div>
                     <div class="md:col-span-2">
                         <label class="block text-xs font-semibold text-slate-700 mb-1.5">Centre Address</label>
                         <textarea name="multiple_centre_address[${examId}][]" rows="2" class="centre-address w-full px-3 py-2 border border-slate-300 rounded-lg bg-white text-sm" placeholder="Enter complete centre address..."></textarea>
                     </div>
                 </div>
-            </div>
-        `;
+            </div>`;
     }
 
     function addExamination() {
         examCounter++;
-        let examId = examCounter;
-        let html = `
+        const examId = examCounter;
+        const html = `
             <div class="exam-item border border-slate-200 rounded-xl p-5 bg-slate-50 mb-4" data-exam-id="${examId}">
                 <div class="flex items-center justify-between border-b border-slate-200 pb-3 mb-4">
                     <div class="flex items-center gap-2">
                         <span class="flex items-center justify-center w-7 h-7 rounded-full bg-[#1e4d7b] text-white text-xs font-bold">${examId}</span>
                         <span class="text-sm font-bold text-[#1e4d7b]">Examination ${examId}</span>
                     </div>
-                    <button type="button" class="remove-examination text-red-500 hover:text-red-700 text-xs font-semibold">
-                        <i class="fas fa-trash-alt mr-1"></i> Remove Examination
-                    </button>
+                    <button type="button" class="remove-examination text-red-500 hover:text-red-700 text-xs font-semibold"><i class="fas fa-trash-alt mr-1"></i> Remove Examination</button>
                 </div>
-                
-                <!-- Checkbox for this exam -->
                 <div class="flex items-center justify-between mb-4 pb-3 border-b border-slate-200">
                     <label class="inline-flex items-center gap-2.5 cursor-pointer select-none">
                         <input type="checkbox" name="multiple_centre_not_available[${examId}][]" class="centre-not-available w-4 h-4 text-[#1e4d7b] rounded border-slate-300">
@@ -1510,279 +1468,230 @@ $(document).ready(function () {
                         <i class="fas fa-plus"></i> Add Centre
                     </button>
                 </div>
-                
-                <div class="centre-details grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                        <label class="block text-sm font-semibold text-slate-700 mb-1.5">Name of examination</label>
-                        <input type="text" name="multiple_exam_name[]" class="w-full px-4 py-2 border border-slate-300 rounded-lg bg-white text-sm" placeholder="Enter examination name">
+                <div>
+                    <label class="block text-sm font-semibold text-slate-700 mb-1.5">Name of examination</label>
+                    <input type="text" name="multiple_exam_name[]" class="w-full px-4 py-2 border border-slate-300 rounded-lg bg-white text-sm" placeholder="Enter examination name">
+                </div>
+                <div class="mt-4">
+                    <label class="block text-sm font-semibold text-slate-700 mb-2">Whether the request is for a single date of examination ?</label>
+                    <div class="flex items-center gap-6 mb-3">
+                        <label class="inline-flex items-center cursor-pointer">
+                            <input type="radio" name="multiple_exam_date_type[${examId}]" value="single"
+                                class="multiple-exam-date-type w-4 h-4 text-[#1e4d7b]" data-exam-id="${examId}" checked>
+                            <span class="ml-2 text-sm text-slate-700">Yes</span>
+                        </label>
+                        <label class="inline-flex items-center cursor-pointer">
+                            <input type="radio" name="multiple_exam_date_type[${examId}]" value="multiple"
+                                class="multiple-exam-date-type w-4 h-4 text-[#1e4d7b]" data-exam-id="${examId}">
+                            <span class="ml-2 text-sm text-slate-700">No</span>
+                        </label>
                     </div>
-                    <div>
-                        <label class="block text-sm font-semibold text-slate-700 mb-1.5">Date of examination</label>
-                        <div class="relative">
-                            <input type="text" name="multiple_exam_date[]" placeholder="dd/mm/yyyy" maxlength="10" class="date-text w-full px-4 py-2 border border-slate-300 rounded-lg bg-white text-sm pr-10">
+                    <div class="multiple-single-date-section" data-exam-id="${examId}">
+                        <div class="relative w-full md:w-1/2">
+                            <input type="text" name="multiple_single_exam_date[]" placeholder="dd/mm/yyyy"
+                                maxlength="10" autocomplete="off"
+                                class="date-text w-full px-4 py-2 border border-slate-300 rounded-lg bg-white text-sm pr-10">
                             <input type="date" class="date-picker absolute right-2 top-1/2 -translate-y-1/2 opacity-0 w-8 h-8 cursor-pointer z-10">
                             <i class="fas fa-calendar-alt absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none"></i>
                         </div>
+                        <div class="mt-5">
+                            <label class="block text-sm font-semibold text-slate-700 mb-1.5">Centre of examination</label>
+                            <div class="exam-centres-container">
+                                ${getCentreHTML(examId, 1)}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="multiple-multiple-date-section hidden" data-exam-id="${examId}">
+                        <div class="multiple-date-container space-y-3" data-exam-id="${examId}"></div>
+                        <div class="mt-4 flex justify-end">
+                            <button type="button"
+                                class="add-multiple-exam-date px-3 py-2 rounded-lg bg-[#1e4d7b] text-white text-sm font-semibold hover:bg-[#123b60] transition whitespace-nowrap"
+                                data-exam-id="${examId}">
+                                <i class="fas fa-plus mr-1"></i> Add Date
+                            </button>
+                        </div>
                     </div>
                 </div>
-                <div class="mt-5">
-                    <label class="block text-sm font-semibold text-slate-700 mb-1.5">Centre of examination</label>
-                    <div class="exam-centres-container">
-                        ${getCentreHTML(examId, 1)}
-                    </div>
-                </div>
-            </div>
-        `;
+            </div>`;
         $('#multiple-exams-list').append(html);
-        let $newExam = $('#multiple-exams-list .exam-item:last-child');
-        $newExam.find('.exam-centre').each(function() {
-            let $stateSelect = $(this).find('.multiple-centre-state');
-            let $districtSelect = $(this).find('.multiple-centre-district');
-            loadIndianStatesForElement($stateSelect);
-            initDistrictSelect2($districtSelect);
+        const $newExam = $('#multiple-exams-list .exam-item:last-child');
+        $newExam.find('.multiple-single-date-section .exam-centre').each(function () {
+            loadIndianStatesForElement($(this).find('.multiple-centre-state'));
+            initDistrictSelect2($(this).find('.multiple-centre-district'));
         });
+
+        // ✅ Default state: single date type → Add Centre visible
+        $newExam.find('.add-exam-centre').show();
     }
 
-    $(document).on('click', '.add-exam-centre', function() {
-        let $examItem = $(this).closest('.exam-item');
-        let examId = $examItem.data('exam-id');
-        let $centreContainer = $examItem.find('.exam-centres-container');
-        let centreNo = $centreContainer.find('.exam-centre').length + 1;
-        let newCentreHtml = getCentreHTML(examId, centreNo);
-        $centreContainer.append(newCentreHtml);
-        let $newCentre = $centreContainer.find('.exam-centre:last-child');
-        let $stateSelect = $newCentre.find('.multiple-centre-state');
-        let $districtSelect = $newCentre.find('.multiple-centre-district');
-        loadIndianStatesForElement($stateSelect);
-        initDistrictSelect2($districtSelect);
-    });
+    // ✅ FIX: Newly added date group also honours "Centre Information Not Available"
+    function addMultipleDateGroup($container, examId) {
+        const rowId = 'm-' + Date.now() + '-' + Math.floor(Math.random() * 1000);
+        const group = document.createElement('div');
+        group.className = 'date-centre-group border border-slate-200 rounded-xl p-4 bg-white/70 mb-4';
+        group.setAttribute('data-group-id', rowId);
 
-    $(document).on('click', '.remove-exam-centre', function() {
-        let $examItem = $(this).closest('.exam-item');
-        $(this).closest('.exam-centre').remove();
-        $examItem.find('.exam-centre').each(function(index) {
-            $(this).find('.text-xs.font-bold.text-slate-600').text('Centre ' + (index + 1));
-        });
-    });
+        group.innerHTML = `
+            <div class="exam-date-row flex items-center gap-2 mb-3">
+                <div class="relative w-full md:w-1/2">
+                 <label class="block text-xs font-bold text-slate-600 mb-1">Date of examination</label>
+                    <input type="text" name="multiple_exam_dates[${examId}][]" placeholder="dd/mm/yyyy" maxlength="10" autocomplete="off"
+                        class="multiple-date-text w-full px-4 py-2 border border-slate-300 rounded-lg bg-white text-sm pr-10">
+                    <input type="date" class="multiple-date-picker absolute right-2 top-1/2 mt-3 -translate-y-1/2 opacity-0 w-8 h-8 cursor-pointer z-10">
+                    <i class="fas fa-calendar-alt absolute right-3 top-1/2 mt-3 -translate-y-1/2 text-slate-400 cursor-pointer z-20"></i>
+                </div>
+                <button type="button" class="remove-multiple-exam-date px-3 py-2 mt-4 rounded-lg bg-red-600 text-white text-sm font-semibold hover:bg-red-700 transition whitespace-nowrap">
+                    <i class="fas fa-trash-alt mr-1"></i> Remove Date
+                </button>
+            </div>
+            <div class="centre-block-for-date" data-centre-block-for="${rowId}">
+                <div class="flex items-center justify-between mb-2">
+                    <label class="block text-xs font-bold text-slate-600">Centre of examination</label>
+                    <button type="button" class="add-multiple-exam-centre-btn inline-flex items-center gap-1 px-2.5 py-1.5 bg-white border border-[#1e4d7b] text-[#1e4d7b] text-xs font-semibold rounded-lg transition" data-exam-id="${examId}" data-row-id="${rowId}">
+                        <i class="fas fa-plus"></i> Add Centre
+                    </button>
+                </div>
+                <div class="exam-centres-container">
+                    ${getCentreHTML(examId, 1)}
+                </div>
+            </div>`;
+        $container.append(group);
 
-    $(document).on('click', '.remove-examination', function() {
-        $(this).closest('.exam-item').remove();
-        $('#multiple-exams-list .exam-item').each(function(index) {
-            let number = index + 1;
-            $(this).attr('data-exam-id', number);
-            $(this).find('.flex.items-center.gap-2 span:last-child').text('Examination ' + number);
-            $(this).find('.rounded-full').text(number);
-        });
-        $('#multiple-exams-list .exam-item').each(function(index) {
-            let newExamId = index + 1;
-            $(this).find('[name^="multiple_centre_"]').each(function() {
-                let name = $(this).attr('name');
-                if (!name) return;
-                name = name.replace(/multiple_centre_([^[]+)\[\d+\]/, 'multiple_centre_$1[' + newExamId + ']');
-                $(this).attr('name', name);
-            });
-        });
-    });
+        const $newCentre = $(group).find('.exam-centre').first();
+        loadIndianStatesForElement($newCentre.find('.multiple-centre-state'));
+        initDistrictSelect2($newCentre.find('.multiple-centre-district'));
+
+        // ✅ If "Centre Information Not Available" is already checked for this exam,
+        //    hide the centre block for this newly added row.
+        const $exam = $container.closest('.exam-item');
+        if ($exam.find('.centre-not-available').is(':checked')) {
+            $(group).find('.centre-block-for-date').hide();
+            $(group).find('.centre-block-for-date input, .centre-block-for-date select, .centre-block-for-date textarea').prop('disabled', true);
+        }
+    }
 
     // ============================================================
-    // EXCEL FILE NAME DISPLAY - FIXED
+    // ✅ MULTIPLE EXAM DATE TYPE TOGGLE
     // ============================================================
-    $(document).on('change', '.excel-input', function() {
-        let fileName = '';
-        let $container = $(this).closest('.flex');
-        
-        // Find the file name display element
-        let $display = $container.find('.excel-file-name');
-        
-        // If not found, try to find any span in the container
-        if ($display.length === 0) {
-            $display = $container.find('span:last-child');
-        }
-        
-        // If still not found, look in the parent div
-        if ($display.length === 0) {
-            $display = $container.closest('div').find('.excel-file-name');
-        }
-        
-        // If still not found, look for any span with text
-        if ($display.length === 0) {
-            $display = $container.find('span').filter(function() {
-                return $(this).text().includes('No file selected') || $(this).text().includes('file selected');
-            });
-        }
-        
-        if (this.files && this.files.length > 0) {
-            fileName = this.files[0].name;
-            $display.text(fileName);
-            $display.removeClass('text-slate-400');
-            $display.addClass('text-emerald-600 font-medium');
-            
-            // Add remove button if not exists
-            let $removeBtn = $container.find('.file-remove-btn');
-            if ($removeBtn.length === 0) {
-                $removeBtn = $('<button type="button" class="file-remove-btn text-red-500 hover:text-red-700 text-xs font-semibold ml-2"><i class="fas fa-times"></i></button>');
-                $container.append($removeBtn);
+    $(document).on('change', '.multiple-exam-date-type', function () {
+        const examId = $(this).data('exam-id');
+        const val = $(this).val();
+        const $exam = $(this).closest('.exam-item');
+
+        if (val === 'multiple') {
+            $exam.find('.multiple-single-date-section').addClass('hidden');
+            $exam.find('.multiple-multiple-date-section').removeClass('hidden');
+            $exam.find('.add-exam-centre').hide();
+
+            const $container = $exam.find('.multiple-date-container');
+            if ($container.find('.date-centre-group').length === 0) {
+                addMultipleDateGroup($container, examId);
             }
-            $removeBtn.show();
         } else {
-            $display.text('No file selected');
-            $display.removeClass('text-emerald-600 font-medium');
-            $display.addClass('text-slate-400');
-            $container.find('.file-remove-btn').hide();
+            $exam.find('.multiple-multiple-date-section').addClass('hidden');
+            $exam.find('.multiple-single-date-section').removeClass('hidden');
+            $exam.find('.add-exam-centre').show();
         }
     });
 
-    // Remove file functionality for Excel
-    $(document).on('click', '.file-remove-btn', function() {
-        let $container = $(this).closest('.flex');
-        let $fileInput = $container.find('.excel-input');
-        
-        // Reset the file input
-        $fileInput.val('');
-        // Trigger change event to update display
-        $fileInput.trigger('change');
-        
-        // Hide remove button
-        $(this).hide();
+    $(document).on('click', '.add-multiple-exam-date', function () {
+        const examId = $(this).data('exam-id');
+        const $container = $(this).closest('.multiple-multiple-date-section').find('.multiple-date-container');
+        addMultipleDateGroup($container, examId);
+    });
+
+    $(document).on('click', '.remove-multiple-exam-date', function () {
+        $(this).closest('.date-centre-group').remove();
+    });
+
+    $(document).on('click', '.add-multiple-exam-centre-btn', function () {
+        const examId = $(this).data('exam-id');
+        const $block = $(this).closest('.centre-block-for-date');
+        const $container = $block.find('.exam-centres-container');
+        const centreNo = $container.find('.exam-centre').length + 1;
+        $container.append(getCentreHTML(examId, centreNo));
+        const $new = $container.find('.exam-centre').last();
+        loadIndianStatesForElement($new.find('.multiple-centre-state'));
+        initDistrictSelect2($new.find('.multiple-centre-district'));
+    });
+
+    $(document).on('click', '.add-exam-centre', function () {
+        const $exam = $(this).closest('.exam-item');
+        const examId = $exam.data('exam-id');
+        const $container = $exam.find('.multiple-single-date-section .exam-centres-container');
+        const centreNo = $container.find('.exam-centre').length + 1;
+        $container.append(getCentreHTML(examId, centreNo));
+        const $new = $container.find('.exam-centre').last();
+        loadIndianStatesForElement($new.find('.multiple-centre-state'));
+        initDistrictSelect2($new.find('.multiple-centre-district'));
+    });
+
+    $(document).on('click', '.remove-exam-centre', function () {
+        const $container = $(this).closest('.exam-centres-container');
+        $(this).closest('.exam-centre').remove();
+        $container.find('.exam-centre').each(function (i) {
+            $(this).find('span.text-xs.font-bold').text('Centre ' + (i + 1));
+        });
+    });
+
+    $(document).on('click', '.remove-examination', function () {
+        $(this).closest('.exam-item').remove();
+        $('#multiple-exams-list .exam-item').each(function (i) {
+            const n = i + 1;
+            $(this).attr('data-exam-id', n);
+            $(this).find('.rounded-full').text(n);
+        });
     });
 
     // ============================================================
     // ORGANISATION SELECT2
     // ============================================================
     $('#organisation_name').select2({
-        width: '100%',
-        placeholder: 'Select or type organisation name',
-        tags: true,
-        allowClear: true,
-        minimumResultsForSearch: 0,
-        createTag: function(params) {
-            let term = $.trim(params.term);
+        width: '100%', placeholder: 'Select or type organisation name',
+        tags: true, allowClear: true, minimumResultsForSearch: 0,
+        createTag: function (params) {
+            const term = $.trim(params.term);
             if (term === '') return null;
             return { id: term, text: term, newTag: true };
         }
     });
 
     $('#organisation_type').select2({
-        width: '100%',
-        placeholder: 'Select or type organisation type',
-        tags: true,
-        allowClear: true,
-        minimumResultsForSearch: 0,
-        createTag: function(params) {
-            let term = $.trim(params.term);
+        width: '100%', placeholder: 'Select or type organisation type',
+        tags: true, allowClear: true, minimumResultsForSearch: 0,
+        createTag: function (params) {
+            const term = $.trim(params.term);
             if (term === '') return null;
             return { id: term, text: term, newTag: true };
         }
     });
 
-    $('#organisation_name').on('change', function() {
-        let $selectedOption = $(this).find('option:selected');
-        let organizationId = $selectedOption.attr('data-organization-id');
-        let orgTypeFromOrganisation = $selectedOption.attr('data-org-type');
-        
-        if (organizationId) {
-            $('#organization_id').val(organizationId);
-        } else {
-            $('#organization_id').val('');
-        }
-        
-        if (orgTypeFromOrganisation) {
-            let $typeOption = $('#organisation_type option').filter(function() {
-                return $(this).attr('data-type-id') == orgTypeFromOrganisation;
+    $('#organisation_name').on('change', function () {
+        const $opt = $(this).find('option:selected');
+        const orgId = $opt.attr('data-organization-id');
+        const orgType = $opt.attr('data-org-type');
+        $('#organization_id').val(orgId || '');
+        if (orgType) {
+            const $t = $('#organisation_type option').filter(function () {
+                return $(this).attr('data-type-id') == orgType;
             });
-            if ($typeOption.length) {
-                $('#organisation_type').val($typeOption.val()).trigger('change');
-            }
+            if ($t.length) $('#organisation_type').val($t.val()).trigger('change');
         }
     });
 
-    $('#organisation_type').on('change', function() {
-        let $selectedOption = $(this).find('option:selected');
-        let typeId = $selectedOption.attr('data-type-id');
-        if (typeId) {
-            $('#org_type').val(typeId);
-        } else {
-            $('#org_type').val('');
-        }
+    $('#organisation_type').on('change', function () {
+        const typeId = $(this).find('option:selected').attr('data-type-id');
+        $('#org_type').val(typeId || '');
     });
-
-    // ============================================================
-    // INITIAL SETUP
-    // ============================================================
-    $('#single-centres-list').find('.centre-item').each(function() {
-        let $centre = $(this);
-        let $state = $centre.find('.single-centre-state');
-        let $city = $centre.find('.single-centre-district');
-        if ($state.length) {
-            let selectedState = $state.attr('data-selected') || $state.val() || '';
-            loadIndianStatesForElement($state, selectedState);
-        }
-        if ($city.length) {
-            initDistrictSelect2($city);
-        }
-    });
-
-    $('#multiple-exams-list').find('.exam-centre').each(function() {
-        let $centre = $(this);
-        let $state = $centre.find('.multiple-centre-state');
-        let $city = $centre.find('.multiple-centre-district');
-        if ($state.length) {
-            let selectedState = $state.attr('data-selected') || $state.val() || '';
-            loadIndianStatesForElement($state, selectedState);
-        }
-        if ($city.length) {
-            initDistrictSelect2($city);
-        }
-    });
-
-    // Initialize based on selected exam type
-    let selectedExam = $('input[name="single_exam"]:checked').val();
-    if (selectedExam === 'yes') {
-        $('#single-exam-container').removeClass('hidden');
-        $('#multiple-exam-container').addClass('hidden');
-        enableSection('#single-exam-container');
-        disableSection('#multiple-exam-container');
-    } else if (selectedExam === 'no') {
-        $('#single-exam-container').addClass('hidden');
-        $('#multiple-exam-container').removeClass('hidden');
-        disableSection('#single-exam-container');
-        enableSection('#multiple-exam-container');
-        if ($('#multiple-exams-list .exam-item').length === 0) {
-            addExamination();
-        }
-    }
 
     // ============================================================
     // VENDOR FUNCTIONS
     // ============================================================
     let vendorCount = 1;
 
-    function getCSRFToken() {
-        return $('input[name="csrf_test_name"]').val() || '';
-    }
-
-    function updateCSRF(response) {
-        if (response && response.csrf_hash) {
-            $('input[name="csrf_test_name"]').val(response.csrf_hash);
-        }
-    }
-
-    function initializeVendorDropdowns() {
-        $('.model-select').each(function () {
-            initializeModelSelect($(this));
-        });
-    }
-
     function initializeModelSelect($select) {
-        if ($select.hasClass('select2-hidden-accessible')) {
-            $select.select2('destroy');
-        }
-
-        $select.select2({
-            placeholder: 'Select jammer model',
-            allowClear: true,
-            width: '100%'
-        });
+        if ($select.hasClass('select2-hidden-accessible')) $select.select2('destroy');
+        $select.select2({ placeholder: 'Select jammer model', allowClear: true, width: '100%' });
     }
 
     function loadVendors() {
@@ -1798,227 +1707,139 @@ $(document).ready(function () {
                     updateCSRF(response);
                 }
             },
-            error: function (xhr, status, error) {
-                console.error('Error loading vendors:', error);
+            error: function () {
                 populateVendorSelectFallback($('.vendor-select'));
             }
         });
     }
 
     function populateVendorSelect($select, vendors) {
-        const currentValue = $select.val();
-        $select.empty();
-        $select.append('<option value="">Select vendor</option>');
-
-        $.each(vendors, function (index, vendor) {
-            $select.append(
-                $('<option>', {
-                    value: vendor.id,
-                    text: vendor.vendor_name
-                })
-            );
+        const cur = $select.val();
+        $select.empty().append('<option value="">Select vendor</option>');
+        $.each(vendors, function (i, v) {
+            $select.append($('<option>', { value: v.id, text: v.vendor_name }));
         });
-
-        if (currentValue) {
-            $select.val(currentValue);
-        }
+        if (cur) $select.val(cur);
     }
 
     function populateVendorSelectFallback($select) {
-        const fallbackVendors = [
+        const fb = [
             { id: 1, vendor_name: 'Bharat Secure Systems Pvt. Ltd.' },
             { id: 2, vendor_name: 'Netra Defence Electronics' },
             { id: 3, vendor_name: 'Shakti Communication Works' },
             { id: 4, vendor_name: 'Indus RF Technologies' }
         ];
-
-        $select.each(function () {
-            populateVendorSelect($(this), fallbackVendors);
-        });
+        $select.each(function () { populateVendorSelect($(this), fb); });
     }
 
     window.addVendor = function () {
         vendorCount++;
-
         const container = document.getElementById('vendorContainer');
         const vendor = document.createElement('div');
         vendor.className = 'vendor-item border border-slate-200 rounded-xl p-4 mb-4 bg-slate-50';
-
         vendor.innerHTML = `
             <div class="flex items-center justify-between mb-4">
-                <h4 class="font-semibold text-[#1e4d7b]">
-                    <i class="fas fa-building mr-1"></i>
-                    Vendor ${vendorCount}
-                </h4>
-                <button
-                    type="button"
-                    onclick="removeVendor(this)"
-                    class="text-red-500 hover:text-red-700 text-sm font-semibold">
-                    <i class="fas fa-trash-alt mr-1"></i>
-                    Remove
+                <h4 class="font-semibold text-[#1e4d7b]"><i class="fas fa-building mr-1"></i> Vendor ${vendorCount}</h4>
+                <button type="button" onclick="removeVendor(this)" class="text-red-500 hover:text-red-700 text-sm font-semibold">
+                    <i class="fas fa-trash-alt mr-1"></i> Remove
                 </button>
             </div>
-
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                    <label class="block text-sm font-semibold text-slate-700 mb-1.5">
-                        Name of vendor
-                    </label>
-                    <select
-                        name="vendor_id[]"
-                        class="vendor-select w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#1e4d7b] transition text-sm bg-white"
-                        required>
-                        <option value="">
-                            Select vendor
-                        </option>
+                    <label class="block text-sm font-semibold text-slate-700 mb-1.5">Name of vendor</label>
+                    <select name="vendor_id[]" class="vendor-select w-full px-4 py-2 border border-slate-300 rounded-lg text-sm bg-white" required>
+                        <option value="">Select vendor</option>
                     </select>
                 </div>
-
                 <div>
-                    <label class="block text-sm font-semibold text-slate-700 mb-1.5">
-                        Jammer model
-                    </label>
-                    <select
-                        name="jammer_model_ids[]"
-                        class="model-select w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#1e4d7b] transition text-sm bg-white"
-                        required>
-                        <option value="">
-                            Select vendor first
-                        </option>
+                    <label class="block text-sm font-semibold text-slate-700 mb-1.5">Jammer model</label>
+                    <select name="jammer_model_ids[]" class="model-select w-full px-4 py-2 border border-slate-300 rounded-lg text-sm bg-white" required>
+                        <option value="">Select vendor first</option>
                     </select>
                 </div>
             </div>
-
             <div class="mt-4">
-                <label class="block text-sm font-semibold text-slate-700 mb-1.5">
-                    Technical specifications of jammers
-                </label>
+                <label class="block text-sm font-semibold text-slate-700 mb-1.5">Technical specifications of jammers</label>
                 <div class="flex items-center gap-2">
                     <label class="flex-1 cursor-pointer flex items-center justify-center px-4 py-2 border border-dashed border-slate-300 bg-white hover:bg-slate-100 rounded-lg transition text-slate-600 text-sm font-medium">
                         <i class="fas fa-file-pdf text-[#e58500] mr-2"></i>
                         <span>Choose file</span>
-                        <input
-                            type="file"
-                            name="technical_specifications[]"
-                            accept=".pdf"
-                            class="hidden tech-file-input"
-                            onchange="showFileName(this)">
+                        <input type="file" name="technical_specifications[]" accept=".pdf" class="hidden tech-file-input">
                     </label>
-                    <span class="file-name text-xs text-slate-400">
-                        No file selected
-                    </span>
+                    <span class="file-name text-xs text-slate-400">No file selected</span>
                 </div>
-            </div>
-        `;
-
+            </div>`;
         container.appendChild(vendor);
-
-        const $newModelSelect = $(vendor).find('.model-select');
-        initializeModelSelect($newModelSelect);
-
+        initializeModelSelect($(vendor).find('.model-select'));
         $.ajax({
-            url: baseUrl + '/getVendors',
-            type: 'GET',
-            dataType: 'json',
+            url: baseUrl + '/getVendors', type: 'GET', dataType: 'json',
             success: function (response) {
                 if (response.status) {
                     populateVendorSelect($(vendor).find('.vendor-select'), response.vendors);
                     updateCSRF(response);
                 }
             },
-            error: function () {
-                populateVendorSelectFallback($(vendor).find('.vendor-select'));
-            }
+            error: function () { populateVendorSelectFallback($(vendor).find('.vendor-select')); }
         });
-
         updateRemoveButtons();
     };
 
     window.removeVendor = function (button) {
-        const vendor = button.closest('.vendor-item');
-        if (vendor) {
-            vendor.remove();
-        }
+        const v = button.closest('.vendor-item');
+        if (v) v.remove();
         renumberVendors();
         updateRemoveButtons();
     };
 
     function renumberVendors() {
         const vendors = document.querySelectorAll('.vendor-item');
-        vendors.forEach(function (vendor, index) {
-            const title = vendor.querySelector('h4');
-            if (title) {
-                title.innerHTML = '<i class="fas fa-building mr-1"></i> Vendor ' + (index + 1);
-            }
+        vendors.forEach(function (v, i) {
+            const t = v.querySelector('h4');
+            if (t) t.innerHTML = '<i class="fas fa-building mr-1"></i> Vendor ' + (i + 1);
         });
         vendorCount = vendors.length;
     }
 
     function updateRemoveButtons() {
         const vendors = document.querySelectorAll('.vendor-item');
-        vendors.forEach(function (vendor) {
-            const removeButton = vendor.querySelector('button[onclick="removeVendor(this)"]');
-            if (!removeButton) {
-                return;
-            }
-            if (vendors.length === 1) {
-                removeButton.classList.add('hidden');
-            } else {
-                removeButton.classList.remove('hidden');
-            }
+        vendors.forEach(function (v) {
+            const btn = v.querySelector('button[onclick="removeVendor(this)"]');
+            if (!btn) return;
+            if (vendors.length === 1) btn.classList.add('hidden');
+            else btn.classList.remove('hidden');
         });
     }
 
     function loadModels(vendorId, $modelSelect) {
         $modelSelect.empty();
-
         if (!vendorId) {
             $modelSelect.append('<option value="">Select vendor first</option>');
             initializeModelSelect($modelSelect);
             return;
         }
-
         $modelSelect.append('<option value="">Loading models...</option>');
         initializeModelSelect($modelSelect);
-
-        const csrfToken = getCSRFToken();
-
         $.ajax({
             url: baseUrl + '/getJammerModelsByVendor',
             type: 'POST',
             dataType: 'json',
-            data: {
-                vendor_id: vendorId,
-                csrf_test_name: csrfToken
-            },
-            headers: {
-                'X-CSRF-TOKEN': csrfToken
-            },
+            data: { vendor_id: vendorId, csrf_test_name: getCSRFToken() },
+            headers: { 'X-CSRF-TOKEN': getCSRFToken() },
             success: function (response) {
                 updateCSRF(response);
                 $modelSelect.empty();
-
-                if (response.status && response.models && response.models.length > 0) {
+                if (response.status && response.models && response.models.length) {
                     $modelSelect.append('<option value="">Select jammer model</option>');
-
-                    $.each(response.models, function (index, model) {
-                        $modelSelect.append(
-                            $('<option>', {
-                                value: model.id,
-                                text: model.name
-                            })
-                        );
+                    $.each(response.models, function (i, m) {
+                        $modelSelect.append($('<option>', { value: m.id, text: m.name }));
                     });
                 } else {
                     $modelSelect.append('<option value="">No models available</option>');
                 }
-
                 initializeModelSelect($modelSelect);
             },
-            error: function (xhr, status, error) {
-                console.error('Error loading jammer models:', error);
-                $modelSelect.empty();
-                $modelSelect.append('<option value="">Error loading models</option>');
+            error: function () {
+                $modelSelect.empty().append('<option value="">Error loading models</option>');
                 initializeModelSelect($modelSelect);
             }
         });
@@ -2026,186 +1847,211 @@ $(document).ready(function () {
 
     $(document).on('change', '.vendor-select', function () {
         const vendorId = $(this).val();
-        const $vendorItem = $(this).closest('.vendor-item');
-        const $modelSelect = $vendorItem.find('.model-select');
-        loadModels(vendorId, $modelSelect);
+        const $v = $(this).closest('.vendor-item');
+        loadModels(vendorId, $v.find('.model-select'));
     });
 
-    // ============================================================
-    // SHOW FILE NAME - FIXED for Vendor Documents
-    // ============================================================
-    window.showFileName = function (input) {
-        const $container = $(input).closest('.flex');
-        let $fileName = $container.find('.file-name');
-        
-        // If not found, try to find any span in the container
-        if ($fileName.length === 0) {
-            $fileName = $container.find('span:last-child');
-        }
-        
-        // If still not found, look in the parent div
-        if ($fileName.length === 0) {
-            $fileName = $container.closest('div').find('.file-name');
-        }
-        
-        if (input.files && input.files.length > 0) {
-            $fileName.text(input.files[0].name);
-            $fileName.removeClass('text-slate-400');
-            $fileName.addClass('text-green-600 font-medium');
-        } else {
-            $fileName.text('No file selected');
-            $fileName.removeClass('text-green-600 font-medium');
-            $fileName.addClass('text-slate-400');
-        }
-    };
-
-    // Initialize vendors
     loadVendors();
-    initializeVendorDropdowns();
 
     // ============================================================
-    // FORM SUBMIT HANDLER
+    // ✅ SUBMIT HANDLER
     // ============================================================
-    window.submitRequest = function() {
+    window.submitRequest = function () {
         const form = document.getElementById('permissionForm');
-        
-        if (!form) {
-            showToast('error', 'Form not found!');
-            return;
-        }
+        if (!form) { showToast('error', 'Form not found!'); return; }
 
-        if (!form.checkValidity()) {
-            form.reportValidity();
-            return;
-        }
+        let hasError = false;
+        form.querySelectorAll('input[required], select[required], textarea[required]').forEach(function (el) {
+            if (el.offsetParent === null) return;
+            if (el.disabled) return;
+            if (!el.checkValidity()) {
+                if (!hasError) {
+                    el.reportValidity();
+                    hasError = true;
+                }
+            }
+        });
+        if (hasError) return;
 
-        const checkedDeclarations = $('input[name="declarations[]"]:checked').length;
-        if (checkedDeclarations < 3) {
+        if ($('input[name="declarations[]"]:checked').length < 3) {
             showToast('warning', 'Please accept all declarations before submitting.');
             return;
         }
 
-        const submitBtn = $('#submitBtn');
-        const originalText = submitBtn.html();
-        submitBtn.html('<i class="fas fa-spinner fa-spin mr-2"></i> Submitting...');
-        submitBtn.prop('disabled', true);
+        const $btn = $('#submitBtn');
+        const originalText = $btn.html();
+        $btn.html('<i class="fas fa-spinner fa-spin mr-2"></i> Submitting...').prop('disabled', true);
 
         const formData = new FormData(form);
-
         const singleExam = $('input[name="single_exam"]:checked').val();
         if (!singleExam) {
-            submitBtn.html(originalText);
-            submitBtn.prop('disabled', false);
+            $btn.html(originalText).prop('disabled', false);
             showToast('warning', 'Please select exam type.');
             return;
         }
         formData.append('single_exam', singleExam);
 
-        // SINGLE EXAM DATA
+        // -------- SINGLE EXAM (YES) --------
         if (singleExam === 'yes') {
             formData.append('single_exam_name', $('input[name="single_exam_name"]').val() || '');
-            formData.append('single_exam_date', $('input[name="single_exam_date"]').val() || '');
+            const dateType = $('input[name="exam_date_type"]:checked').val() || 'single';
+            formData.append('single_exam_date_type', dateType);
 
-            const singleCentreNames = [];
-            const singleCentreCoordinates = [];
-            const singleCentreStates = [];
-            const singleCentreDistricts = [];
-            const singleCentreAddresses = [];
+            const centreNotAvailable = $('.single-centre-not-available').is(':checked') ? '1' : '0';
+            formData.append('single_centre_not_available', centreNotAvailable);
 
-            $('input[name="single_centre_name[]"]').each(function() {
-                singleCentreNames.push($(this).val() || '');
-            });
-            $('input[name="single_centre_coordinates[]"]').each(function() {
-                singleCentreCoordinates.push($(this).val() || '');
-            });
-            $('select[name="single_centre_state[]"]').each(function() {
-                singleCentreStates.push($(this).val() || '');
-            });
-            $('select[name="single_centre_district[]"]').each(function() {
-                singleCentreDistricts.push($(this).val() || '');
-            });
-            $('textarea[name="single_centre_address[]"]').each(function() {
-                singleCentreAddresses.push($(this).val() || '');
-            });
+            if (dateType === 'single') {
+                formData.append('single_exam_date', $('#singleExamDateText').val() || '');
 
-            formData.append('single_centre_names_json', JSON.stringify(singleCentreNames));
-            formData.append('single_centre_coordinates_json', JSON.stringify(singleCentreCoordinates));
-            formData.append('single_centre_states_json', JSON.stringify(singleCentreStates));
-            formData.append('single_centre_districts_json', JSON.stringify(singleCentreDistricts));
-            formData.append('single_centre_addresses_json', JSON.stringify(singleCentreAddresses));
+                const names = [], coords = [], states = [], districts = [], addresses = [];
+                const cPersons = [], cEmails = [], cPhones = [];
+
+                $('#single-date-centres-container .centre-item').each(function () {
+                    names.push($(this).find('.centre-name').val() || '');
+                    coords.push($(this).find('.centre-coordinates').val() || '');
+                    states.push($(this).find('.single-centre-state').val() || '');
+                    districts.push($(this).find('.single-centre-district').val() || '');
+                    addresses.push($(this).find('.centre-address').val() || '');
+                    cPersons.push($(this).find('input[name="contact_person[]"]').val() || '');
+                    cEmails.push($(this).find('input[name="contact_email[]"]').val() || '');
+                    cPhones.push($(this).find('input[name="contact_phone[]"]').val() || '');
+                });
+
+                formData.append('single_centre_names_json', JSON.stringify(names));
+                formData.append('single_centre_coordinates_json', JSON.stringify(coords));
+                formData.append('single_centre_states_json', JSON.stringify(states));
+                formData.append('single_centre_districts_json', JSON.stringify(districts));
+                formData.append('single_centre_addresses_json', JSON.stringify(addresses));
+                formData.append('single_centre_contact_persons_json', JSON.stringify(cPersons));
+                formData.append('single_centre_contact_emails_json', JSON.stringify(cEmails));
+                formData.append('single_centre_contact_phones_json', JSON.stringify(cPhones));
+            } else {
+                const smDates = [];
+                const smCentreNames = [], smCentreCoords = [], smCentreStates = [], smCentreDistricts = [], smCentreAddresses = [];
+                const smCentreContacts = [], smCentreEmails = [], smCentrePhones = [];
+
+                $('#multipleDateContainer .date-centre-group').each(function () {
+                    const $group = $(this);
+                    const dateVal = $group.find('.single-multi-date-text').val() || '';
+                    smDates.push(dateVal);
+
+                    const cNames = [], cCoords = [], cStates = [], cDistricts = [], cAddresses = [];
+                    const cPersons = [], cEmails = [], cPhones = [];
+
+                    $group.find('.single-multi-centre').each(function () {
+                        cNames.push($(this).find('.centre-name').val() || '');
+                        cCoords.push($(this).find('.centre-coordinates').val() || '');
+                        cStates.push($(this).find('.single-multi-centre-state').val() || '');
+                        cDistricts.push($(this).find('.single-multi-centre-district').val() || '');
+                        cAddresses.push($(this).find('.centre-address').val() || '');
+                        cPersons.push($(this).find('input[name="single_multi_contact_person[]"]').val() || '');
+                        cEmails.push($(this).find('input[name="single_multi_contact_email[]"]').val() || '');
+                        cPhones.push($(this).find('input[name="single_multi_contact_phone[]"]').val() || '');
+                    });
+
+                    smCentreNames.push(cNames);
+                    smCentreCoords.push(cCoords);
+                    smCentreStates.push(cStates);
+                    smCentreDistricts.push(cDistricts);
+                    smCentreAddresses.push(cAddresses);
+                    smCentreContacts.push(cPersons);
+                    smCentreEmails.push(cEmails);
+                    smCentrePhones.push(cPhones);
+                });
+
+                formData.append('single_multi_exam_dates_json', JSON.stringify(smDates));
+                formData.append('single_multi_centre_names_json', JSON.stringify(smCentreNames));
+                formData.append('single_multi_centre_coordinates_json', JSON.stringify(smCentreCoords));
+                formData.append('single_multi_centre_states_json', JSON.stringify(smCentreStates));
+                formData.append('single_multi_centre_districts_json', JSON.stringify(smCentreDistricts));
+                formData.append('single_multi_centre_addresses_json', JSON.stringify(smCentreAddresses));
+                formData.append('single_multi_centre_contact_persons_json', JSON.stringify(smCentreContacts));
+                formData.append('single_multi_centre_contact_emails_json', JSON.stringify(smCentreEmails));
+                formData.append('single_multi_centre_contact_phones_json', JSON.stringify(smCentrePhones));
+            }
         }
 
-        // MULTIPLE EXAM DATA
-        const multipleExamNames = [];
-        const multipleExamDates = [];
-        const multipleCentreNames = [];
-        const multipleCentreCoordinates = [];
-        const multipleCentreStates = [];
-        const multipleCentreDistricts = [];
-        const multipleCentreAddresses = [];
+        // -------- MULTIPLE EXAM (NO) --------
+        const mExamNames = [], mExamDateTypes = [], mExamDatesSingle = [], mExamDatesMultiple = [];
+        const mCentreNames = [], mCentreCoords = [], mCentreStates = [], mCentreDistricts = [], mCentreAddresses = [];
+        const mCentreContacts = [], mCentreEmails = [], mCentrePhones = [];
 
-        $('.exam-item').each(function() {
+        $('.exam-item').each(function () {
+            const examId = $(this).data('exam-id');
             const examName = $(this).find('input[name="multiple_exam_name[]"]').val() || '';
-            const examDate = $(this).find('input[name="multiple_exam_date[]"]').val() || '';
-            multipleExamNames.push(examName);
-            multipleExamDates.push(examDate);
+            mExamNames.push(examName);
 
-            const centres = [];
-            $(this).find('.exam-centre').each(function() {
-                const centre = {
-                    name: $(this).find('.centre-name').val() || '',
-                    coordinates: $(this).find('.centre-coordinates').val() || '',
-                    state: $(this).find('.multiple-centre-state').val() || '',
-                    district: $(this).find('.multiple-centre-district').val() || '',
-                    address: $(this).find('.centre-address').val() || '',
-                    not_available: $(this).find('input[type="checkbox"]').is(':checked') ? 1 : 0
-                };
-                centres.push(centre);
+            const dateType = $(this).find(`input[name="multiple_exam_date_type[${examId}]"]:checked`).val() || 'single';
+            mExamDateTypes.push(dateType);
+
+            if (dateType === 'single') {
+                mExamDatesSingle.push($(this).find('input[name="multiple_single_exam_date[]"]').val() || '');
+                mExamDatesMultiple.push([]);
+            } else {
+                const dates = [];
+                $(this).find(`input[name^="multiple_exam_dates[${examId}]"]`).each(function () {
+                    dates.push($(this).val() || '');
+                });
+                mExamDatesSingle.push('');
+                mExamDatesMultiple.push(dates);
+            }
+
+            const cNames = [], cCoords = [], cStates = [], cDistricts = [], cAddresses = [];
+            const cPersons = [], cEmails = [], cPhones = [];
+
+            $(this).find('.exam-centre').each(function () {
+                cNames.push($(this).find('.centre-name').val() || '');
+                cCoords.push($(this).find('.centre-coordinates').val() || '');
+                cStates.push($(this).find('.multiple-centre-state').val() || '');
+                cDistricts.push($(this).find('.multiple-centre-district').val() || '');
+                cAddresses.push($(this).find('.centre-address').val() || '');
+                cPersons.push($(this).find('input[name^="contact_person"]').val() || '');
+                cEmails.push($(this).find('input[name^="contact_email"]').val() || '');
+                cPhones.push($(this).find('input[name^="contact_phone"]').val() || '');
             });
-            multipleCentreNames.push(centres.map(c => c.name));
-            multipleCentreCoordinates.push(centres.map(c => c.coordinates));
-            multipleCentreStates.push(centres.map(c => c.state));
-            multipleCentreDistricts.push(centres.map(c => c.district));
-            multipleCentreAddresses.push(centres.map(c => c.address));
+
+            mCentreNames.push(cNames);
+            mCentreCoords.push(cCoords);
+            mCentreStates.push(cStates);
+            mCentreDistricts.push(cDistricts);
+            mCentreAddresses.push(cAddresses);
+            mCentreContacts.push(cPersons);
+            mCentreEmails.push(cEmails);
+            mCentrePhones.push(cPhones);
         });
 
-        formData.append('multiple_exam_names_json', JSON.stringify(multipleExamNames));
-        formData.append('multiple_exam_dates_json', JSON.stringify(multipleExamDates));
-        formData.append('multiple_centre_names_json', JSON.stringify(multipleCentreNames));
-        formData.append('multiple_centre_coordinates_json', JSON.stringify(multipleCentreCoordinates));
-        formData.append('multiple_centre_states_json', JSON.stringify(multipleCentreStates));
-        formData.append('multiple_centre_districts_json', JSON.stringify(multipleCentreDistricts));
-        formData.append('multiple_centre_addresses_json', JSON.stringify(multipleCentreAddresses));
+        formData.append('multiple_exam_names_json', JSON.stringify(mExamNames));
+        formData.append('multiple_exam_date_types_json', JSON.stringify(mExamDateTypes));
+        formData.append('multiple_exam_dates_single_json', JSON.stringify(mExamDatesSingle));
+        formData.append('multiple_exam_dates_multiple_json', JSON.stringify(mExamDatesMultiple));
+        formData.append('multiple_centre_names_json', JSON.stringify(mCentreNames));
+        formData.append('multiple_centre_coordinates_json', JSON.stringify(mCentreCoords));
+        formData.append('multiple_centre_states_json', JSON.stringify(mCentreStates));
+        formData.append('multiple_centre_districts_json', JSON.stringify(mCentreDistricts));
+        formData.append('multiple_centre_addresses_json', JSON.stringify(mCentreAddresses));
+        formData.append('multiple_centre_contact_persons_json', JSON.stringify(mCentreContacts));
+        formData.append('multiple_centre_contact_emails_json', JSON.stringify(mCentreEmails));
+        formData.append('multiple_centre_contact_phones_json', JSON.stringify(mCentrePhones));
 
-        // VENDOR DATA
-        const vendorIds = [];
-        const jammerModelIds = [];
-
-        $('.vendor-item').each(function() {
-            const vendorId = $(this).find('select[name="vendor_id[]"]').val() || '';
-            const jammerModelId = $(this).find('select[name="jammer_model_ids[]"]').val() || '';
-            
-            vendorIds.push(vendorId);
-            jammerModelIds.push(jammerModelId);
+        // -------- VENDORS --------
+        const vendorIds = [], jammerModelIds = [];
+        $('.vendor-item').each(function () {
+            vendorIds.push($(this).find('select[name="vendor_id[]"]').val() || '');
+            jammerModelIds.push($(this).find('select[name="jammer_model_ids[]"]').val() || '');
         });
-
         formData.append('vendor_ids_json', JSON.stringify(vendorIds));
         formData.append('jammer_ids_json', JSON.stringify(jammerModelIds));
 
-        // DECLARATIONS
-        const declarations = [];
-        $('input[name="declarations[]"]:checked').each(function() {
-            declarations.push($(this).val());
-        });
-        formData.append('declarations_json', JSON.stringify(declarations));
+        // -------- DECLARATIONS --------
+        const decls = [];
+        $('input[name="declarations[]"]:checked').each(function () { decls.push($(this).val()); });
+        formData.append('declarations_json', JSON.stringify(decls));
 
-        // ORGANISATION DATA
-        const organisationName = $('#organisation_name').val() || '';
-        const organisationType = $('#organisation_type').val() || '';
-        formData.append('organisation_name', organisationName);
-        formData.append('organisation_type_name', organisationType);
+        // -------- ORG --------
+        formData.append('organisation_name', $('#organisation_name').val() || '');
+        formData.append('organisation_type_name', $('#organisation_type').val() || '');
 
-        // MAKE AJAX REQUEST
+        // -------- AJAX --------
         $.ajax({
             url: baseUrl + '/submit-request',
             type: 'POST',
@@ -2213,48 +2059,1275 @@ $(document).ready(function () {
             contentType: false,
             processData: false,
             cache: false,
-            headers: {
-                'X-CSRF-TOKEN': $('input[name="csrf_test_name"]').val()
-            },
-            success: function(response) {
-                submitBtn.html(originalText);
-                submitBtn.prop('disabled', false);
-
+            headers: { 'X-CSRF-TOKEN': $('input[name="csrf_test_name"]').val() },
+            success: function (response) {
+                $btn.html(originalText).prop('disabled', false);
                 if (response.success) {
                     showToast('success', response.message || 'Application submitted successfully!');
-                    
-                    setTimeout(function() {
-                        if (response.redirect_url) {
-                            window.location.href = response.redirect_url;
-                        }
+                    setTimeout(function () {
+                        if (response.redirect_url) window.location.href = response.redirect_url;
                     }, 1500);
                 } else {
-                    showToast('error', response.message || 'Something went wrong. Please try again.');
+                    showToast('error', response.message || 'Something went wrong.');
                 }
             },
-            error: function(xhr, status, error) {
-                submitBtn.html(originalText);
-                submitBtn.prop('disabled', false);
-
-                let errorMessage = 'An error occurred while submitting the form.';
-                
+            error: function (xhr) {
+                $btn.html(originalText).prop('disabled', false);
+                let msg = 'An error occurred while submitting the form.';
                 if (xhr.status === 403) {
-                    errorMessage = 'Security token expired. Please refresh the page and try again.';
-                    setTimeout(function() {
-                        location.reload();
-                    }, 10000);
+                    msg = 'Security token expired. Please refresh the page.';
+                    location.reload();
+                    return;
                 } else if (xhr.responseJSON && xhr.responseJSON.message) {
-                    errorMessage = xhr.responseJSON.message;
+                    msg = xhr.responseJSON.message;
                 }
-
-                showToast('error', errorMessage);
-                console.error('Error:', xhr.responseText);
+                showToast('error', msg);
             }
         });
     };
 
-    console.log('Application initialized successfully.');
+    // ============================================================
+    // INITIAL SETUP
+    // ============================================================
+    initSingleDateCentreBlock();
+    initSingleMultipleDateBlock();
+
+    const selectedExam = $('input[name="single_exam"]:checked').val();
+    if (selectedExam === 'no') {
+        $('#single-exam-container').addClass('hidden');
+        $('#multiple-exam-container').removeClass('hidden');
+        disableSection('#single-exam-container');
+        enableSection('#multiple-exam-container');
+        if ($('#multiple-exams-list .exam-item').length === 0) addExamination();
+    }
+
 });
+</script>
+
+<script>
+   // ============================================================
+    // EDIT REQUEST — Load form with existing data
+    // ============================================================
+    window.saveAsDraft = function () {
+    const form = document.getElementById('permissionForm');
+    if (!form) { showToast('error', 'Form not found!'); return; }
+
+    // ✅ Check declarations first
+    if ($('input[name="declarations[]"]:checked').length < 3) {
+        showToast('warning', 'Please accept all declarations before saving draft.');
+        return;
+    }
+
+    // Basic validation - only check if org is selected
+    const orgName = $('#organisation_name').val() || '';
+    if (!orgName.trim()) {
+        showToast('warning', 'Please select an organisation before saving draft.');
+        return;
+    }
+
+    const $btn = $('button[type="save_as_draft"]');
+    const originalText = $btn.html();
+    $btn.html('<i class="fas fa-spinner fa-spin mr-2"></i> Saving...').prop('disabled', true);
+
+    const formData = new FormData(form);
+    const singleExam = $('input[name="single_exam"]:checked').val() || 'no';
+    formData.append('single_exam', singleExam);
+    formData.append('save_as_draft', '1');
+
+    // -------- SINGLE EXAM (YES) --------
+    if (singleExam === 'yes') {
+        formData.append('single_exam_name', $('input[name="single_exam_name"]').val() || '');
+        const dateType = $('input[name="exam_date_type"]:checked').val() || 'single';
+        formData.append('single_exam_date_type', dateType);
+
+        const centreNotAvailable = $('.single-centre-not-available').is(':checked') ? '1' : '0';
+        formData.append('single_centre_not_available', centreNotAvailable);
+
+        if (dateType === 'single') {
+            formData.append('single_exam_date', $('#singleExamDateText').val() || '');
+
+            const names = [], coords = [], states = [], districts = [], addresses = [];
+            const cPersons = [], cEmails = [], cPhones = [];
+
+            $('#single-date-centres-container .centre-item').each(function () {
+                names.push($(this).find('.centre-name').val() || '');
+                coords.push($(this).find('.centre-coordinates').val() || '');
+                states.push($(this).find('.single-centre-state').val() || '');
+                districts.push($(this).find('.single-centre-district').val() || '');
+                addresses.push($(this).find('.centre-address').val() || '');
+                cPersons.push($(this).find('input[name="contact_person[]"]').val() || '');
+                cEmails.push($(this).find('input[name="contact_email[]"]').val() || '');
+                cPhones.push($(this).find('input[name="contact_phone[]"]').val() || '');
+            });
+
+            formData.append('single_centre_names_json', JSON.stringify(names));
+            formData.append('single_centre_coordinates_json', JSON.stringify(coords));
+            formData.append('single_centre_states_json', JSON.stringify(states));
+            formData.append('single_centre_districts_json', JSON.stringify(districts));
+            formData.append('single_centre_addresses_json', JSON.stringify(addresses));
+            formData.append('single_centre_contact_persons_json', JSON.stringify(cPersons));
+            formData.append('single_centre_contact_emails_json', JSON.stringify(cEmails));
+            formData.append('single_centre_contact_phones_json', JSON.stringify(cPhones));
+        } else {
+            const smDates = [];
+            const smCentreNames = [], smCentreCoords = [], smCentreStates = [], smCentreDistricts = [], smCentreAddresses = [];
+            const smCentreContacts = [], smCentreEmails = [], smCentrePhones = [];
+
+            $('#multipleDateContainer .date-centre-group').each(function () {
+                const $group = $(this);
+                const dateVal = $group.find('.single-multi-date-text').val() || '';
+                smDates.push(dateVal);
+
+                const cNames = [], cCoords = [], cStates = [], cDistricts = [], cAddresses = [];
+                const cPersons = [], cEmails = [], cPhones = [];
+
+                $group.find('.single-multi-centre').each(function () {
+                    cNames.push($(this).find('.centre-name').val() || '');
+                    cCoords.push($(this).find('.centre-coordinates').val() || '');
+                    cStates.push($(this).find('.single-multi-centre-state').val() || '');
+                    cDistricts.push($(this).find('.single-multi-centre-district').val() || '');
+                    cAddresses.push($(this).find('.centre-address').val() || '');
+                    cPersons.push($(this).find('input[name="single_multi_contact_person[]"]').val() || '');
+                    cEmails.push($(this).find('input[name="single_multi_contact_email[]"]').val() || '');
+                    cPhones.push($(this).find('input[name="single_multi_contact_phone[]"]').val() || '');
+                });
+
+                smCentreNames.push(cNames);
+                smCentreCoords.push(cCoords);
+                smCentreStates.push(cStates);
+                smCentreDistricts.push(cDistricts);
+                smCentreAddresses.push(cAddresses);
+                smCentreContacts.push(cPersons);
+                smCentreEmails.push(cEmails);
+                smCentrePhones.push(cPhones);
+            });
+
+            formData.append('single_multi_exam_dates_json', JSON.stringify(smDates));
+            formData.append('single_multi_centre_names_json', JSON.stringify(smCentreNames));
+            formData.append('single_multi_centre_coordinates_json', JSON.stringify(smCentreCoords));
+            formData.append('single_multi_centre_states_json', JSON.stringify(smCentreStates));
+            formData.append('single_multi_centre_districts_json', JSON.stringify(smCentreDistricts));
+            formData.append('single_multi_centre_addresses_json', JSON.stringify(smCentreAddresses));
+            formData.append('single_multi_centre_contact_persons_json', JSON.stringify(smCentreContacts));
+            formData.append('single_multi_centre_contact_emails_json', JSON.stringify(smCentreEmails));
+            formData.append('single_multi_centre_contact_phones_json', JSON.stringify(smCentrePhones));
+        }
+    }
+
+    // -------- MULTIPLE EXAM (NO) --------
+    const mExamNames = [], mExamDateTypes = [], mExamDatesSingle = [], mExamDatesMultiple = [];
+    const mCentreNames = [], mCentreCoords = [], mCentreStates = [], mCentreDistricts = [], mCentreAddresses = [];
+    const mCentreContacts = [], mCentreEmails = [], mCentrePhones = [];
+
+    $('.exam-item').each(function () {
+        const examId = $(this).data('exam-id');
+        const examName = $(this).find('input[name="multiple_exam_name[]"]').val() || '';
+        mExamNames.push(examName);
+
+        const dateType = $(this).find(`input[name="multiple_exam_date_type[${examId}]"]:checked`).val() || 'single';
+        mExamDateTypes.push(dateType);
+
+        if (dateType === 'single') {
+            mExamDatesSingle.push($(this).find('input[name="multiple_single_exam_date[]"]').val() || '');
+            mExamDatesMultiple.push([]);
+        } else {
+            const dates = [];
+            $(this).find(`input[name^="multiple_exam_dates[${examId}]"]`).each(function () {
+                dates.push($(this).val() || '');
+            });
+            mExamDatesSingle.push('');
+            mExamDatesMultiple.push(dates);
+        }
+
+        const cNames = [], cCoords = [], cStates = [], cDistricts = [], cAddresses = [];
+        const cPersons = [], cEmails = [], cPhones = [];
+
+        $(this).find('.exam-centre').each(function () {
+            cNames.push($(this).find('.centre-name').val() || '');
+            cCoords.push($(this).find('.centre-coordinates').val() || '');
+            cStates.push($(this).find('.multiple-centre-state').val() || '');
+            cDistricts.push($(this).find('.multiple-centre-district').val() || '');
+            cAddresses.push($(this).find('.centre-address').val() || '');
+            cPersons.push($(this).find('input[name^="contact_person"]').val() || '');
+            cEmails.push($(this).find('input[name^="contact_email"]').val() || '');
+            cPhones.push($(this).find('input[name^="contact_phone"]').val() || '');
+        });
+
+        mCentreNames.push(cNames);
+        mCentreCoords.push(cCoords);
+        mCentreStates.push(cStates);
+        mCentreDistricts.push(cDistricts);
+        mCentreAddresses.push(cAddresses);
+        mCentreContacts.push(cPersons);
+        mCentreEmails.push(cEmails);
+        mCentrePhones.push(cPhones);
+    });
+
+    formData.append('multiple_exam_names_json', JSON.stringify(mExamNames));
+    formData.append('multiple_exam_date_types_json', JSON.stringify(mExamDateTypes));
+    formData.append('multiple_exam_dates_single_json', JSON.stringify(mExamDatesSingle));
+    formData.append('multiple_exam_dates_multiple_json', JSON.stringify(mExamDatesMultiple));
+    formData.append('multiple_centre_names_json', JSON.stringify(mCentreNames));
+    formData.append('multiple_centre_coordinates_json', JSON.stringify(mCentreCoords));
+    formData.append('multiple_centre_states_json', JSON.stringify(mCentreStates));
+    formData.append('multiple_centre_districts_json', JSON.stringify(mCentreDistricts));
+    formData.append('multiple_centre_addresses_json', JSON.stringify(mCentreAddresses));
+    formData.append('multiple_centre_contact_persons_json', JSON.stringify(mCentreContacts));
+    formData.append('multiple_centre_contact_emails_json', JSON.stringify(mCentreEmails));
+    formData.append('multiple_centre_contact_phones_json', JSON.stringify(mCentrePhones));
+
+    // -------- VENDORS --------
+    const vendorIds = [], jammerModelIds = [];
+    $('.vendor-item').each(function () {
+        vendorIds.push($(this).find('select[name="vendor_id[]"]').val() || '');
+        jammerModelIds.push($(this).find('select[name="jammer_model_ids[]"]').val() || '');
+    });
+    formData.append('vendor_ids_json', JSON.stringify(vendorIds));
+    formData.append('jammer_ids_json', JSON.stringify(jammerModelIds));
+
+    // -------- DECLARATIONS --------
+    const decls = [];
+    $('input[name="declarations[]"]:checked').each(function () { decls.push($(this).val()); });
+    formData.append('declarations_json', JSON.stringify(decls));
+
+    // -------- ORG --------
+    formData.append('organisation_name', $('#organisation_name').val() || '');
+    formData.append('organisation_type_name', $('#organisation_type').val() || '');
+
+    // -------- AJAX --------
+    $.ajax({
+        url: baseUrl + '/save-draft',
+        type: 'POST',
+        data: formData,
+        contentType: false,
+        processData: false,
+        cache: false,
+        headers: { 'X-CSRF-TOKEN': $('input[name="csrf_test_name"]').val() },
+        success: function (response) {
+            $btn.html(originalText).prop('disabled', false);
+            if (response.success) {
+                showToast('success', response.message || 'Draft saved successfully!');
+                if (response.redirect_url) {
+                    setTimeout(function () {
+                        window.location.href = response.redirect_url;
+                    }, 1500);
+                }
+            } else {
+                showToast('error', response.message || 'Something went wrong.');
+            }
+        },
+        error: function (xhr) {
+            $btn.html(originalText).prop('disabled', false);
+            let msg = 'An error occurred while saving draft.';
+            if (xhr.status === 403) {
+                msg = 'Security token expired. Please refresh the page.';
+                location.reload();
+                return;
+            } else if (xhr.responseJSON && xhr.responseJSON.message) {
+                msg = xhr.responseJSON.message;
+            }
+            showToast('error', msg);
+        }
+    });
+};   
+</script>
+
+<script>
+/**
+ * EDIT REQUEST JS
+ * Ye file SIRF edit mode me load hoti hai.
+ */
+(function () {
+    'use strict';
+
+    const BASE = (window.BASE_URL || '/').replace(/\/$/, '');
+    const EDIT_DATA = window.EDIT_MODE_DATA || null;
+
+    function getCSRFToken() {
+        return $('input[name="csrf_test_name"]').val() || '';
+    }
+
+    function updateCSRF(res) {
+        if (res && res.csrf_hash) {
+            $('input[name="csrf_test_name"]').val(res.csrf_hash);
+        }
+    }
+
+    function escapeHtml(str) {
+        return String(str || '')
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#39;');
+    }
+
+    // ============================================================
+    // GLOBAL FILE HANDLER
+    // ============================================================
+    window.__editShowFileName = function (input) {
+        if (!input) return;
+
+        const $input = $(input);
+        const files = input.files;
+
+        let $display = $input.closest('label').siblings('.file-name').first();
+        if (!$display.length) $display = $input.closest('.flex').find('.file-name').last();
+        if (!$display.length) $display = $input.closest('.mt-4, .mt-3, .mt-2').find('.file-name').last();
+        if (!$display.length) return;
+
+        if (files && files.length > 0) {
+            const fileName = files.length > 1
+                ? files.length + ' files selected'
+                : files[0].name;
+            const safe = escapeHtml(fileName);
+
+            $display.html(
+                `<span class="text-emerald-600 font-medium truncate max-w-[220px] inline-block" title="${safe}">${safe}</span>`
+            );
+        } else {
+            const originalHtml = $display.data('original-html');
+            if (originalHtml) {
+                $display.html(originalHtml);
+            } else {
+                $display.html('<span class="text-xs text-slate-400">No file selected</span>');
+            }
+        }
+    };
+
+    $(document).on('change', 'input[type="file"]', function () {
+        window.__editShowFileName(this);
+    });
+
+    // ============================================================
+    // HYDRATE MAIN
+    // ============================================================
+    function hydrateEditMode(data) {
+        if (!data || !data.application) return;
+        const app = data.application;
+
+        $('#organization_id').val(data.organization_id || '');
+        $('#org_type').val(data.org_type || '');
+
+        const orgText = app.organisation || '';
+        if (orgText) {
+            if ($('#organisation_name option').filter(function () {
+                return $(this).val() === orgText;
+            }).length === 0) {
+                $('#organisation_name').append(new Option(orgText, orgText, true, true));
+            }
+            $('#organisation_name').val(orgText).trigger('change.select2');
+        }
+
+        const orgTypeText = app.organisation_type || '';
+        if (orgTypeText) {
+            if ($('#organisation_type option').filter(function () {
+                return $(this).val() === orgTypeText;
+            }).length === 0) {
+                $('#organisation_type').append(new Option(orgTypeText, orgTypeText, true, true));
+            }
+            $('#organisation_type').val(orgTypeText).trigger('change.select2');
+        }
+
+        // DECLARATIONS
+        const decl = data.declarations || {};
+        $('input[name="declarations[]"][value="security"]').prop('checked', decl.security == 1);
+        $('input[name="declarations[]"][value="accountability"]').prop('checked', decl.accountability == 1);
+        $('input[name="declarations[]"][value="non_interference"]').prop('checked', decl.non_interference == 1);
+        $('input[name="declarations[]"]').trigger('change');
+
+        // SINGLE / MULTIPLE
+        const isSingle = data.is_single_exam == 1;
+        $('input[name="single_exam"][value="' + (isSingle ? 'yes' : 'no') + '"]')
+            .prop('checked', true).trigger('change');
+
+        if (isSingle) hydrateSingleExam(data);
+        else hydrateMultipleExam(data);
+
+        hydrateVendors(data);
+
+        console.log('[EDIT] Hydration done');
+    }
+
+    // ============================================================
+    // SINGLE EXAM
+    // ============================================================
+    function hydrateSingleExam(data) {
+        const dates = data.existing_dates || []; // each has ->centres from controller
+
+        if (dates.length > 0) {
+            $('input[name="single_exam_name"]').val(dates[0].exam_name || '');
+        }
+
+        const isMultiDate = dates.length > 1;
+
+        if (!isMultiDate) {
+            $('input[name="exam_date_type"][value="single"]').prop('checked', true).trigger('change');
+            $('#singleDateSection').removeClass('hidden');
+            $('#multipleDateSection').addClass('hidden');
+            $('#singleExamExcelSection').removeClass('hidden');
+
+            if (dates.length > 0 && dates[0].exam_date) {
+                const p = dates[0].exam_date.split(' ')[0].split('-');
+                if (p.length === 3) {
+                    $('#singleExamDateText').val(p[2] + '/' + p[1] + '/' + p[0]);
+                }
+            }
+
+            const singleCentres = (dates[0] && dates[0].centres) ? dates[0].centres : [];
+
+            const $c = $('#single-date-centres-container').empty();
+            if (singleCentres.length === 0) {
+                appendSingleDateCentreRow($c, 1, null);
+            } else {
+                singleCentres.forEach(function (row, i) {
+                    appendSingleDateCentreRow($c, i + 1, row);
+                });
+            }
+
+            if (data.centre_list_ready == 0 && $('.single-centre-not-available').length) {
+                $('.single-centre-not-available').prop('checked', true).trigger('change');
+            }
+        } else {
+            $('input[name="exam_date_type"][value="multiple"]').prop('checked', true).trigger('change');
+            $('#singleDateSection').addClass('hidden');
+            $('#multipleDateSection').removeClass('hidden');
+            $('#singleExamExcelSection').addClass('hidden');
+
+            const $container = $('#multipleDateContainer').empty();
+            dates.forEach(function (dt, di) {
+                appendSingleMultiDateGroup($container, di, dt, dt.centres || []);
+            });
+        }
+    }
+
+    function appendSingleDateCentreRow($container, centreNo, row) {
+        const html = `
+            <div class="centre-item border border-slate-200 rounded-xl p-4 bg-slate-50 mt-3" data-single-centre-no="${centreNo}">
+                <div class="flex justify-between items-center mb-4">
+                    <span class="text-xs font-bold text-[#1e4d7b]">Centre ${centreNo}</span>
+                    ${centreNo > 1 ? `<button type="button" class="remove-single-date-centre text-red-500 hover:text-red-700 text-xs font-semibold"><i class="fas fa-trash-alt mr-1"></i> Remove</button>` : ''}
+                </div>
+                <div class="centre-details grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-700 mb-1.5">Centre Name</label>
+                        <input type="text" name="single_centre_name[]" class="centre-name w-full px-3 py-2 border border-slate-300 rounded-lg bg-white text-sm">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-700 mb-1.5">Centre Coordinates</label>
+                        <input type="text" name="single_centre_coordinates[]" class="centre-coordinates w-full px-3 py-2 border border-slate-300 rounded-lg bg-white text-sm">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-700 mb-1.5">State</label>
+                        <select name="single_centre_state[]" class="single-centre-state w-full px-3 py-2 border border-slate-300 rounded-lg bg-white text-sm">
+                            <option value="">Select State / UT</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-700 mb-1.5">District</label>
+                        <select name="single_centre_district[]" class="single-centre-district w-full px-3 py-2 border border-slate-300 rounded-lg bg-white text-sm" disabled>
+                            <option value="">Select District / City</option>
+                        </select>
+                    </div>
+                    <div class="md:col-span-2 grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div class="w-full">
+                            <label class="block text-xs font-semibold text-slate-600 mb-1">Contact Person</label>
+                            <input type="text" name="contact_person[]" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm">
+                        </div>
+                        <div class="w-full">
+                            <label class="block text-xs font-semibold text-slate-600 mb-1">Email</label>
+                            <input type="email" name="contact_email[]" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm">
+                        </div>
+                        <div class="w-full">
+                            <label class="block text-xs font-semibold text-slate-600 mb-1">Phone</label>
+                            <input type="tel" name="contact_phone[]" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm">
+                        </div>
+                    </div>
+                    <div class="md:col-span-2">
+                        <label class="block text-xs font-semibold text-slate-700 mb-1.5">Centre Address</label>
+                        <textarea name="single_centre_address[]" rows="2" class="centre-address w-full px-3 py-2 border border-slate-300 rounded-lg bg-white text-sm"></textarea>
+                    </div>
+                </div>
+            </div>`;
+        $container.append(html);
+        const $item = $container.find('.centre-item').last();
+        if (row) {
+            $item.find('.centre-name').val(row.centre_name || '');
+            $item.find('.centre-coordinates').val(row.centre_coordinates || '');
+            $item.find('.centre-address').val(row.centre_address || '');
+            $item.find('input[name="contact_person[]"]').val(row.coorrdinator_name || '');
+            $item.find('input[name="contact_email[]"]').val(row.coordinator_email || '');
+            $item.find('input[name="contact_phone[]"]').val(row.coordinator_mobile_no || '');
+        }
+        loadStateAndDistrict(
+            $item.find('.single-centre-state'),
+            $item.find('.single-centre-district'),
+            row ? row.state : '',
+            row ? row.district : ''
+        );
+    }
+
+    function appendSingleMultiDateGroup($container, dateIndex, dateRow, dateCentres) {
+        const rowId = 'sm-edit-' + Date.now() + '-' + dateIndex;
+        const dateStr = (dateRow.exam_date || '').split(' ')[0];
+        const p = dateStr.split('-');
+        const displayDate = p.length === 3 ? (p[2] + '/' + p[1] + '/' + p[0]) : '';
+
+        const group = document.createElement('div');
+        group.className = 'date-centre-group border border-slate-200 rounded-xl p-4 bg-slate-50 mb-4';
+        group.setAttribute('data-group-id', rowId);
+        group.innerHTML = `
+            <div class="exam-date-row flex items-center gap-2 mb-3">
+                <div class="relative w-full md:w-1/2">
+                    <label class="block text-xs font-bold text-slate-600 mb-1">Date of examination</label>
+                    <input type="text" name="single_multi_exam_dates[]" placeholder="dd/mm/yyyy" maxlength="10" autocomplete="off"
+                        class="single-multi-date-text w-full px-4 py-2 border border-slate-300 rounded-lg text-sm pr-10" value="${displayDate}">
+                    <input type="date" class="single-multi-date-picker absolute right-2 top-1/2 mt-3 -translate-y-1/2 opacity-0 w-8 h-8 z-10">
+                    <i class="fas fa-calendar-alt absolute right-3 top-1/2 mt-3 -translate-y-1/2 text-slate-400 cursor-pointer z-20"></i>
+                </div>
+                <button type="button" class="remove-single-multi-date px-3 py-2 mt-4 rounded-lg bg-red-600 text-white text-sm font-semibold">
+                    <i class="fas fa-trash-alt mr-1"></i> Remove Date
+                </button>
+            </div>
+            <div class="centre-block-for-date" data-centre-block-for="${rowId}">
+                <div class="flex items-center justify-between mb-2">
+                    <label class="block text-xs font-bold text-slate-600">Centre of examination</label>
+                    <button type="button" class="add-single-multi-centre inline-flex items-center gap-1 px-2.5 py-1.5 bg-white border border-[#1e4d7b] text-[#1e4d7b] text-xs font-semibold rounded-lg" data-row-id="${rowId}">
+                        <i class="fas fa-plus"></i> Add Centre
+                    </button>
+                </div>
+                <div class="single-multi-centres-container"></div>
+            </div>`;
+        $container.append(group);
+        const $group = $(group);
+        const $cContainer = $group.find('.single-multi-centres-container');
+
+        if (!dateCentres || dateCentres.length === 0) {
+            appendSingleMultiCentreRow($cContainer, 1, null);
+        } else {
+            dateCentres.forEach(function (row, i) {
+                appendSingleMultiCentreRow($cContainer, i + 1, row);
+            });
+        }
+    }
+
+    function appendSingleMultiCentreRow($container, centreNo, row) {
+        const html = `
+            <div class="single-multi-centre border border-slate-200 rounded-lg p-4 bg-white mb-3">
+                <div class="flex items-center justify-between mb-4">
+                    <span class="text-xs font-bold text-slate-600">Centre ${centreNo}</span>
+                    ${centreNo > 1 ? `<button type="button" class="remove-single-multi-centre text-red-500 hover:text-red-700 text-xs font-semibold"><i class="fas fa-trash-alt mr-1"></i> Remove</button>` : ''}
+                </div>
+                <div class="centre-details grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-700 mb-1.5">Centre Name</label>
+                        <input type="text" name="single_multi_centre_name[]" class="centre-name w-full px-3 py-2 border border-slate-300 rounded-lg bg-white text-sm">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-700 mb-1.5">Centre Coordinates</label>
+                        <input type="text" name="single_multi_centre_coordinates[]" class="centre-coordinates w-full px-3 py-2 border border-slate-300 rounded-lg bg-white text-sm">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-700 mb-1.5">State / UT</label>
+                        <select name="single_multi_centre_state[]" class="single-multi-centre-state w-full px-3 py-2 border border-slate-300 rounded-lg bg-white text-sm">
+                            <option value="">Select State / UT</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-700 mb-1.5">City / District</label>
+                        <select name="single_multi_centre_district[]" class="single-multi-centre-district w-full px-3 py-2 border border-slate-300 rounded-lg bg-white text-sm" disabled>
+                            <option value="">Select District / City</option>
+                        </select>
+                    </div>
+                    <div class="md:col-span-2 grid grid-cols-1 md:grid-cols-3 gap-3">
+                        <div class="w-full">
+                            <label class="block text-xs font-semibold text-slate-600 mb-1">Contact Person</label>
+                            <input type="text" name="single_multi_contact_person[]" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm">
+                        </div>
+                        <div class="w-full">
+                            <label class="block text-xs font-semibold text-slate-600 mb-1">Email</label>
+                            <input type="email" name="single_multi_contact_email[]" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm">
+                        </div>
+                        <div class="w-full">
+                            <label class="block text-xs font-semibold text-slate-600 mb-1">Phone</label>
+                            <input type="tel" name="single_multi_contact_phone[]" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm">
+                        </div>
+                    </div>
+                    <div class="md:col-span-2">
+                        <label class="block text-xs font-semibold text-slate-700 mb-1.5">Centre Address</label>
+                        <textarea name="single_multi_centre_address[]" rows="2" class="centre-address w-full px-3 py-2 border border-slate-300 rounded-lg bg-white text-sm"></textarea>
+                    </div>
+                </div>
+            </div>`;
+        $container.append(html);
+        const $item = $container.find('.single-multi-centre').last();
+        if (row) {
+            $item.find('.centre-name').val(row.centre_name || '');
+            $item.find('.centre-coordinates').val(row.centre_coordinates || '');
+            $item.find('.centre-address').val(row.centre_address || '');
+            $item.find('input[name="single_multi_contact_person[]"]').val(row.coorrdinator_name || '');
+            $item.find('input[name="single_multi_contact_email[]"]').val(row.coordinator_email || '');
+            $item.find('input[name="single_multi_contact_phone[]"]').val(row.coordinator_mobile_no || '');
+        }
+        loadStateAndDistrict(
+            $item.find('.single-multi-centre-state'),
+            $item.find('.single-multi-centre-district'),
+            row ? row.state : '',
+            row ? row.district : ''
+        );
+    }
+
+    // ============================================================
+    // MULTIPLE EXAM
+    // ============================================================
+    function hydrateMultipleExam(data) {
+        const dates = data.existing_dates || []; // each has ->centres
+
+        // Group dates by exam_name
+        const examOrder = [];
+        const examMap   = {};
+        dates.forEach(function (d) {
+            const name = d.exam_name || 'Examination';
+            if (!examMap[name]) { examMap[name] = []; examOrder.push(name); }
+            examMap[name].push(d);
+        });
+
+        if (examOrder.length === 0) return;
+
+        $('#multiple-exams-list').empty();
+        let examCounter = 0;
+
+        examOrder.forEach(function (examName) {
+            examCounter++;
+            appendMultipleExamBlock(examCounter, examName, examMap[examName]);
+        });
+    }
+
+    function appendMultipleExamBlock(examId, examName, examDates) {
+        const isSingle = examDates.length <= 1;
+
+        const html = `
+            <div class="exam-item border border-slate-200 rounded-xl p-5 bg-slate-50 mb-4" data-exam-id="${examId}">
+                <div class="flex items-center justify-between border-b border-slate-200 pb-3 mb-4">
+                    <div class="flex items-center gap-2">
+                        <span class="flex items-center justify-center w-7 h-7 rounded-full bg-[#1e4d7b] text-white text-xs font-bold">${examId}</span>
+                        <span class="text-sm font-bold text-[#1e4d7b]">Examination ${examId}</span>
+                    </div>
+                    <button type="button" class="remove-examination text-red-500 hover:text-red-700 text-xs font-semibold">
+                        <i class="fas fa-trash-alt mr-1"></i> Remove Examination
+                    </button>
+                </div>
+                <div class="flex items-center justify-between mb-4 pb-3 border-b border-slate-200">
+                    <label class="inline-flex items-center gap-2.5 cursor-pointer select-none">
+                        <input type="checkbox" name="multiple_centre_not_available[${examId}][]" class="centre-not-available w-4 h-4 text-[#1e4d7b] rounded border-slate-300">
+                        <span class="text-xs font-semibold text-slate-700">Centre Information Not Available</span>
+                    </label>
+                    <button type="button" class="add-exam-centre inline-flex items-center gap-1.5 px-3 py-2 bg-white border border-[#1e4d7b] text-[#1e4d7b] text-xs font-semibold rounded-lg">
+                        <i class="fas fa-plus"></i> Add Centre
+                    </button>
+                </div>
+                <div>
+                    <label class="block text-sm font-semibold text-slate-700 mb-1.5">Name of examination</label>
+                    <input type="text" name="multiple_exam_name[]" class="w-full px-4 py-2 border border-slate-300 rounded-lg bg-white text-sm" value="${escapeHtml(examName)}">
+                </div>
+                <div class="mt-4">
+                    <label class="block text-sm font-semibold text-slate-700 mb-2">Whether the request is for a single date of examination ?</label>
+                    <div class="flex items-center gap-6 mb-3">
+                        <label class="inline-flex items-center cursor-pointer">
+                            <input type="radio" name="multiple_exam_date_type[${examId}]" value="single"
+                                class="multiple-exam-date-type w-4 h-4 text-[#1e4d7b]" data-exam-id="${examId}" ${isSingle ? 'checked' : ''}>
+                            <span class="ml-2 text-sm text-slate-700">Yes</span>
+                        </label>
+                        <label class="inline-flex items-center cursor-pointer">
+                            <input type="radio" name="multiple_exam_date_type[${examId}]" value="multiple"
+                                class="multiple-exam-date-type w-4 h-4 text-[#1e4d7b]" data-exam-id="${examId}" ${!isSingle ? 'checked' : ''}>
+                            <span class="ml-2 text-sm text-slate-700">No</span>
+                        </label>
+                    </div>
+                    <div class="multiple-single-date-section ${isSingle ? '' : 'hidden'}" data-exam-id="${examId}">
+                        <div class="relative w-full md:w-1/2">
+                            <input type="text" name="multiple_single_exam_date[]" placeholder="dd/mm/yyyy"
+                                maxlength="10" autocomplete="off"
+                                class="date-text w-full px-4 py-2 border border-slate-300 rounded-lg bg-white text-sm pr-10">
+                            <input type="date" class="date-picker absolute right-2 top-1/2 -translate-y-1/2 opacity-0 w-8 h-8 z-10">
+                            <i class="fas fa-calendar-alt absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none"></i>
+                        </div>
+                        <div class="mt-5">
+                            <label class="block text-sm font-semibold text-slate-700 mb-1.5">Centre of examination</label>
+                            <div class="exam-centres-container"></div>
+                        </div>
+                    </div>
+                    <div class="multiple-multiple-date-section ${!isSingle ? '' : 'hidden'}" data-exam-id="${examId}">
+                        <div class="multiple-date-container space-y-3" data-exam-id="${examId}"></div>
+                        <div class="mt-4 flex justify-end">
+                            <button type="button" class="add-multiple-exam-date px-3 py-2 rounded-lg bg-[#1e4d7b] text-white text-sm font-semibold" data-exam-id="${examId}">
+                                <i class="fas fa-plus mr-1"></i> Add Date
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>`;
+        $('#multiple-exams-list').append(html);
+        const $exam = $('#multiple-exams-list .exam-item').last();
+
+        if (isSingle) {
+            const dt = examDates[0];
+            if (dt && dt.exam_date) {
+                const p = dt.exam_date.split(' ')[0].split('-');
+                if (p.length === 3) {
+                    $exam.find('input[name="multiple_single_exam_date[]"]').val(p[2] + '/' + p[1] + '/' + p[0]);
+                }
+            }
+            const dateCentres = dt.centres || [];
+            const $cContainer = $exam.find('.multiple-single-date-section .exam-centres-container').empty();
+            if (dateCentres.length === 0) {
+                appendMultipleCentreRow($cContainer, examId, 1, null);
+            } else {
+                dateCentres.forEach(function (row, i) {
+                    appendMultipleCentreRow($cContainer, examId, i + 1, row);
+                });
+            }
+            $exam.find('.add-exam-centre').show();
+        } else {
+            const $mContainer = $exam.find('.multiple-date-container').empty();
+            examDates.forEach(function (dt, di) {
+                appendMultipleDateGroup($mContainer, examId, di, dt, dt.centres || []);
+            });
+            $exam.find('.add-exam-centre').hide();
+        }
+    }
+
+    function appendMultipleDateGroup($container, examId, dateIndex, dt, dateCentres) {
+        const rowId = 'm-edit-' + Date.now() + '-' + dateIndex;
+        const dateStr = (dt.exam_date || '').split(' ')[0];
+        const p = dateStr.split('-');
+        const displayDate = p.length === 3 ? (p[2] + '/' + p[1] + '/' + p[0]) : '';
+
+        const group = document.createElement('div');
+        group.className = 'date-centre-group border border-slate-200 rounded-xl p-4 bg-white/70 mb-4';
+        group.setAttribute('data-group-id', rowId);
+        group.innerHTML = `
+            <div class="exam-date-row flex items-center gap-2 mb-3">
+                <div class="relative w-full md:w-1/2">
+                    <label class="block text-xs font-bold text-slate-600 mb-1">Date of examination</label>
+                    <input type="text" name="multiple_exam_dates[${examId}][]" placeholder="dd/mm/yyyy" maxlength="10" autocomplete="off"
+                        class="multiple-date-text w-full px-4 py-2 border border-slate-300 rounded-lg bg-white text-sm pr-10" value="${displayDate}">
+                    <input type="date" class="multiple-date-picker absolute right-2 top-1/2 mt-3 -translate-y-1/2 opacity-0 w-8 h-8 z-10">
+                    <i class="fas fa-calendar-alt absolute right-3 top-1/2 mt-3 -translate-y-1/2 text-slate-400 cursor-pointer z-20"></i>
+                </div>
+                <button type="button" class="remove-multiple-exam-date px-3 py-2 mt-4 rounded-lg bg-red-600 text-white text-sm font-semibold hover:bg-red-700 transition whitespace-nowrap">
+                    <i class="fas fa-trash-alt mr-1"></i> Remove Date
+                </button>
+            </div>
+            <div class="centre-block-for-date" data-centre-block-for="${rowId}">
+                <div class="flex items-center justify-between mb-2">
+                    <label class="block text-xs font-bold text-slate-600">Centre of examination</label>
+                    <button type="button" class="add-multiple-exam-centre-btn inline-flex items-center gap-1 px-2.5 py-1.5 bg-white border border-[#1e4d7b] text-[#1e4d7b] text-xs font-semibold rounded-lg" data-exam-id="${examId}" data-row-id="${rowId}">
+                        <i class="fas fa-plus"></i> Add Centre
+                    </button>
+                </div>
+                <div class="exam-centres-container"></div>
+            </div>`;
+        $container.append(group);
+        const $group = $(group);
+        const $cContainer = $group.find('.exam-centres-container');
+
+        if (!dateCentres || dateCentres.length === 0) {
+            appendMultipleCentreRow($cContainer, examId, 1, null);
+        } else {
+            dateCentres.forEach(function (row, i) {
+                appendMultipleCentreRow($cContainer, examId, i + 1, row);
+            });
+        }
+    }
+
+    function appendMultipleCentreRow($container, examId, centreNo, row) {
+        const html = `
+            <div class="exam-centre border border-slate-200 rounded-lg p-4 bg-white mb-3">
+                <div class="flex items-center justify-between mb-4">
+                    <span class="text-xs font-bold text-slate-600">Centre ${centreNo}</span>
+                    ${centreNo > 1 ? `<button type="button" class="remove-exam-centre text-red-500 hover:text-red-700 text-xs font-semibold"><i class="fas fa-trash-alt mr-1"></i> Remove</button>` : ''}
+                </div>
+                <div class="centre-details grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-700 mb-1.5">Centre Name</label>
+                        <input type="text" name="multiple_centre_name[${examId}][]" class="centre-name w-full px-3 py-2 border border-slate-300 rounded-lg bg-white text-sm">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-700 mb-1.5">Centre Coordinates</label>
+                        <input type="text" name="multiple_centre_coordinates[${examId}][]" class="centre-coordinates w-full px-3 py-2 border border-slate-300 rounded-lg bg-white text-sm">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-700 mb-1.5">State / UT</label>
+                        <select name="multiple_centre_state[${examId}][]" class="multiple-centre-state w-full">
+                            <option value="">Select State / UT</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-700 mb-1.5">City / District</label>
+                        <select name="multiple_centre_district[${examId}][]" class="multiple-centre-district w-full" disabled>
+                            <option value="">Select District / City</option>
+                        </select>
+                    </div>
+                    <div class="md:col-span-2 grid grid-cols-1 md:grid-cols-3 gap-3">
+                        <div class="w-full">
+                            <label class="block text-xs font-semibold text-slate-600 mb-1">Contact Person</label>
+                            <input type="text" name="contact_person[${examId}][]" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm">
+                        </div>
+                        <div class="w-full">
+                            <label class="block text-xs font-semibold text-slate-600 mb-1">Email</label>
+                            <input type="email" name="contact_email[${examId}][]" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm">
+                        </div>
+                        <div class="w-full">
+                            <label class="block text-xs font-semibold text-slate-600 mb-1">Phone</label>
+                            <input type="tel" name="contact_phone[${examId}][]" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm">
+                        </div>
+                    </div>
+                    <div class="md:col-span-2">
+                        <label class="block text-xs font-semibold text-slate-700 mb-1.5">Centre Address</label>
+                        <textarea name="multiple_centre_address[${examId}][]" rows="2" class="centre-address w-full px-3 py-2 border border-slate-300 rounded-lg bg-white text-sm"></textarea>
+                    </div>
+                </div>
+            </div>`;
+        $container.append(html);
+        const $item = $container.find('.exam-centre').last();
+        if (row) {
+            $item.find('.centre-name').val(row.centre_name || '');
+            $item.find('.centre-coordinates').val(row.centre_coordinates || '');
+            $item.find('.centre-address').val(row.centre_address || '');
+            $item.find('input[name^="contact_person"]').val(row.coorrdinator_name || '');
+            $item.find('input[name^="contact_email"]').val(row.coordinator_email || '');
+            $item.find('input[name^="contact_phone"]').val(row.coordinator_mobile_no || '');
+        }
+        loadStateAndDistrict(
+            $item.find('.multiple-centre-state'),
+            $item.find('.multiple-centre-district'),
+            row ? row.state : '',
+            row ? row.district : ''
+        );
+    }
+
+    // ============================================================
+    // VENDORS — Existing PDF Name (Green, No Link)
+    // ============================================================
+    function hydrateVendors(data) {
+        const vendors = data.existing_vendors || [];
+        if (vendors.length === 0) return;
+
+        $('#vendorContainer').empty();
+        let count = 0;
+
+        vendors.forEach(function (v) {
+            count++;
+
+            const existingPdfName = (v.existing_pdf_name || '').trim();
+
+            let fileNameHtml;
+            if (existingPdfName !== '') {
+                const safeName = escapeHtml(existingPdfName);
+                fileNameHtml = `<span class="text-xs text-emerald-600 font-medium truncate max-w-[220px] inline-block" title="${safeName}">${safeName}</span>`;
+            } else {
+                fileNameHtml = `<span class="text-xs text-slate-400">No file selected</span>`;
+            }
+
+            const el = document.createElement('div');
+            el.className = 'vendor-item border border-slate-200 rounded-xl p-4 mb-4 bg-slate-50';
+            el.innerHTML = `
+                <div class="flex items-center justify-between mb-4">
+                    <h4 class="font-semibold text-[#1e4d7b]"><i class="fas fa-building mr-1"></i> Vendor ${count}</h4>
+                    <button type="button" onclick="removeVendor(this)" class="text-red-500 hover:text-red-700 text-sm font-semibold">
+                        <i class="fas fa-trash-alt mr-1"></i> Remove
+                    </button>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-semibold text-slate-700 mb-1.5">Name of vendor</label>
+                        <select name="vendor_id[]" class="vendor-select w-full px-4 py-2 border border-slate-300 rounded-lg text-sm bg-white" required>
+                            <option value="">Select vendor</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold text-slate-700 mb-1.5">Jammer model</label>
+                        <select name="jammer_model_ids[]" class="model-select w-full px-4 py-2 border border-slate-300 rounded-lg text-sm bg-white" required>
+                            <option value="">Select jammer model</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="mt-4">
+                    <label class="block text-sm font-semibold text-slate-700 mb-1.5">Technical specifications of jammers</label>
+                    <div class="flex items-center gap-2">
+                        <label class="flex-1 cursor-pointer flex items-center justify-center px-4 py-2 border border-dashed border-slate-300 bg-white hover:bg-slate-100 rounded-lg transition text-slate-600 text-sm font-medium">
+                            <i class="fas fa-file-pdf text-[#e58500] mr-2"></i>
+                            <span>Choose file (blank = keep existing)</span>
+                            <input type="file" name="technical_specifications[]" accept=".pdf"
+                                   class="hidden tech-file-input"
+                                   onchange="window.__editShowFileName(this)">
+                        </label>
+                        <span class="file-name text-xs">${fileNameHtml}</span>
+                    </div>
+                </div>`;
+            document.getElementById('vendorContainer').appendChild(el);
+
+            const $fileNameSpan = $(el).find('.file-name');
+            $fileNameSpan.data('original-html', $fileNameSpan.html());
+
+            const $el = $(el);
+
+            $.ajax({
+                url: BASE + '/getVendors',
+                type: 'GET',
+                dataType: 'json',
+                success: function (res) {
+                    if (res.status) {
+                        const $sel = $el.find('.vendor-select');
+                        $sel.empty().append('<option value="">Select vendor</option>');
+                        $.each(res.vendors, function (i, vd) {
+                            $sel.append($('<option>', { value: vd.id, text: vd.vendor_name }));
+                        });
+                        $sel.val(v.vendor_id);
+
+                        $.ajax({
+                            url: BASE + '/getJammerModelsByVendor',
+                            type: 'POST',
+                            dataType: 'json',
+                            data: { vendor_id: v.vendor_id, csrf_test_name: getCSRFToken() },
+                            success: function (mr) {
+                                updateCSRF(mr);
+                                const $m = $el.find('.model-select');
+                                $m.empty().append('<option value="">Select jammer model</option>');
+                                if (mr.status && mr.models && mr.models.length) {
+                                    $.each(mr.models, function (i, m) {
+                                        $m.append($('<option>', { value: m.id, text: m.name }));
+                                    });
+                                }
+                                $m.val(v.jammer_id);
+                            }
+                        });
+                    }
+                }
+            });
+        });
+    }
+
+    // ============================================================
+    // STATE / DISTRICT
+    // ============================================================
+    function loadStateAndDistrict($stateSel, $distSel, selectedState, selectedDistrict) {
+        if (!$stateSel.length) return;
+
+        $.ajax({
+            url: BASE + '/location/get-states',
+            type: 'GET',
+            dataType: 'json',
+            success: function (response) {
+                $stateSel.empty().append('<option value="">Select State / UT</option>');
+                if (response.status && response.data && response.data.length) {
+                    $.each(response.data, function (i, st) {
+                        $stateSel.append($('<option>', {
+                            value: st.id,
+                            text: st.state_name,
+                            selected: String(st.id) === String(selectedState)
+                        }));
+                    });
+                }
+                if ($stateSel.hasClass('select2-hidden-accessible')) $stateSel.select2('destroy');
+                $stateSel.select2({ width: '100%', placeholder: 'Select State / UT', allowClear: true });
+
+                if (selectedState) {
+                    $.ajax({
+                        url: BASE + '/location/get-cities',
+                        type: 'POST',
+                        dataType: 'json',
+                        data: { state_id: selectedState, csrf_test_name: getCSRFToken() },
+                        success: function (dr) {
+                            updateCSRF(dr);
+                            $distSel.empty().append('<option value="">Select District / City</option>');
+                            if (dr.status && dr.data && dr.data.length) {
+                                $.each(dr.data, function (i, dist) {
+                                    $distSel.append($('<option>', {
+                                        value: dist.id,
+                                        text: dist.city_name,
+                                        selected: String(dist.id) === String(selectedDistrict)
+                                    }));
+                                });
+                            }
+                            $distSel.prop('disabled', false);
+                            if ($distSel.hasClass('select2-hidden-accessible')) $distSel.select2('destroy');
+                            $distSel.select2({ width: '100%', placeholder: 'Select District / City', allowClear: true });
+                        }
+                    });
+                }
+            }
+        });
+    }
+
+    // ============================================================
+    // SUBMIT EDIT
+    // ============================================================
+    window.submitEditRequest = function () {
+        const form = document.getElementById('permissionForm');
+        if (!form) { showToast('error', 'Form not found!'); return; }
+
+        let hasError = false;
+        form.querySelectorAll('input[required], select[required], textarea[required]').forEach(function (el) {
+            if (el.offsetParent === null) return;
+            if (el.disabled) return;
+            if (!el.checkValidity()) {
+                if (!hasError) { el.reportValidity(); hasError = true; }
+            }
+        });
+        if (hasError) return;
+
+        if ($('input[name="declarations[]"]:checked').length < 3) {
+            showToast('warning', 'Please accept all declarations.');
+            return;
+        }
+
+        const $btn = $('#submitBtn');
+        const originalText = $btn.html();
+        $btn.html('<i class="fas fa-spinner fa-spin mr-2"></i> Updating...').prop('disabled', true);
+
+        const formData = new FormData(form);
+        const singleExam = $('input[name="single_exam"]:checked').val();
+        formData.append('single_exam', singleExam);
+
+        // SINGLE
+        if (singleExam === 'yes') {
+            formData.append('single_exam_name', $('input[name="single_exam_name"]').val() || '');
+            const dateType = $('input[name="exam_date_type"]:checked').val() || 'single';
+            formData.append('single_exam_date_type', dateType);
+            formData.append('single_centre_not_available', $('.single-centre-not-available').is(':checked') ? '1' : '0');
+
+            if (dateType === 'single') {
+                formData.append('single_exam_date', $('#singleExamDateText').val() || '');
+                const names = [], coords = [], states = [], districts = [], addresses = [];
+                const persons = [], emails = [], phones = [];
+                $('#single-date-centres-container .centre-item').each(function () {
+                    names.push($(this).find('.centre-name').val() || '');
+                    coords.push($(this).find('.centre-coordinates').val() || '');
+                    states.push($(this).find('.single-centre-state').val() || '');
+                    districts.push($(this).find('.single-centre-district').val() || '');
+                    addresses.push($(this).find('.centre-address').val() || '');
+                    persons.push($(this).find('input[name="contact_person[]"]').val() || '');
+                    emails.push($(this).find('input[name="contact_email[]"]').val() || '');
+                    phones.push($(this).find('input[name="contact_phone[]"]').val() || '');
+                });
+                formData.append('single_centre_names_json', JSON.stringify(names));
+                formData.append('single_centre_coordinates_json', JSON.stringify(coords));
+                formData.append('single_centre_states_json', JSON.stringify(states));
+                formData.append('single_centre_districts_json', JSON.stringify(districts));
+                formData.append('single_centre_addresses_json', JSON.stringify(addresses));
+                formData.append('single_centre_contact_persons_json', JSON.stringify(persons));
+                formData.append('single_centre_contact_emails_json', JSON.stringify(emails));
+                formData.append('single_centre_contact_phones_json', JSON.stringify(phones));
+            } else {
+                const smDates = [];
+                const smNames = [], smCoords = [], smStates = [], smDists = [], smAddrs = [];
+                const smPersons = [], smEmails = [], smPhones = [];
+                $('#multipleDateContainer .date-centre-group').each(function () {
+                    const $g = $(this);
+                    smDates.push($g.find('.single-multi-date-text').val() || '');
+                    const cN = [], cC = [], cS = [], cD = [], cA = [], cP = [], cE = [], cPh = [];
+                    $g.find('.single-multi-centre').each(function () {
+                        cN.push($(this).find('.centre-name').val() || '');
+                        cC.push($(this).find('.centre-coordinates').val() || '');
+                        cS.push($(this).find('.single-multi-centre-state').val() || '');
+                        cD.push($(this).find('.single-multi-centre-district').val() || '');
+                        cA.push($(this).find('.centre-address').val() || '');
+                        cP.push($(this).find('input[name="single_multi_contact_person[]"]').val() || '');
+                        cE.push($(this).find('input[name="single_multi_contact_email[]"]').val() || '');
+                        cPh.push($(this).find('input[name="single_multi_contact_phone[]"]').val() || '');
+                    });
+                    smNames.push(cN); smCoords.push(cC); smStates.push(cS);
+                    smDists.push(cD); smAddrs.push(cA); smPersons.push(cP);
+                    smEmails.push(cE); smPhones.push(cPh);
+                });
+                formData.append('single_multi_exam_dates_json', JSON.stringify(smDates));
+                formData.append('single_multi_centre_names_json', JSON.stringify(smNames));
+                formData.append('single_multi_centre_coordinates_json', JSON.stringify(smCoords));
+                formData.append('single_multi_centre_states_json', JSON.stringify(smStates));
+                formData.append('single_multi_centre_districts_json', JSON.stringify(smDists));
+                formData.append('single_multi_centre_addresses_json', JSON.stringify(smAddrs));
+                formData.append('single_multi_centre_contact_persons_json', JSON.stringify(smPersons));
+                formData.append('single_multi_centre_contact_emails_json', JSON.stringify(smEmails));
+                formData.append('single_multi_centre_contact_phones_json', JSON.stringify(smPhones));
+            }
+        }
+
+        // ============================================================
+        // MULTIPLE EXAM — FIXED (nested centres per date)
+        // ============================================================
+        const mNames = [], mTypes = [], mDSingle = [], mDMulti = [];
+        const mCN = [], mCC = [], mCS = [], mCD = [], mCA = [], mCP = [], mCE = [], mCPh = [];
+        let anyMultipleCentreNA = false;
+
+        $('.exam-item').each(function () {
+            const $exam = $(this);
+            const examId = $exam.data('exam-id');
+
+            mNames.push($exam.find('input[name="multiple_exam_name[]"]').val() || '');
+
+            const dt = $exam.find(`input[name="multiple_exam_date_type[${examId}]"]:checked`).val() || 'single';
+            mTypes.push(dt);
+
+            if ($exam.find('.centre-not-available').is(':checked')) {
+                anyMultipleCentreNA = true;
+            }
+
+            // Per-exam nested arrays
+            const examCN = [], examCC = [], examCS = [], examCD = [], examCA = [], examCP = [], examCE = [], examCPh = [];
+
+            if (dt === 'single') {
+                mDSingle.push($exam.find('input[name="multiple_single_exam_date[]"]').val() || '');
+                mDMulti.push([]);
+
+                // Single date → one flat centre group
+                const cN = [], cC = [], cS = [], cD = [], cA = [], cP = [], cE = [], cPh = [];
+                $exam.find('.multiple-single-date-section .exam-centre').each(function () {
+                    cN.push($(this).find('.centre-name').val() || '');
+                    cC.push($(this).find('.centre-coordinates').val() || '');
+                    cS.push($(this).find('.multiple-centre-state').val() || '');
+                    cD.push($(this).find('.multiple-centre-district').val() || '');
+                    cA.push($(this).find('.centre-address').val() || '');
+                    cP.push($(this).find('input[name^="contact_person"]').val() || '');
+                    cE.push($(this).find('input[name^="contact_email"]').val() || '');
+                    cPh.push($(this).find('input[name^="contact_phone"]').val() || '');
+                });
+                examCN.push(cN); examCC.push(cC); examCS.push(cS); examCD.push(cD);
+                examCA.push(cA); examCP.push(cP); examCE.push(cE); examCPh.push(cPh);
+            } else {
+                mDSingle.push('');
+                const arr = [];
+                $exam.find(`input[name^="multiple_exam_dates[${examId}]"]`).each(function () {
+                    arr.push($(this).val() || '');
+                });
+                mDMulti.push(arr);
+
+                // Multiple dates → nest centres per date group
+                $exam.find('.multiple-date-container .date-centre-group').each(function () {
+                    const $group = $(this);
+                    const cN = [], cC = [], cS = [], cD = [], cA = [], cP = [], cE = [], cPh = [];
+                    $group.find('.exam-centre').each(function () {
+                        cN.push($(this).find('.centre-name').val() || '');
+                        cC.push($(this).find('.centre-coordinates').val() || '');
+                        cS.push($(this).find('.multiple-centre-state').val() || '');
+                        cD.push($(this).find('.multiple-centre-district').val() || '');
+                        cA.push($(this).find('.centre-address').val() || '');
+                        cP.push($(this).find('input[name^="contact_person"]').val() || '');
+                        cE.push($(this).find('input[name^="contact_email"]').val() || '');
+                        cPh.push($(this).find('input[name^="contact_phone"]').val() || '');
+                    });
+                    examCN.push(cN); examCC.push(cC); examCS.push(cS); examCD.push(cD);
+                    examCA.push(cA); examCP.push(cP); examCE.push(cE); examCPh.push(cPh);
+                });
+            }
+
+            mCN.push(examCN); mCC.push(examCC); mCS.push(examCS); mCD.push(examCD);
+            mCA.push(examCA); mCP.push(examCP); mCE.push(examCE); mCPh.push(examCPh);
+        });
+
+        formData.append('multiple_exam_names_json', JSON.stringify(mNames));
+        formData.append('multiple_exam_date_types_json', JSON.stringify(mTypes));
+        formData.append('multiple_exam_dates_single_json', JSON.stringify(mDSingle));
+        formData.append('multiple_exam_dates_multiple_json', JSON.stringify(mDMulti));
+        formData.append('multiple_centre_names_json', JSON.stringify(mCN));
+        formData.append('multiple_centre_coordinates_json', JSON.stringify(mCC));
+        formData.append('multiple_centre_states_json', JSON.stringify(mCS));
+        formData.append('multiple_centre_districts_json', JSON.stringify(mCD));
+        formData.append('multiple_centre_addresses_json', JSON.stringify(mCA));
+        formData.append('multiple_centre_contact_persons_json', JSON.stringify(mCP));
+        formData.append('multiple_centre_contact_emails_json', JSON.stringify(mCE));
+        formData.append('multiple_centre_contact_phones_json', JSON.stringify(mCPh));
+        formData.append('multiple_centre_not_available_present', anyMultipleCentreNA ? '1' : '0');
+
+        // VENDORS
+        const vIds = [], jIds = [];
+        $('.vendor-item').each(function () {
+            vIds.push($(this).find('select[name="vendor_id[]"]').val() || '');
+            jIds.push($(this).find('select[name="jammer_model_ids[]"]').val() || '');
+        });
+        formData.append('vendor_ids_json', JSON.stringify(vIds));
+        formData.append('jammer_ids_json', JSON.stringify(jIds));
+
+        // DECLARATIONS
+        const decls = [];
+        $('input[name="declarations[]"]:checked').each(function () { decls.push($(this).val()); });
+        formData.append('declarations_json', JSON.stringify(decls));
+
+        // ORG
+        formData.append('organisation_name', $('#organisation_name').val() || '');
+        formData.append('organisation_type_name', $('#organisation_type').val() || '');
+
+        // AJAX
+        const appId = form.dataset.appId;
+        $.ajax({
+            url: BASE + '/update-request/' + appId,
+            type: 'POST',
+            data: formData,
+            contentType: false,
+            processData: false,
+            cache: false,
+            headers: { 'X-CSRF-TOKEN': getCSRFToken() },
+            success: function (response) {
+                $btn.html(originalText).prop('disabled', false);
+                if (response.success) {
+                    showToast('success', response.message || 'Application updated successfully!');
+                    setTimeout(function () {
+                        if (response.redirect_url) window.location.href = response.redirect_url;
+                    }, 1500);
+                } else {
+                    showToast('error', response.message || 'Something went wrong.');
+                }
+            },
+            error: function (xhr) {
+                $btn.html(originalText).prop('disabled', false);
+                let msg = 'An error occurred while updating.';
+                if (xhr.status === 403) {
+                    msg = 'Security token expired. Please refresh.';
+                    location.reload();
+                    return;
+                } else if (xhr.responseJSON && xhr.responseJSON.message) {
+                    msg = xhr.responseJSON.message;
+                }
+                showToast('error', msg);
+            }
+        });
+    };
+
+    // ============================================================
+    // HOOK SUBMIT BUTTON
+    // ============================================================
+    $(document).off('click', '#submitBtn').on('click', '#submitBtn', function (e) {
+        e.preventDefault();
+        if (window.IS_EDIT_MODE) {
+            window.submitEditRequest();
+        } else if (typeof window.submitRequest === 'function') {
+            window.submitRequest();
+        }
+    });
+
+    // ============================================================
+    // BOOT
+    // ============================================================
+    $(document).ready(function () {
+        setTimeout(function () {
+            if (EDIT_DATA) hydrateEditMode(EDIT_DATA);
+
+            const checked = $('input[name="declarations[]"]:checked').length;
+            const $btn = $('#submitBtn');
+            if (checked === 3) {
+                $btn.prop('disabled', false)
+                    .removeClass('opacity-50 cursor-not-allowed')
+                    .addClass('hover:opacity-90');
+            } else {
+                $btn.prop('disabled', true)
+                    .addClass('opacity-50 cursor-not-allowed')
+                    .removeClass('hover:opacity-90');
+            }
+        }, 200);
+    });
+
+})();
 </script>
 
 <?php

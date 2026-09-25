@@ -43,20 +43,19 @@ class RequestModel extends Model
                 v.application_id as id,
                 v.app_no,
                 v.organisation,
-                act.name as status_name,
+                v.current_status as status_name,
                 v.currently_with,
                 v.created_at,
                 v.centre_list_ready,
                 GROUP_CONCAT(DISTINCT d.exam_name SEPARATOR "||") as exam_names,
                 GROUP_CONCAT(d.exam_date ORDER BY d.exam_date ASC SEPARATOR "||") as exam_dates
             ')
-            ->join('mas_application_action act', 'act.id = v.current_status', 'left')
             ->join('application_date_mapping d', 'd.app_id = v.application_id', 'left')
             ->groupBy('
                 v.application_id, 
                 v.app_no, 
                 v.organisation, 
-                act.name, 
+                v.current_status, 
                 v.currently_with, 
                 v.created_at, 
                 v.centre_list_ready
