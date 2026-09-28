@@ -202,15 +202,15 @@ ob_start();
 
                                 <td class="px-5 py-4 text-left">
                                     <?php 
-                                    $statusVal = $request['status_name'] ?? '1';
+                                    $statusVal = $request['status_name'] ?? 'Pending';
 
-                                    if (in_array($statusVal, [9, 10, 11, 12, '9', '10', '11', '12', 'APPROVED', 'COMPLETED'])) {
+                                    if (in_array(strtoupper($statusVal), ['APPROVED', 'COMPLETED'])) {
                                         $statusClass = 'bg-emerald-50 text-emerald-700 border-emerald-500';
                                         $statusIcon  = 'fa-check-circle';
-                                    } elseif (in_array($statusVal, [14, '14', 'REJECTED'])) {
+                                    } elseif (in_array(strtoupper($statusVal), ['REJECTED'])) {
                                         $statusClass = 'bg-red-50 text-red-700 border-red-500';
                                         $statusIcon  = 'fa-times-circle';
-                                    } elseif (in_array($statusVal, [13, '13', 'RETURNED'])) {
+                                    } elseif (in_array(strtoupper($statusVal), ['RETURNED'])) {
                                         $statusClass = 'bg-orange-50 text-orange-700 border-orange-500';
                                         $statusIcon  = 'fa-rotate-left';
                                     } else {

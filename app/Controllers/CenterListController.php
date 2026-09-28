@@ -24,38 +24,55 @@ class CenterListController extends BaseController
      * Upload Page Load
      */
     public function index()
-    {
-        if (!session()->get('isLoggedIn')) {
-            return redirect()->to(base_url('login'));
+        {
+            if (!session()->get('isLoggedIn')) {
+                return redirect()->to(base_url('login'));
+            }
+
+            $currentUserId = (int) session()->get('user_id');
+
+            $builder = $this->db->table('application a');
+            $builder->select('
+                a.id, 
+                a.app_no, 
+                a.created_at, 
+                a.centre_list_ready,
+                MAX(u.name) as uploaded_by_name, 
+                MAX(o.org_name) as organisation,
+                MAX(
+                    CASE 
+                        WHEN latest_history.status BETWEEN 4 AND 9 THEN "Pending with cabsec" 
+                        ELSE act.name 
+                    END
+                ) as status_name,
+                GROUP_CONCAT(DISTINCT adm.exam_name SEPARATOR "||") as exam_names,
+                GROUP_CONCAT(DISTINCT adm.exam_date SEPARATOR "||") as exam_dates
+            ');
+            
+            // Latest history join logic
+            $builder->join('(
+                SELECT ah1.* 
+                FROM application_history ah1
+                INNER JOIN (
+                    SELECT app_id, MAX(id) as max_id 
+                    FROM application_history 
+                    GROUP BY app_id
+                ) ah2 ON ah1.id = ah2.max_id
+            ) latest_history', 'latest_history.app_id = a.id', 'left');
+
+            $builder->join('mas_application_action act', 'act.id = latest_history.status', 'left');
+            $builder->join('user u', 'u.id = a.user_id', 'left');
+            $builder->join('mas_organization o', 'o.id = u.organization_id', 'left');
+            $builder->join('application_date_mapping adm', 'adm.app_id = a.id', 'left');
+            $builder->where('a.user_id', $currentUserId);
+            $builder->where('a.isactive', 1);
+            $builder->groupBy('a.id');
+            $builder->orderBy('a.id', 'DESC');
+
+            $data['center_lists'] = $builder->get()->getResultArray();
+
+            return view('pages/center-list-upload', $data);
         }
-
-        $currentUserId = (int) session()->get('user_id');
-
-        $builder = $this->db->table('application a');
-        $builder->select('
-            a.id, 
-            a.app_no, 
-            a.created_at, 
-            a.centre_list_ready,
-            u.name as uploaded_by_name, 
-            o.org_name as organisation,
-            act.name as status_name,
-            GROUP_CONCAT(DISTINCT adm.exam_name SEPARATOR "||") as exam_names,
-            GROUP_CONCAT(DISTINCT adm.exam_date SEPARATOR "||") as exam_dates
-        ');
-        $builder->join('user u', 'u.id = a.user_id', 'left');
-        $builder->join('mas_organization o', 'o.id = u.organization_id', 'left');
-        $builder->join('mas_application_action act', 'act.id = a.current_status', 'left');
-        $builder->join('application_date_mapping adm', 'adm.app_id = a.id', 'left');
-        $builder->where('a.user_id', $currentUserId);
-        $builder->where('a.isactive', 1);
-        $builder->groupBy('a.id');
-        $builder->orderBy('a.id', 'DESC');
-
-        $data['center_lists'] = $builder->get()->getResultArray();
-
-        return view('pages/center-list-upload', $data);
-    }
 
     /**
      * Standard Excel Format Download

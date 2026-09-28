@@ -38,32 +38,41 @@ class RequestModel extends Model
      */
     public function getAllRequests(?int $userId = null)
     {
-        $builder = $this->db->table('vw_application_latest_status v')
+        $builder = $this->db->table('application a')
             ->select('
-                v.application_id as id,
-                v.app_no,
-                v.organisation,
-                v.current_status as status_name,
-                v.currently_with,
-                v.created_at,
-                v.centre_list_ready,
+                a.id,
+                a.app_no,
+                MAX(o.org_name) as organisation,
+                MAX(
+                    CASE 
+                        WHEN latest_history.status BETWEEN 4 AND 9 THEN "Pending with cabsec" 
+                        ELSE act.name 
+                    END
+                ) as status_name,
+                a.created_at,
+                a.centre_list_ready,
                 GROUP_CONCAT(DISTINCT d.exam_name SEPARATOR "||") as exam_names,
                 GROUP_CONCAT(d.exam_date ORDER BY d.exam_date ASC SEPARATOR "||") as exam_dates
             ')
-            ->join('application_date_mapping d', 'd.app_id = v.application_id', 'left')
-            ->groupBy('
-                v.application_id, 
-                v.app_no, 
-                v.organisation, 
-                v.current_status, 
-                v.currently_with, 
-                v.created_at, 
-                v.centre_list_ready
-            ')
-            ->orderBy('v.created_at', 'DESC');
+            ->join('(
+                SELECT ah1.* 
+                FROM application_history ah1
+                INNER JOIN (
+                    SELECT app_id, MAX(id) as max_id 
+                    FROM application_history 
+                    GROUP BY app_id
+                ) ah2 ON ah1.id = ah2.max_id
+            ) latest_history', 'latest_history.app_id = a.id', 'left')
+            ->join('mas_application_action act', 'act.id = latest_history.status', 'left')
+            ->join('user u', 'u.id = a.user_id', 'left')
+            ->join('mas_organization o', 'o.id = u.organization_id', 'left')
+            ->join('application_date_mapping d', 'd.app_id = a.id', 'left')
+            ->where('a.isactive', 1)
+            ->groupBy('a.id')
+            ->orderBy('a.id', 'DESC');
 
         if ($userId !== null) {
-            $builder->where('v.currently_with', $userId);
+            $builder->where('a.user_id', $userId);
         }
 
         return $builder->get()->getResultArray();
