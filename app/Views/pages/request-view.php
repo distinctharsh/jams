@@ -2236,6 +2236,89 @@ $csrfHash = $data['csrf_hash'] ?? csrf_hash();
                         </div>
                     </div>
                 </div>
+            <?php
+            $roleIds   = session()->get('role_ids');
+            $roleNames = '';
+            $hasRole1  = false;
+            if (! empty($roleIds)) {
+                $db  = db_connect();
+                $ids = array_filter(array_map('intval', explode(',', (string) $roleIds)));
+                if (! empty($ids)) {
+                    $hasRole1 = in_array(1, $ids, true);
+
+                    $rows = $db->table('mas_role')
+                        ->select('name')
+                        ->whereIn('id', $ids)
+                        ->get()
+                        ->getResultArray();
+
+                    $roleNames = strtolower(
+                        implode(',', array_column($rows, 'name'))
+                    );
+                }
+            }
+            $currentStatus = (int) $application->current_status;
+            ?>
+            <div class="actions-card space-y-3">
+                <?php if ($hasRole1): ?>
+                    <?php if (! in_array($currentStatus, [3, 12], true)): ?>
+                        <div class="actions-header">
+                            <div class="actions-body">
+                                <a href="<?= base_url('edit-request/' . $application->id) ?>"
+                                   class="btn btn-sm text-white font-semibold"
+                                   style="background-color: rgb(229, 133, 0); border-color: rgb(229, 133, 0);"
+                                   onmouseover="this.style.backgroundColor='#c96f00'"
+                                   onmouseout="this.style.backgroundColor='#e58500'">
+                                    <i class="fas fa-undo-alt"></i>
+                                    Return / Edit
+                                </a>
+                            </div>
+                        </div>
+                    <?php endif; ?>
+                <?php else: ?>
+                    <?php if ($currentStatus === 12): ?>
+                        <div></div>
+                    <?php elseif (in_array($currentStatus, [9, 10, 11], true)): ?>
+                        <button type="button"
+                                id="permission_downloadBtn"
+                                class="btn btn-sm btn-success d-block mx-auto permission-btn"
+                                data-app-id="<?= (int) $application->id ?>"
+                                onclick="permission_downloadApplicationPreview(this.dataset.appId)">
+                            <i class="fas fa-download"></i>
+                            PERMISSION LETTER GENERATED
+                        </button>
+                    <?php else: ?>
+                            <div class="actions-header">
+                            <div class="actions-body">
+                                <button type="button"
+                                        class="btn btn-sm btn-primary"
+                                        data-app-id="<?= (int) $application->id ?>"
+                                        data-role-ids="<?= esc($roleIds ?? '', 'attr') ?>"
+                                        data-role-names="<?= esc($roleNames, 'attr') ?>"
+                                        onclick="openForwardModal(this)">
+                                    <i class="fas fa-share"></i>
+                                    Forward
+                                </button>
+                                <a href="<?= base_url('edit-request/' . $application->id) ?>"
+                                   class="btn btn-sm text-white font-semibold"
+                                   style="background-color: rgb(229, 133, 0); border-color: rgb(229, 133, 0);"
+                                   onmouseover="this.style.backgroundColor='#c96f00'"
+                                   onmouseout="this.style.backgroundColor='#e58500'">
+                                    <i class="fas fa-undo-alt"></i>
+                                    Return / Edit
+                                </a>
+                                <button type="button"
+                                        class="btn btn-destructive"
+                                        onclick="openRejectModal()">
+                                    <i class="fas fa-times-circle"></i>
+                                    Reject
+                                </button>
+                            </div>
+                        </div>
+                    <?php endif; ?>
+                <?php endif; ?>
+            </div>
+
             </div>
 
             <!-- RIGHT COLUMN -->
@@ -2636,18 +2719,21 @@ $csrfHash = $data['csrf_hash'] ?? csrf_hash();
                     <div class="grid grid-cols-1 lg:grid-cols-2 gap-5">
 
                         <!-- CARD 1: GENERATED APPLICATION PDF -->
+                      
                         <div class="gov-card mb-5 p-5">
-                            
                             <?php if ($statusId != 15): ?>
+                                <!-- Generated Application PDF -->
                                 <div class="border border-slate-200 bg-slate-50 rounded-lg p-3 mb-3">
                                     <h3 class="text-base font-bold text-slate-800 mb-4 flex items-center gap-2">
                                         <i class="far fa-file-alt text-[#1e4d7b]"></i>
                                         Generated Application PDF
                                     </h3>
-                                    <p id="applicationNumber" class="text-xs font-bold text-slate-800">
+                                    <p id="applicationNumber"
+                                       class="text-xs font-bold text-slate-800">
                                         <?= esc($application->app_no ?? 'JPMS/2026/001057') ?>
                                     </p>
-                                    <p id="applicationOrganisation" class="text-xs text-slate-500 mt-1">
+                                    <p id="applicationOrganisation"
+                                       class="text-xs text-slate-500 mt-1">
                                         <?= esc($application->organisation ?? '—') ?>
                                     </p>
                                     <div class="mt-2">
@@ -2657,83 +2743,129 @@ $csrfHash = $data['csrf_hash'] ?? csrf_hash();
                                                          ? 'bg-green-50 text-green-700'
                                                          : 'bg-blue-50 text-[#1e4d7b]' ?>
                                                      text-[10px] font-bold">
-                                            <?= ($statusId >= 3) ? 'Signed PDF Uploaded' : 'PDF Generated' ?>
+
+                                            <?= ($statusId >= 3)
+                                                ? 'Signed PDF Uploaded'
+                                                : 'PDF Generated' ?>
                                         </span>
                                     </div>
                                 </div>
                             <?php else: ?>
+                                <!-- Saved as Draft -->
                                 <div class="border border-amber-200 bg-amber-50 rounded-lg p-3 mb-3">
                                     <h3 class="text-base font-bold text-slate-800 mb-4 flex items-center gap-2">
                                         <i class="far fa-edit text-amber-600"></i>
                                         Saved as Draft
                                     </h3>
-                                    <p id="applicationNumber" class="text-xs font-bold text-slate-800">
+                                    <p id="applicationNumber"
+                                       class="text-xs font-bold text-slate-800">
                                         <?= esc($application->app_no ?? 'JPMS/2026/001057') ?>
                                     </p>
-                                    <p id="applicationOrganisation" class="text-xs text-slate-500 mt-1">
+                                    <p id="applicationOrganisation"
+                                       class="text-xs text-slate-500 mt-1">
                                         <?= esc($application->organisation ?? '—') ?>
                                     </p>
                                     <div class="mt-2">
                                         <span id="applicationStatus"
                                               class="inline-flex items-center px-2.5 py-1 rounded-md
-                                                     bg-amber-100 text-amber-700 text-[10px] font-bold">
+                                                     bg-amber-100 text-amber-700
+                                                     text-[10px] font-bold">
+
                                             <i class="far fa-save mr-1"></i>
                                             Save as Draft
                                         </span>
                                     </div>
                                 </div>
                             <?php endif; ?>
-
                             <?php if ($statusId < 3): ?>
+                                <!-- Download PDF -->
                                 <button type="button"
                                         onclick="downloadApplicationPreview(<?= (int) $application->id ?>)"
-                                        class="w-full px-4 py-2.5 bg-[#1e4d7b] hover:bg-[#163a5d] text-white rounded-lg text-sm font-semibold transition flex items-center justify-center gap-2">
+                                        class="w-full px-4 py-2.5 bg-[#1e4d7b]
+                                               hover:bg-[#163a5d] text-white rounded-lg
+                                               text-sm font-semibold transition
+                                               flex items-center justify-center gap-2">
+
                                     <i class="fas fa-download"></i>
                                     Download PDF
                                 </button>
-
+                                <!-- Upload Signed PDF -->
                                 <button type="button"
                                         onclick="document.getElementById('signedPdfInput').click()"
-                                        class="w-full mt-2 px-4 py-2.5 bg-green-600 hover:bg-green-700 text-white rounded-lg text-sm font-semibold transition flex items-center justify-center gap-2">
+                                        class="w-full mt-2 px-4 py-2.5 bg-green-600
+                                               hover:bg-green-700 text-white rounded-lg
+                                               text-sm font-semibold transition
+                                               flex items-center justify-center gap-2">
+
                                     <i class="fas fa-pen"></i>
                                     Upload Signed PDF
                                 </button>
+                                <!-- Signed PDF Preview -->
+                                <div id="signedPdfPreview"
+                                     class="<?= ($signed_pdf) ? '' : 'hidden' ?> mt-3">
 
-                                <div id="signedPdfPreview" class="<?= ($signed_pdf) ? '' : 'hidden' ?> mt-3">
-                                    <div class="flex items-center gap-2 p-3 bg-green-50 border border-green-200 rounded-lg">
-                                        <div class="w-8 h-8 rounded-lg bg-white flex items-center justify-center shrink-0">
+                                    <div class="flex items-center gap-2 p-3
+                                                bg-green-50 border border-green-200 rounded-lg">
+                                        <!-- PDF Icon -->
+                                        <div class="w-8 h-8 rounded-lg bg-white
+                                                    flex items-center justify-center shrink-0">
+
                                             <i class="fas fa-file-pdf text-red-500"></i>
+
                                         </div>
+                                        <!-- File Information -->
                                         <div class="flex-1 min-w-0">
-                                            <p id="signedPdfFileName" class="text-xs font-semibold text-slate-700 truncate">
-                                                <?= $signed_pdf ? esc($signed_pdf->document_name) : '' ?>
+
+                                            <p id="signedPdfFileName"
+                                               class="text-xs font-semibold
+                                                      text-slate-700 truncate">
+
+                                                <?= $signed_pdf
+                                                    ? esc($signed_pdf->document_name)
+                                                    : '' ?>
+
                                             </p>
-                                            <p id="signedPdfFileSize" class="text-[10px] text-slate-500"></p>
+                                            <p id="signedPdfFileSize"
+                                               class="text-[10px] text-slate-500">
+                                            </p>
                                         </div>
+                                        <!-- Remove Button -->
                                         <button type="button"
                                                 onclick="removeSignedPdf(event)"
-                                                class="w-7 h-7 rounded-lg bg-red-50 text-red-600 hover:bg-red-100 flex items-center justify-center transition">
+                                                class="w-7 h-7 rounded-lg
+                                                       bg-red-50 text-red-600
+                                                       hover:bg-red-100
+                                                       flex items-center justify-center
+                                                       transition">
+
                                             <i class="fas fa-times text-xs"></i>
                                         </button>
                                     </div>
                                 </div>
+                                <!-- File Input - Active only before signed PDF upload -->
+                                <input type="file"
+                                       id="signedPdfInput"
+                                       name="signed_pdf"
+                                       accept=".pdf,application/pdf"
+                                       class="hidden"
+                                       onchange="handleSignedPdf(this, <?= (int) $application->id ?>)">
                             <?php else: ?>
-                                <button type="button"
-                                        onclick="document.getElementById('signedPdfInput').click()"
-                                        class="w-full mt-2 px-4 py-2.5 bg-amber-600 hover:bg-amber-700 text-white rounded-lg text-sm font-semibold transition flex items-center justify-center gap-2">
-                                    <i class="fas fa-upload"></i>
-                                    Re-Upload Signed PDF
-                                </button>
+                                <!--
+                                    Status >= 3
+                                    Signed PDF is already uploaded.
+
+                                    IMPORTANT:
+                                    No Re-Upload button.
+                                    File input is disabled.
+                                -->
+                                <input type="file"
+                                       id="signedPdfInput"
+                                       name="signed_pdf"
+                                       accept=".pdf,application/pdf"
+                                       class="hidden"
+                                       disabled>
                             <?php endif; ?>
-
-                            <input type="file"
-                                   id="signedPdfInput"
-                                   name="signed_pdf"
-                                   accept=".pdf,application/pdf"
-                                   class="hidden"
-                                   onchange="handleSignedPdf(this, <?= (int) $application->id ?>)">
                         </div>
-
                         <!-- CARD 2: PERMISSION LETTER -->
                         <?php if (in_array((int) $application->current_status, [9, 10, 11, 12])): ?>
                             <div class="gov-card p-5">
@@ -2800,90 +2932,6 @@ $csrfHash = $data['csrf_hash'] ?? csrf_hash();
                 <?php endif; ?>
             </div>
 
-
-
-            <?php
-            $roleIds   = session()->get('role_ids');
-            $roleNames = '';
-            $hasRole1  = false;
-            if (! empty($roleIds)) {
-                $db  = db_connect();
-                $ids = array_filter(array_map('intval', explode(',', (string) $roleIds)));
-                if (! empty($ids)) {
-                    $hasRole1 = in_array(1, $ids, true);
-
-                    $rows = $db->table('mas_role')
-                        ->select('name')
-                        ->whereIn('id', $ids)
-                        ->get()
-                        ->getResultArray();
-
-                    $roleNames = strtolower(
-                        implode(',', array_column($rows, 'name'))
-                    );
-                }
-            }
-            $currentStatus = (int) $application->current_status;
-            ?>
-            <div class="actions-card lg:col-span-2 space-y-3">
-                <?php if ($hasRole1): ?>
-                    <?php if (! in_array($currentStatus, [3, 12], true)): ?>
-                        <div class="actions-header">
-                            <div class="actions-body">
-                                <a href="<?= base_url('edit-request/' . $application->id) ?>"
-                                   class="btn btn-sm text-white font-semibold"
-                                   style="background-color: rgb(229, 133, 0); border-color: rgb(229, 133, 0);"
-                                   onmouseover="this.style.backgroundColor='#c96f00'"
-                                   onmouseout="this.style.backgroundColor='#e58500'">
-                                    <i class="fas fa-undo-alt"></i>
-                                    Return / Edit
-                                </a>
-                            </div>
-                        </div>
-                    <?php endif; ?>
-                <?php else: ?>
-                    <?php if ($currentStatus === 12): ?>
-                        <div></div>
-                    <?php elseif (in_array($currentStatus, [9, 10, 11], true)): ?>
-                        <button type="button"
-                                id="permission_downloadBtn"
-                                class="btn btn-sm btn-success d-block mx-auto permission-btn"
-                                data-app-id="<?= $appId ?? '' ?>"
-                                onclick="permission_downloadApplicationPreview(this.dataset.appId)">
-                            <i class="fas fa-download"></i>
-                            PERMISSION LETTER GENERATED
-                        </button>
-                    <?php else: ?>
-                            <div class="actions-header">
-                            <div class="actions-body">
-                                <button type="button"
-                                        class="btn btn-sm btn-primary"
-                                        data-app-id="<?= (int) $application->id ?>"
-                                        data-role-ids="<?= esc($roleIds ?? '', 'attr') ?>"
-                                        data-role-names="<?= esc($roleNames, 'attr') ?>"
-                                        onclick="openForwardModal(this)">
-                                    <i class="fas fa-share"></i>
-                                    Forward
-                                </button>
-                                <a href="<?= base_url('edit-request/' . $application->id) ?>"
-                                   class="btn btn-sm text-white font-semibold"
-                                   style="background-color: rgb(229, 133, 0); border-color: rgb(229, 133, 0);"
-                                   onmouseover="this.style.backgroundColor='#c96f00'"
-                                   onmouseout="this.style.backgroundColor='#e58500'">
-                                    <i class="fas fa-undo-alt"></i>
-                                    Return / Edit
-                                </a>
-                                <button type="button"
-                                        class="btn btn-destructive"
-                                        onclick="openRejectModal()">
-                                    <i class="fas fa-times-circle"></i>
-                                    Reject
-                                </button>
-                            </div>
-                        </div>
-                    <?php endif; ?>
-                <?php endif; ?>
-            </div>
           
         </div>
     </div>
