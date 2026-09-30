@@ -361,7 +361,7 @@ ob_start();
 
 </style>
 
-<div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-5">
     <div id="toast-container"
          style="
             position:fixed;
