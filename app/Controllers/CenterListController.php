@@ -31,6 +31,11 @@ class CenterListController extends BaseController
 
             $currentUserId = (int) session()->get('user_id');
 
+            $roleIds = session()->get('role_ids') ?? '';
+            $userRoles = array_map('intval', array_filter(explode(',', $roleIds)));
+            $isOnlyRoleOne = (count($userRoles) === 1 && in_array(1, $userRoles));
+            $filterUserId  = $isOnlyRoleOne ? $currentUserId : null;
+
             $builder = $this->db->table('application a');
             $builder->select('
                 a.id, 
@@ -49,7 +54,6 @@ class CenterListController extends BaseController
                 GROUP_CONCAT(DISTINCT adm.exam_date SEPARATOR "||") as exam_dates
             ');
             
-            // Latest history join logic
             $builder->join('(
                 SELECT ah1.* 
                 FROM application_history ah1
@@ -64,7 +68,13 @@ class CenterListController extends BaseController
             $builder->join('user u', 'u.id = a.user_id', 'left');
             $builder->join('mas_organization o', 'o.id = u.organization_id', 'left');
             $builder->join('application_date_mapping adm', 'adm.app_id = a.id', 'left');
-            $builder->where('a.user_id', $currentUserId);
+            
+            if ($filterUserId !== null) {
+                $builder->where('a.user_id', $filterUserId);
+            }
+
+            $builder->where('(a.centre_list_ready = 0 OR a.centre_list_ready IS NULL)');
+
             $builder->where('a.isactive', 1);
             $builder->groupBy('a.id');
             $builder->orderBy('a.id', 'DESC');

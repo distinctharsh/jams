@@ -951,13 +951,21 @@ public function toggleLockUser($id = null)
             return redirect()->to(base_url('/'));
         }
 
+        $roleIds = session()->get('role_ids') ?? '';
+        $userRoles = array_map('intval', array_filter(explode(',', $roleIds)));
+        $userId = session()->get('user_id');
+        $isOnlyRoleOne = (count($userRoles) === 1 && in_array(1, $userRoles));
+        $filterUserId  = $isOnlyRoleOne ? $userId : null;
+
         $requestModel = new \App\Models\RequestModel();
+
         $data = [
-            'requests'     => $requestModel->getAllRequests(),
-            'user_id'      => session()->get('user_id'),
+            'requests'     => $requestModel->getAllRequests($filterUserId),
+            'user_id'      => $userId,
             'username'     => session()->get('username'),
             'full_name'    => session()->get('full_name'),
             'email'        => session()->get('email'),
+            'userRoles'    => $userRoles,
         ];
 
         return view('pages/requests-content', $data);
