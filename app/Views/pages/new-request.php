@@ -393,8 +393,15 @@ ob_start();
                                 Centre Information Not Available
                             </h3>
                             <div class="mt-3 bg-slate-50 p-4 rounded-lg border border-slate-200">
-                                <p class="text-sm font-semibold text-slate-700 mb-2">The Declarations should be in Detail:</p>
-                               <div class="space-y-3 text-sm font-medium text-slate-700 leading-relaxed"> <div class="flex items-start gap-2"> <span class="font-bold text-[#1e4d7b] shrink-0">i.</span> <span><strong>Adequate arrangements should be made for safe custody of the jammers during its deployment in examination centers.</strong></span> </div> <div class="flex items-start gap-2"> <span class="font-bold text-[#1e4d7b] shrink-0">ii.</span> <span><strong>Each jammer deployed at the examination centers, as indicated in Annexures of the letter under reference, will be accounted for and any discrepancy in this regard will be reported immediately to the appropriate law enforcement agency and to the Office of Secretary (Security).</strong></span> </div> <div class="flex items-start gap-2"> <span class="font-bold text-[#1e4d7b] shrink-0">iii.</span> <span><strong>While deploying the jammers it will be ensured by <span style="color:#1e4d7b;">[Name of examination conducting body]</span> that the jammers do not interfere with existing mobile communication network outside examination center.</strong></span> </div> </div>
+                                <div class="text-sm font-medium text-slate-700 leading-relaxed text-justify">
+                                    <strong>
+                                        The approval by Cabinet Secretariat will be subject to the condition
+                                        that list of examination centres alongwith their full address and
+                                        number of jammers to be deployed in each centre will be provided to
+                                        this office by examination conducting body 7 days before actual date
+                                        of examination/deployment of jammers.
+                                    </strong>
+                                </div>
                             </div>
                             <div class="mt-4">
                                 <label class="flex items-start gap-2 cursor-pointer">
@@ -464,14 +471,20 @@ ob_start();
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
                             <label class="block text-sm font-semibold text-slate-700 mb-1.5">Name of organisation</label>
-                            <select name="organisation_name" id="organisation_name" class="organisation-select w-full" required>
+                            <select name="organisation_name"
+                                    id="organisation_name"
+                                    class="organisation-select w-full"
+                                    required>
                                 <option value=""></option>
                                 <?php if (!empty($organizations)): ?>
                                     <?php foreach ($organizations as $organisation): ?>
-                                        <option value="<?= esc($organisation['org_name']) ?>"
+                                        <option
+                                            value="<?= esc($organisation['org_name']) ?>"
                                             data-organization-id="<?= esc($organisation['id']) ?>"
                                             data-org-type="<?= esc($organisation['org_type']) ?>"
-                                            <?= ((int)$organisation['id'] === (int)$organization_id) ? 'selected' : '' ?>>
+                                            data-org-description="<?= esc($organisation['org_description'] ?? '') ?>"
+                                            <?= ((int)$organisation['id'] === (int)$organization_id) ? 'selected' : '' ?>
+                                        >
                                             <?= esc($organisation['org_name']) ?>
                                         </option>
                                     <?php endforeach; ?>
@@ -711,10 +724,17 @@ ob_start();
                             </span>
                         </label>
                         <label class="flex items-start gap-2 cursor-pointer">
-                            <input type="checkbox" name="declarations[]" value="non_interference"
-                                class="mt-1 w-4 h-4 text-[#1e4d7b] rounded border-slate-300 focus:ring-[#1e4d7b]">
+                            <input type="checkbox"
+                                   name="declarations[]"
+                                   value="non_interference"
+                                   class="mt-1 w-4 h-4 text-[#1e4d7b] rounded border-slate-300 focus:ring-[#1e4d7b]">
                             <span class="text-xs text-slate-700 font-medium leading-relaxed">
-                                <strong>iii.</strong> While deploying the jammers it will be ensured by <strong>[Name of examination conducting body]</strong> that the jammers do not interfere with existing mobile communication network outside examination center.
+                                <strong>iii.</strong>
+                                While deploying the jammers it will be ensured by
+                                <strong class="examination-conducting-body">
+                                    [Name of examination conducting body]
+                                </strong>
+                                that the jammers do not interfere with existing mobile communication network outside examination center.
                             </span>
                         </label>
                     </div>
@@ -3330,6 +3350,26 @@ $(document).ready(function () {
 })();
 </script>
 
+<script>
+$(document).ready(function () {
+    function updateExaminationConductingBody() {
+        const selectedOption = $('.organisation-select option:selected');
+        const description = selectedOption.attr('data-org-description') || '';
+        const displayText = description.trim() !== ''
+            ? description
+            : '[Name of examination conducting body]';
+
+        $('.examination-conducting-body').text(displayText);
+    }
+    // Organization change
+    $('.organisation-select').on('change', function () {
+        updateExaminationConductingBody();
+    });
+    // First page load
+    updateExaminationConductingBody();
+
+});
+</script>
 <?php
 $page_content = ob_get_clean();
 include dirname(__DIR__) . '/dashboard.php';

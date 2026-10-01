@@ -2261,7 +2261,7 @@ $csrfHash = $data['csrf_hash'] ?? csrf_hash();
             ?>
             <div class="actions-card space-y-3">
                 <?php if ($hasRole1): ?>
-                    <?php if (! in_array($currentStatus, [3, 12], true)): ?>
+                    <?php if (! in_array($currentStatus, [3,4,5,6,7,8,9,10,11,12], true)): ?>
                         <div class="actions-header">
                             <div class="actions-body">
                                 <a href="<?= base_url('edit-request/' . $application->id) ?>"
@@ -2867,72 +2867,88 @@ $csrfHash = $data['csrf_hash'] ?? csrf_hash();
                             <?php endif; ?>
                         </div>
                         <!-- CARD 2: PERMISSION LETTER -->
-                        <?php if (in_array((int) $application->current_status, [9, 10, 11, 12])): ?>
-                            <div class="gov-card p-5">
-                                <h3 class="text-base font-bold text-slate-800 mb-3 flex items-center gap-2">
-                                    <i class="far fa-file-pdf text-red-600"></i>
-                                    Permission Letter
-                                </h3>
 
-                                <?php if ((int) $application->current_status === 12): ?>
-                                    <div class="flex items-center justify-between px-4 py-3 bg-green-50 border border-green-200 rounded-xl">
-                                        <div class="flex items-center gap-3">
-                                            <div class="w-10 h-10 rounded-lg bg-white flex items-center justify-center shrink-0">
-                                                <i class="fas fa-file-pdf text-red-600 text-xl"></i>
-                                            </div>
-                                            <div>
-                                                <p class="text-sm font-bold text-slate-700">PERMISSION LETTER</p>
-                                                <p class="text-[10px] text-slate-500">Signed Permission Letter</p>
-                                            </div>
-                                        </div>
-                                        <div class="flex items-center gap-2">
-                                            <a href="<?= base_url('view-document/' . $doc['id']) ?>"
-                                               target="_blank"
-                                               title="Preview PDF"
-                                               class="w-9 h-9 flex items-center justify-center bg-[#1e4d7b] hover:bg-[#163a5d] text-white rounded-lg shadow-sm transition">
-                                                <i class="fas fa-eye text-xs"></i>
-                                            </a>
-                                            <a href="<?= base_url('download-document/' . $doc['id']) ?>"
-                                               title="Download PDF"
-                                               class="w-9 h-9 flex items-center justify-center bg-green-600 hover:bg-green-700 text-white rounded-lg shadow-sm transition">
-                                                <i class="fas fa-download text-xs"></i>
-                                            </a>
-                                        </div>
-                                    </div>
-                                <?php else: ?>
-                                    <div class="border border-slate-200 bg-slate-50 rounded-lg p-3">
-                                        <div class="flex items-center justify-between gap-3">
-                                            <div class="flex items-center gap-2">
-                                                <div class="w-9 h-9 rounded-lg bg-red-50 flex items-center justify-center">
-                                                    <i class="fas fa-file-pdf text-red-600"></i>
+                        <?php
+                        $currentStatus = (int) $application->current_status;
+                        $roleIds       = (int) session()->get('role_ids');
+                        ?>
+                        <?php if (in_array($currentStatus, [9, 10, 11, 12], true)): ?>
+                                <?php if ($currentStatus === 12): ?>
+                                    <!-- STATUS 12: Signed Permission Letter -->
+                                    <?php if (!empty($doc) && !empty($doc['id'])): ?>
+                                        <div class="gov-card p-5">
+                                        <div class="flex items-center justify-between px-4 py-3 bg-green-50 border border-green-200 rounded-xl">
+                                            <div class="flex items-center gap-3">
+                                                <div class="w-10 h-10 rounded-lg bg-white flex items-center justify-center shrink-0">
+                                                    <i class="fas fa-file-pdf text-red-600 text-xl"></i>
                                                 </div>
                                                 <div>
-                                                    <p class="text-xs font-bold text-slate-700">Permission Letter</p>
-                                                    <p class="text-[10px] text-slate-500">Upload signed PDF</p>
+                                                    <p class="text-sm font-bold text-slate-700">
+                                                        PERMISSION LETTER
+                                                    </p>
+                                                    <p class="text-[10px] text-slate-500">
+                                                        Signed Permission Letter
+                                                    </p>
                                                 </div>
                                             </div>
-                                            <button type="button"
-                                                    onclick="document.getElementById('permissionLetterInput').click()"
-                                                    class="px-3 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg text-xs font-semibold transition flex items-center gap-2">
-                                                <i class="fas fa-file-signature"></i>
-                                                <?= ((int) $application->current_status === 9) ? 'UPLOAD' : 'RE-UPLOAD' ?>
-                                            </button>
+                                            <div class="flex items-center gap-2">
+                                                <!-- Preview -->
+                                                <a href="<?= base_url('view-document/' . (int) $doc['id']) ?>"
+                                                   target="_blank"
+                                                   title="Preview PDF"
+                                                   class="w-9 h-9 flex items-center justify-center bg-[#1e4d7b] hover:bg-[#163a5d] text-white rounded-lg shadow-sm transition">
+                                                    <i class="fas fa-eye text-xs"></i>
+                                                </a>
+                                                <!-- Download -->
+                                                <a href="<?= base_url('download-document/' . (int) $doc['id']) ?>"
+                                                   title="Download PDF"
+                                                   class="w-9 h-9 flex items-center justify-center bg-green-600 hover:bg-green-700 text-white rounded-lg shadow-sm transition">
+                                                    <i class="fas fa-download text-xs"></i>
+                                                </a>
+                                            </div>
                                         </div>
-                                        <input type="file"
-                                               id="permissionLetterInput"
-                                               name="permission_letter"
-                                               accept=".pdf,application/pdf"
-                                               class="hidden"
-                                               onchange="handlePermissionLetter(this, <?= (int) $application->id ?>)">
-                                    </div>
+                                        </div>
+                                    <?php endif; ?>
+                                <?php elseif (in_array($currentStatus, [9, 10, 11], true)): ?>
+                                    <?php if ($roleIds !== 1): ?>
+                                        <div class="gov-card p-5">
+                                        <div class="border border-slate-200 bg-slate-50 rounded-lg p-3">
+                                            <div class="flex items-center justify-between gap-3">
+                                                <div class="flex items-center gap-2">
+                                                    <div class="w-9 h-9 rounded-lg bg-red-50 flex items-center justify-center">
+                                                        <i class="fas fa-file-pdf text-red-600"></i>
+                                                    </div>
+                                                    <div>
+                                                        <p class="text-xs font-bold text-slate-700">
+                                                            Permission Letter
+                                                        </p>
+                                                        <p class="text-[10px] text-slate-500">
+                                                            Upload signed PDF
+                                                        </p>
+                                                    </div>
+                                                </div>
+                                                <button type="button"
+                                                        onclick="document.getElementById('permissionLetterInput').click()"
+                                                        class="px-3 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg text-xs font-semibold transition flex items-center gap-2">
+                                                    <i class="fas fa-file-signature"></i>
+                                                    <?= ($currentStatus === 9) ? 'UPLOAD' : 'RE-UPLOAD' ?>
+                                                </button>
+                                            </div>
+                                            <input type="file"
+                                                   id="permissionLetterInput"
+                                                   name="permission_letter"
+                                                   accept=".pdf,application/pdf"
+                                                   class="hidden"
+                                                   onchange="handlePermissionLetter(this, <?= (int) $application->id ?>)">
+                                        </div>
+                                        </div>
+                                    <?php endif; ?>
                                 <?php endif; ?>
-                            </div>
                         <?php endif; ?>
                     </div>
                 <?php endif; ?>
             </div>
 
-          
         </div>
     </div>
 </div>

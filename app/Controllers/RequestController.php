@@ -46,7 +46,7 @@ class RequestController extends BaseController
         ];
 
         $data['organizations'] = $db->table('mas_organization')
-            ->select('id, org_name, org_type')
+            ->select('id, org_name, org_description, org_type')
             ->where('isactive', 1)
             ->orderBy('org_name', 'ASC')
             ->get()
