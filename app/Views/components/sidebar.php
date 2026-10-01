@@ -83,7 +83,7 @@
             };
             ?>
 
-            <a href="<?= base_url('dashboard') ?>" class="nav-item">
+            <a href="<?= base_url('dashboard') ?>" class="nav-item <?= url_is('dashboard*') ? 'active' : '' ?>">
                 <i class="fas fa-layer-group"></i> 
                 <span>Dashboard</span>
             </a>
@@ -91,14 +91,14 @@
             <hr class="dashboard-hr">
 
             <?php if ($hasRole([1])): ?>
-                <a href="<?= base_url('new-request') ?>" class="nav-item booking-btn">
+                <a href="<?= base_url('new-request') ?>" class="nav-item booking-btn <?= url_is('new-request*') ? 'active' : '' ?>">
                     <i class="fas fa-calendar-check"></i>
                     <span>New Jammer Request</span>
                 </a>
             <?php endif; ?>
 
             <?php if ($hasRole([1,2,3,4,5,6,7,9])): ?>
-                <a href="<?= base_url('requests') ?>" class="nav-item">
+                <a href="<?= base_url('requests') ?>" class="nav-item <?= (url_is('requests*') || url_is('request-view*')) ? 'active' : '' ?>">
                     <i class="fas fa-clipboard-list"></i> 
                     <span>
                         Total Request 
@@ -114,14 +114,14 @@
             <?php endif; ?>
 
             <?php if ($hasRole([1,2,3,4,5,6,7,9])): ?>
-                <a href="<?= base_url('center-lists') ?>" class="nav-item">
+                <a href="<?= base_url('center-lists') ?>" class="nav-item <?= url_is('center-lists*') ? 'active' : '' ?>">
                     <i class="fas fa-upload"></i> 
                     <span>Upload Center Lists</span>
                 </a>
             <?php endif; ?>
 
             <?php if ($hasRole([1,2,3,4,5,6,7,8,9])): ?>
-                <a href="<?= base_url('analytics') ?>" class="nav-item">
+                <a href="<?= base_url('analytics') ?>" class="nav-item <?= url_is('analytics*') ? 'active' : '' ?>">
                     <i class="fas fa-chart-simple"></i> 
                     <span>Reports</span>
                 </a>
@@ -130,19 +130,64 @@
             <?php if ($hasRole([9])): ?>
                 <div class="sidebar-category-header nav-label">System</div>
             <?php endif; ?>
-            <?php if ($hasRole([9])): ?><a href="<?= base_url('settings') ?>" class="nav-item"><i class="fas fa-sliders"></i> <span>Settings</span></a><?php endif; ?>
-            <?php if ($hasRole([9])): ?><a href="<?= base_url('audit-log') ?>" class="nav-item"><i class="fas fa-shield-halved"></i> <span>Audit Log</span></a><?php endif; ?>
-            <?php if ($hasRole([9])): ?><a href="<?= base_url('audit-trail') ?>" class="nav-item"><i class="fas fa-history"></i> <span>Audit Trail</span></a><?php endif; ?>
+            
+            <?php if ($hasRole([9])): ?>
+                <a href="<?= base_url('settings') ?>" class="nav-item <?= url_is('settings*') ? 'active' : '' ?>">
+                    <i class="fas fa-sliders"></i> <span>Settings</span>
+                </a>
+            <?php endif; ?>
+            
+            <?php if ($hasRole([9])): ?>
+                <a href="<?= base_url('audit-log') ?>" class="nav-item <?= url_is('audit-log*') ? 'active' : '' ?>">
+                    <i class="fas fa-shield-halved"></i> <span>Audit Log</span>
+                </a>
+            <?php endif; ?>
+            
+            <?php if ($hasRole([9])): ?>
+                <a href="<?= base_url('audit-trail') ?>" class="nav-item <?= url_is('audit-trail*') ? 'active' : '' ?>">
+                    <i class="fas fa-history"></i> <span>Audit Trail</span>
+                </a>
+            <?php endif; ?>
 
             <?php if ($hasRole([4,9])): ?>
                 <div class="sidebar-category-header nav-label">Admin</div>
             <?php endif; ?>
-            <?php if ($hasRole([4,7,9])): ?><a href="<?= base_url('registrations') ?>" class="nav-item"><i class="fas fa-id-card"></i> <span>Pending Registration</span></a><?php endif; ?>
-            <?php if ($hasRole([4,9])): ?><a href="<?= base_url('users') ?>" class="nav-item"><i class="fas fa-users"></i> <span>Users</span></a><?php endif; ?>
-            <?php if ($hasRole([4,9])): ?><a href="<?= base_url('organizations') ?>" class="nav-item"><i class="fa-solid fa-sitemap"></i> <span>Manage Organization</span></a><?php endif; ?>
-            <?php if ($hasRole([4,9])): ?><a href="<?= base_url('organization-types') ?>" class="nav-item"><i class="fa-solid fa-layer-group"></i> <span>Organization Types</span></a><?php endif; ?>
-            <?php if ($hasRole([4,9])): ?><a href="<?= base_url('vendors') ?>" class="nav-item"><i class="fas fa-handshake"></i> <span>Vendor</span></a><?php endif; ?>
-            <?php if ($hasRole([4,9])): ?><a href="<?= base_url('models') ?>" class="nav-item"><i class="fas fa-microchip"></i> <span>Model</span></a><?php endif; ?>
+            
+            <?php if ($hasRole([4,7,9])): ?>
+                <a href="<?= base_url('registrations') ?>" class="nav-item <?= url_is('registrations*') ? 'active' : '' ?>">
+                    <i class="fas fa-id-card"></i> <span>Pending Registration</span>
+                </a>
+            <?php endif; ?>
+            
+            <?php if ($hasRole([4,9])): ?>
+                <a href="<?= base_url('users') ?>" class="nav-item <?= url_is('users*') ? 'active' : '' ?>">
+                    <i class="fas fa-users"></i> <span>Users</span>
+                </a>
+            <?php endif; ?>
+            
+            <?php if ($hasRole([4,9])): ?>
+                <a href="<?= base_url('organizations') ?>" class="nav-item <?= url_is('organizations*') ? 'active' : '' ?>">
+                    <i class="fa-solid fa-sitemap"></i> <span>Manage Organization</span>
+                </a>
+            <?php endif; ?>
+            
+            <?php if ($hasRole([4,9])): ?>
+                <a href="<?= base_url('organization-types') ?>" class="nav-item <?= url_is('organization-types*') ? 'active' : '' ?>">
+                    <i class="fa-solid fa-layer-group"></i> <span>Organization Types</span>
+                </a>
+            <?php endif; ?>
+            
+            <?php if ($hasRole([4,9])): ?>
+                <a href="<?= base_url('vendors') ?>" class="nav-item <?= url_is('vendors*') ? 'active' : '' ?>">
+                    <i class="fas fa-handshake"></i> <span>Vendor</span>
+                </a>
+            <?php endif; ?>
+            
+            <?php if ($hasRole([4,9])): ?>
+                <a href="<?= base_url('models') ?>" class="nav-item <?= url_is('models*') ? 'active' : '' ?>">
+                    <i class="fas fa-microchip"></i> <span>Model</span>
+                </a>
+            <?php endif; ?>
         </nav>
     </div>
     </aside>
