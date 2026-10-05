@@ -339,7 +339,10 @@ $(document).ready(function() {
     });
 
     function updateCSRF(hash) {
-        if(hash) $('input[type="hidden"][name^="csrf"]').val(hash);
+        if (hash) {
+            $('#actionForm input[name="' + '<?= csrf_token() ?>' + '"]').val(hash);
+            $('input[name="' + '<?= csrf_token() ?>' + '"]').val(hash);
+        }
     }
 
     $(document).on('click', '.approve-reg-btn', function() {
@@ -476,6 +479,7 @@ $(document).ready(function() {
                     dataType: "json",
                     success: function(res) {
                         if(res.csrfHash) updateCSRF(res.csrfHash);
+
                         if(res.success) {
                             $('#actionModal').addClass('hidden');
                             
@@ -484,12 +488,12 @@ $(document).ready(function() {
                                     icon: 'success',
                                     title: 'Approved & Mail Sent!',
                                     html: `<p class="text-sm text-slate-600 mb-2">User account generated and mail notification sent successfully.</p>
-                                           <div class="bg-slate-50 p-3 rounded-lg border border-slate-200 text-left">
-                                             <div class="text-xs text-slate-500 font-semibold uppercase">User Email</div>
-                                             <div class="font-bold text-slate-800 mb-2">${res.email}</div>
-                                             <div class="text-xs text-slate-500 font-semibold uppercase">Generated Password</div>
-                                             <div class="font-mono font-bold text-green-600">${res.password}</div>
-                                           </div>`,
+                                        <div class="bg-slate-50 p-3 rounded-lg border border-slate-200 text-left">
+                                            <div class="text-xs text-slate-500 font-semibold uppercase">User Email</div>
+                                            <div class="font-bold text-slate-800 mb-2">${res.email}</div>
+                                            <div class="text-xs text-slate-500 font-semibold uppercase">Generated Password</div>
+                                            <div class="font-mono font-bold text-green-600">${res.password}</div>
+                                        </div>`,
                                     confirmButtonColor: '#16a34a'
                                 }).then(() => {
                                     location.reload();
@@ -501,12 +505,20 @@ $(document).ready(function() {
                                 location.reload();
                             }
                         } else {
-                            if(typeof showToast === "function") {
-                                showToast('error', res.message || 'Action failed');
-                            } else {
-                                Swal.fire('Error', res.message || 'Action failed', 'error');
+                            Swal.fire('Error', res.message || 'Action failed', 'error');
+                        }
+                    },
+                    error: function(xhr) {
+                        let errMsg = 'Something went wrong on the server.';
+                        if (xhr.responseJSON) {
+                            if (xhr.responseJSON.csrfHash) {
+                                updateCSRF(xhr.responseJSON.csrfHash);
+                            }
+                            if (xhr.responseJSON.message) {
+                                errMsg = xhr.responseJSON.message;
                             }
                         }
+                        Swal.fire('Error', errMsg, 'error');
                     },
                     complete: function() {
                         let defaultBtnText = (actionType == 4) ? 'Confirm Approval' : 'Confirm Rejection';

@@ -910,35 +910,64 @@ public function toggleLockUser($id = null)
 
     public function approveRegistration()
     {
-        helper('auth');
-        $regId      = $this->request->getPost('reg_id');
-        $action     = $this->request->getPost('action');
-        $remarks    = $this->request->getPost('remarks');
-        $approvedBy = session()->get('user_id') ?? 1;
-        $regModel = new \App\Models\RegistrationModel();
-        $registration = $regModel->find($regId);
-        $userEmail    = $registration['email'] ?? '';
+        try {
+            helper('auth');
+            $regId      = $this->request->getPost('reg_id');
+            $action     = $this->request->getPost('action');
+            $remarks    = $this->request->getPost('remarks');
+            $approvedBy = session()->get('user_id') ?? 1;
 
-        if ($action == 4) { 
-            $plainPassword = get_default_password(); 
-            $passwordHash  = get_default_password_hash();
-            $regModel->approveRegistrationSp($regId, $approvedBy, $action, $remarks, $passwordHash);
-            return $this->response->setJSON([
-                'success'  => true,
-                'is_approved' => true,
-                'email'       => $userEmail,
-                'password'    => $plainPassword,
-                'message'     => 'Application Approved Successfully!',
-                'csrfHash'    => csrf_hash()
-            ]);
-        } else {
-            $regModel->approveRegistrationSp($regId, $approvedBy, $action, $remarks);
+            if (empty($regId) || empty($action)) {
+                return $this->response->setJSON([
+                    'success'  => false,
+                    'message'  => 'Registration ID and Action are required.',
+                    'csrfHash' => csrf_hash()
+                ]);
+            }
 
-            return $this->response->setJSON([
-                'success'     => true,
-                'is_approved' => false,
-                'message'     => 'Application Rejected Successfully!',
-                'csrfHash'    => csrf_hash()
+            $regModel     = new \App\Models\RegistrationModel();
+            $registration = $regModel->find($regId);
+
+            if (!$registration) {
+                return $this->response->setJSON([
+                    'success'  => false,
+                    'message'  => 'Registration record not found.',
+                    'csrfHash' => csrf_hash()
+                ]);
+            }
+
+            $userEmail = $registration['email'] ?? '';
+
+            if ($action == 4) { 
+                $plainPassword = get_default_password(); 
+                $passwordHash  = get_default_password_hash();
+                $regModel->approveRegistrationSp($regId, $approvedBy, $action, $remarks, $passwordHash);
+                
+                return $this->response->setJSON([
+                    'success'     => true,
+                    'is_approved' => true,
+                    'email'       => $userEmail,
+                    'password'    => $plainPassword,
+                    'message'     => 'Application Approved Successfully!',
+                    'csrfHash'    => csrf_hash()
+                ]);
+            } else {
+                $regModel->approveRegistrationSp($regId, $approvedBy, $action, $remarks);
+
+                return $this->response->setJSON([
+                    'success'     => true,
+                    'is_approved' => false,
+                    'message'     => 'Application Rejected Successfully!',
+                    'csrfHash'    => csrf_hash()
+                ]);
+            }
+        } catch (\Throwable $e) {
+            log_message('error', 'Approve Registration Error: ' . $e->getMessage());
+
+            return $this->response->setStatusCode(500)->setJSON([
+                'success'  => false,
+                'message'  => 'Server Error: ' . $e->getMessage(),
+                'csrfHash' => csrf_hash()
             ]);
         }
     }
