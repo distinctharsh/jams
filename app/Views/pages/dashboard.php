@@ -7,6 +7,8 @@ ob_start();
     $hasRole = function (array $roles) use ($userRoles): bool {
         return !empty(array_intersect($roles, $userRoles));
     };
+    
+    $currentUserId = (int)(session()->get('user_id') ?? session()->get('id') ?? 0);
 ?>
 
 <?php if (session()->getFlashdata('success')): ?>
@@ -244,7 +246,11 @@ ob_start();
                                                 <i class="fas fa-eye"></i>
                                             </a>
 
-                                            <?php if ($hasRole([1])): ?>
+                                            <?php 
+                                            $requestOwnerId = (int)($request['created_by'] ?? $request['user_id'] ?? 0); 
+                                            ?>
+
+                                            <?php if ($hasRole([1]) && $requestOwnerId ===$currentUserId): ?>
                                                 <a href="<?= base_url('requests/edit/' . $request['id']) ?>" 
                                                 class="w-9 h-9 rounded-lg bg-yellow-50 text-yellow-700 hover:bg-yellow-100 transition inline-flex items-center justify-center" 
                                                 title="Edit">
