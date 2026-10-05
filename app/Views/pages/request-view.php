@@ -1884,7 +1884,7 @@ $csrfHash = $data['csrf_hash'] ?? csrf_hash();
                                 <div class="bg-slate-50/70 border border-slate-200 rounded-lg px-4 py-3">
                                     <label class="block text-[11px] font-medium text-slate-500 mb-1">Authorised Contact</label>
                                     <p class="text-sm font-semibold text-slate-800">
-                                        <?= esc(session()->get('name') ?? session()->get('username') ?? 'N/A') ?>
+                                        <?= esc(getMasterValue('user', $application->user_id, 'name', 'id')) ?>
                                     </p>
                                 </div>
                                 <div class="bg-slate-50/70 border border-slate-200 rounded-lg px-4 py-3">
@@ -2138,7 +2138,7 @@ $csrfHash = $data['csrf_hash'] ?? csrf_hash();
                                             <i class="fas fa-user text-[#1e4d7b] text-[10px]"></i>
                                         </div>
                                         <p class="text-sm font-semibold text-slate-800">
-                                            <?= esc(session()->get('name') ?? session()->get('username') ?? 'N/A') ?>
+                                            <?= esc(getMasterValue('user', $application->user_id, 'name', 'id')) ?>
                                         </p>
                                     </div>
                                 </div>
@@ -2149,7 +2149,7 @@ $csrfHash = $data['csrf_hash'] ?? csrf_hash();
                                             <i class="fas fa-envelope text-[#1e4d7b] text-[10px]"></i>
                                         </div>
                                         <p class="text-sm font-semibold text-slate-800 truncate">
-                                            <?= esc(session()->get('email') ?? 'N/A') ?>
+                                             <?= esc(getMasterValue('user', $application->user_id, 'email', 'id')) ?>
                                         </p>
                                     </div>
                                 </div>
@@ -2160,16 +2160,7 @@ $csrfHash = $data['csrf_hash'] ?? csrf_hash();
                                             <i class="fas fa-phone text-[#1e4d7b] text-[10px]"></i>
                                         </div>
                                         <p class="text-sm font-semibold text-slate-800">
-                                            <?php
-                                                $db = \Config\Database::connect();
-                                                $userId = session()->get('user_id') ?? session()->get('id');
-                                                $row = $db->table('user')
-                                                          ->select('mobile_no')
-                                                          ->where('id', $userId)
-                                                          ->get()
-                                                          ->getRow();
-                                                echo esc($row->mobile_no ?? 'N/A');
-                                            ?>
+                                             <?= esc(getMasterValue('user', $application->user_id, 'mobile_no', 'id')) ?>
                                         </p>
                                     </div>
                                 </div>
@@ -3117,7 +3108,13 @@ $csrfHash = $data['csrf_hash'] ?? csrf_hash();
 </div>
 
 <!-- Modal Structure -->
-
+<?php if ($message = session()->getFlashdata('error')): ?>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        showToast(<?= json_encode($message) ?>, 'Access Denied');
+    });
+</script>
+<?php endif; ?>
 
 
 <script src="<?= base_url('assets/js/tost.js') ?>"></script>

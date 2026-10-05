@@ -1603,11 +1603,6 @@ public function downloadDocument($documentId)
 public function editRequest($appId = null)
 {
     $appId = (int) $appId;
-
-    log_message('error', '=== EDIT REQUEST DEBUG START ===');
-    log_message('error', 'appId: ' . $appId);
-    log_message('error', 'userId: ' . session()->get('user_id'));
-
     if ($appId <= 0) {
         return redirect()->to(base_url('request-view'))->with('error', 'Invalid application.');
     }

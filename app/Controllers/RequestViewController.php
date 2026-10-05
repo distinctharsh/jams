@@ -140,7 +140,7 @@ class RequestViewController extends BaseController
             return redirect()->to('/dashboard')
                 ->with(
                     'error',
-                    'Application not found.'
+                    'Access Denied.'
                 );
         }
 
@@ -699,10 +699,10 @@ class RequestViewController extends BaseController
             if ($isAjax) {
                 return $this->response->setJSON([
                     'success' => false,
-                    'message' => 'Application not found'
+                    'message' => 'Access Denied'
                 ]);
             }
-            return redirect()->back()->with('error', 'Application not found');
+            return redirect()->back()->with('error', 'Access Denied');
         }
 
         $file = $this->request->getFile('signed_pdf');
@@ -884,7 +884,7 @@ class RequestViewController extends BaseController
         if (!$application) {
             return $this->response
                 ->setStatusCode(404)
-                ->setJSON(['error' => 'Application not found']);
+                ->setJSON(['error' => 'Access Denied']);
         }
 
         $examDates = $db->table('application_date_mapping')
@@ -1095,7 +1095,7 @@ class RequestViewController extends BaseController
                 ->setStatusCode(404)
                 ->setJSON([
                     'status'  => false,
-                    'message' => 'Application not found.'
+                    'message' => 'Access Denied.'
                 ]);
         }
         $examDates = $db->table('application_date_mapping')
@@ -1694,7 +1694,7 @@ class RequestViewController extends BaseController
                 ->setStatusCode(404)
                 ->setJSON([
                     'success'   => false,
-                    'message'   => 'Application not found.',
+                    'message'   => 'Access Denied.',
                     'csrf_hash' => csrf_hash(),
                 ]);
         }
@@ -1862,7 +1862,7 @@ class RequestViewController extends BaseController
                 return $this->response
                     ->setJSON([
                         'success'   => false,
-                        'message'   => 'Application not found.',
+                        'message'   => 'Access Denied.',
                         'csrf_hash' => csrf_hash(),
                     ])
                     ->setStatusCode(404);
@@ -2039,14 +2039,14 @@ class RequestViewController extends BaseController
             if ($isAjax) {
                 return $this->response->setJSON([
                     'success'   => false,
-                    'message'   => 'Application not found',
+                    'message'   => 'Access Denied',
                     'csrf_hash' => csrf_hash()
                 ]);
             }
 
             return redirect()
                 ->back()
-                ->with('error', 'Application not found');
+                ->with('error', 'Access Denied');
         }
 
         $file = $this->request->getFile('permission_letter');
