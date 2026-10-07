@@ -1633,6 +1633,12 @@ if ($authorizationStatus === 4) {
                         </div>
                     </div>
 
+                    <a href="<?= base_url('download-nodal-officer-template') ?>" 
+                        class="text-decoration-none"
+                        style="font-size: 11px; font-weight: 600; color: var(--gov-blue);">
+                            <i class="fas fa-file-word text-primary me-1"></i> Download Letter Format (.docx)
+                        </a>
+
                     <?php if (!$hasSubmitted): ?>
                     <form id="authorizationForm"
                           method="post"

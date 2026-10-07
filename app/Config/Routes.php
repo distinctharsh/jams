@@ -185,3 +185,5 @@ $routes->get('uploads/authorization/(:segment)', 'PdfController::viewPdf/$1', ['
 $routes->get('center-lists', 'CenterListController::index', ['filter' => 'role:1,2,3,4,5,6,7,9']);
 $routes->get('center-lists/download-format', 'CenterListController::downloadFormat', ['filter' => 'role:1,2,3,4,5,6,7,9']);
 $routes->post('center-lists/upload', 'CenterListController::upload', ['filter' => 'role:1,2,3,4,5,6,7,9']);
+
+$routes->get('download-nodal-officer-template', 'Auth::downloadNodalOfficerTemplate');

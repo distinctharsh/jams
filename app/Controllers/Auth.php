@@ -867,4 +867,16 @@ class Auth extends BaseController
             'message' => 'Email is available.'
         ]);
     }
+
+
+    public function downloadNodalOfficerTemplate()
+    {
+        $filePath = WRITEPATH . 'uploads/templates/nodal_officer_template.docx';
+
+        if (file_exists($filePath)) {
+            return $this->response->download($filePath, null);
+        } else {
+            throw \CodeIgniter\Exceptions\PageNotFoundException::forPageNotFound("Template file not found at: " . $filePath);
+        }
+    }
 }
