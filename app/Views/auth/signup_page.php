@@ -2507,7 +2507,27 @@ main.signup-page-main {
     padding: 8px 12px;
 }.signup-input-group select.select2-hidden-accessible {
     display: none !important;
-}</style>
+}
+
+
+.select2-container--open .select2-dropdown {
+    width: 290px !important;           
+    max-width: 85vw !important;        
+    border-radius: 6px !important;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.15) !important;
+}
+
+
+.select2-results__option {
+    padding: 8px 12px !important;
+    white-space: normal !important; 
+    word-break: break-word !important;
+    font-size: 13px !important;
+    line-height: 1.4 !important;
+}
+
+
+</style>
 <!-- Main Wrapper -->
 <main class="main signup-page-main">
     <div id="toastContainer" class="position-fixed"></div>
@@ -2612,10 +2632,15 @@ main.signup-page-main {
                                         </option>
                                         <?php if (!empty($organizations)): ?>
                                             <?php foreach ($organizations as $org): ?>
+                                                <?php 
+                                                    $displayText = !empty($org['org_description']) 
+                                                        ? esc($org['org_description']) . ' (' . esc($org['org_name']) . ')' 
+                                                        : esc($org['org_name']);
+                                                ?>
                                                 <option value="<?= esc($org['org_name']) ?>"
                                                         data-org-type="<?= esc($org['org_type']) ?>"
                                                         data-org-id="<?= esc($org['id']) ?>">
-                                                    <?= esc($org['org_name']) ?>
+                                                    <?= $displayText ?>
                                                 </option>
                                             <?php endforeach; ?>
                                         <?php endif; ?>
@@ -3850,7 +3875,7 @@ $(document).ready(function () {
         placeholder: 'Select Body Name',
         allowClear: true,
         width: '100%',
-        dropdownAutoWidth: true
+        dropdownAutoWidth: false
     });
 
 });

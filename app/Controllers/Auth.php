@@ -116,16 +116,16 @@ class Auth extends BaseController
 
             $db = \Config\Database::connect();
             $data['organizations'] = $db->table('mas_organization')
-                                        ->select('id, org_name, org_type')
+                                        ->select('id, org_name, org_type, org_description') // Added org_description here
                                         ->where('isactive', 1)
                                         ->get()
                                         ->getResultArray();
 
             $data['organization_types'] = $db->table('mas_organization_type')
-                                             ->select('id, name, is_ugc_id_required')
-                                             ->where('isactive', 1)
-                                             ->get()
-                                             ->getResultArray();
+                                            ->select('id, name, is_ugc_id_required')
+                                            ->where('isactive', 1)
+                                            ->get()
+                                            ->getResultArray();
             $data['title'] = 'Sign Up - JAMS';
             return view('auth/signup_page', $data);
         } catch (\Exception $e) {
