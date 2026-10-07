@@ -1739,7 +1739,7 @@ header + #mainContent #hero,
                                target="_blank"
                                rel="noopener noreferrer"
                                class="jammer-guidelines-link">
-                                <strong>Jammer Guidelines, 2025</strong>
+                                <strong>Jammer Guidelines of GoI, 2025</strong>
                             </a>
                             (updated as on 29.12.2025),
                             <strong>M/s Bharat Electronics Limited (BEL)</strong>
@@ -1783,7 +1783,7 @@ header + #mainContent #hero,
                                target="_blank"
                                rel="noopener noreferrer"
                                class="jammer-guidelines-link">
-                                <strong>Jammer Guidelines, 2025</strong>
+                                <strong>Jammer Guidelines of GoI, 2025</strong>
                             </a>.
                         </div>
 
